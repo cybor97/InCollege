@@ -1,0 +1,9 @@
+﻿<Application x:Class="InCollege.Server.App"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:local="clr-namespace:InCollege.Server"
+             StartupUri="MonitoringWindow.xaml">
+    <Application.Resources>
+         
+    </Application.Resources>
+</Application>

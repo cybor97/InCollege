@@ -1,0 +1,103 @@
+﻿<Window x:Class="InCollege.Client.LoginWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        WindowStyle="None"
+        ResizeMode="NoResize"
+        TextElement.Foreground="{DynamicResource MaterialDesignBody}"
+        TextElement.FontWeight="Regular"
+        TextElement.FontSize="13"
+        AllowsTransparency="True"
+        TextOptions.TextFormattingMode="Ideal" 
+        TextOptions.TextRenderingMode="Auto"        
+        Background="Transparent"
+        FontFamily="{DynamicResource MaterialDesignFont}"
+        Opacity="1"
+        Name="_this"
+        Title="Вход" Height="200" Width="200">
+    <Window.Resources>
+        <Storyboard x:Key="ClosingStoryboard">
+            <DoubleAnimation Storyboard.TargetName="_this"
+                             Storyboard.TargetProperty="Opacity"
+                             To="0"
+                             Completed="ClosingStoryboard_Completed"
+                             Duration="0:0:0.3"/>
+            <x:Code>
+                private void ClosingStoryboard_Completed(object sender, EventArgs e)
+                {
+                    Close();
+                }
+            </x:Code>
+        </Storyboard>
+    </Window.Resources>
+    <Border CornerRadius="10"
+            Background="{DynamicResource MaterialDesignPaper}"
+            MouseLeftButtonDown="BorderMD">
+        <x:Code>
+            void BorderMD(object sender, EventArgs e)
+            {
+                try { DragMove(); } catch { }
+            }
+        </x:Code>
+        <Grid Name="MainContainer">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+            <Grid Name="Header" Height="30" Margin="10 5 10 0">
+                <TextBlock Name="CloseButton" 
+                       Text="X" FontSize="20"
+                       FontFamily="Lucida Calligraphy"
+                           Foreground="#232323"
+                       MouseLeftButtonDown="CloseButtonMD"
+                       HorizontalAlignment="Right">
+                <x:Code>
+                    void CloseButtonMD(object sender, MouseButtonEventArgs e)
+                    {
+                        ((Storyboard)Resources["ClosingStoryboard"]).Begin();
+                    }
+                </x:Code>
+                    <TextBlock.Triggers>
+                        <EventTrigger RoutedEvent="MouseEnter">
+                            <BeginStoryboard>
+                                <Storyboard>
+                                    <ColorAnimation Storyboard.TargetName="CloseButton"
+                                                    Storyboard.TargetProperty="(TextBlock.Foreground).(SolidColorBrush.Color)"
+                                                    From="#232323"
+                                                    Duration="0:0:0.3"
+                                                    To="Red"/>
+                                </Storyboard>
+                            </BeginStoryboard>
+                        </EventTrigger>
+                        <EventTrigger RoutedEvent="MouseLeave">
+                            <BeginStoryboard>
+                                <Storyboard>
+                                    <ColorAnimation Storyboard.TargetName="CloseButton"
+                                                    Storyboard.TargetProperty="(TextBlock.Foreground).(SolidColorBrush.Color)"
+                                                    To="#232323"
+                                                    Duration="0:0:0.3"
+                                                    From="Red"/>
+                                </Storyboard>
+                            </BeginStoryboard>
+                        </EventTrigger>
+                    </TextBlock.Triggers>
+                </TextBlock>
+            </Grid>
+            <Grid Margin="10" Grid.Row="1">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+                <TextBlock Text="Имя пользователя" Grid.Row="0"/>
+                <TextBox x:Name="LoginTB" Margin="0 0 0 10" Grid.Row="1"/>
+                <TextBlock Text="Пароль" Grid.Row="2"/>
+                <PasswordBox x:Name="PasswordTB" Grid.Row="3"/>
+                <Button HorizontalAlignment="Center" Content="Войти" Name="LoginButton"
+                Grid.Row="5" Background="White"/>
+            </Grid>
+        </Grid>
+    </Border>
+</Window>
