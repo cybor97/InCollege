@@ -2,7 +2,7 @@
 
 namespace InCollege.Core.Data.Base
 {
-    abstract class DBRecord
+    public abstract class DBRecord
     {
         public int ID { get; set; }
 

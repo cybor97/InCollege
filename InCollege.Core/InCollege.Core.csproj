@@ -46,13 +46,15 @@
   <ItemGroup>
     <Compile Include="Data\Account.cs" />
     <Compile Include="Data\AttestationType.cs" />
+    <Compile Include="Data\Base\AccountData.cs" />
     <Compile Include="Data\Base\DBHolder.cs" />
     <Compile Include="Data\Base\DBRecord.cs" />
+    <Compile Include="Data\Base\Enums.cs" />
     <Compile Include="Data\CommissionMember.cs" />
-    <Compile Include="Data\CommissionRole.cs" />
     <Compile Include="Data\Configuration.cs" />
     <Compile Include="Data\DayRecord.cs" />
     <Compile Include="Data\Department.cs" />
+    <Compile Include="Data\DepartmentHead.cs" />
     <Compile Include="Data\ExamStatementResult.cs" />
     <Compile Include="Data\Group.cs" />
     <Compile Include="Data\Log.cs" />
@@ -61,10 +63,8 @@
     <Compile Include="Data\Professor.cs" />
     <Compile Include="Data\Specialty.cs" />
     <Compile Include="Data\Statement.cs" />
-    <Compile Include="Data\StatementAttestationType.cs" />
     <Compile Include="Data\Student.cs" />
     <Compile Include="Data\Subject.cs" />
-    <Compile Include="Data\DayRecordType.cs" />
     <Compile Include="Network\Client.cs" />
     <Compile Include="Network\Response.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

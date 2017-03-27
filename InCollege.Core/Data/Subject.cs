@@ -1,6 +1,10 @@
-﻿namespace InCollege.Core.Data
+﻿using InCollege.Core.Data.Base;
+
+namespace InCollege.Core.Data
 {
-    class Subject
+    public class Subject : DBRecord
     {
+        public string SubjectName { get; set; }
+        public string SubjectIndex { get; set; }
     }
 }
