@@ -139,6 +139,11 @@
   <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <ProjectReference Include="..\InCollege.Core\InCollege.Core.csproj">
+      <Project>{b4275e83-12d6-4856-b9d7-6965d4098cfe}</Project>
+      <Name>InCollege.Core</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
