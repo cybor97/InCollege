@@ -1,10 +1,14 @@
 ﻿using Newtonsoft.Json;
+using SQLite;
 
 namespace InCollege.Core.Data.Base
 {
     public abstract class DBRecord
     {
-        public int ID { get; set; }
+        [PrimaryKey]
+        public int ID { get; set; } = -1;
+        [NotNull]
+        public bool IsLocal { get; set; } = true;
 
         public string Serialize()
         {

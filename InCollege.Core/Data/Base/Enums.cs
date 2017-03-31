@@ -16,14 +16,9 @@
         Admin
     }
 
-    public enum DayRecordType:byte
+    public enum TechnicalMarkValue : byte
     {
-        AbsentRespectfulReason,
         Absent,
-        Warning,
-        Mark,
-        MarkSeminar,
-        MarkLabWork,
-        MarkPracticalWork
+
     }
 }
