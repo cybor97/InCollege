@@ -2,7 +2,7 @@
 
 namespace InCollege.Core.Data
 {
-    class AttestationType:DBRecord
+    public class AttestationType:DBRecord
     {
         public string TypeName { get; set; }
     }

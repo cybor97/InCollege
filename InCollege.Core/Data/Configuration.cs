@@ -1,5 +1,5 @@
 ﻿using InCollege.Core.Data.Base;
-using System.ComponentModel.DataAnnotations.Schema;
+using SQLite;
 
 namespace InCollege.Core.Data
 {

@@ -1,15 +1,12 @@
 ﻿using InCollege.Core.Data.Base;
 using System;
-using System.ComponentModel.DataAnnotations.Schema;
 
 namespace InCollege.Core.Data
 {
     public class Message : DBRecord
     {
-        [Column("FromID")]
-        public virtual Account From { get; set; }
-        [Column("ToID")]
-        public virtual Account To { get; set; }
+        public int FromID { get; set; }
+        public int ToID { get; set; }
         public string MessageText { get; set; }
         /// <summary>
         /// JSON-encoded representation.
