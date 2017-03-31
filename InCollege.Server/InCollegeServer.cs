@@ -1,9 +1,6 @@
-﻿using InCollege.Core.Data.Base;
-using System;
+﻿using System;
 using System.Net;
 using System.Net.Sockets;
-using System.Security.Cryptography.X509Certificates;
-using System.Threading.Tasks;
 using uhttpsharp;
 using uhttpsharp.Handlers;
 using uhttpsharp.Listeners;
