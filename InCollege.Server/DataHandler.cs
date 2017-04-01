@@ -24,27 +24,19 @@ namespace InCollege.Server
         static Dictionary<string, Func<IHttpHeaders, string>> Actions = new Dictionary<string, Func<IHttpHeaders, string>>()
         {
             { "GetRange", GetRangeProcessor },
-            { "GetByID", GetByIDProcessor }
         };
 
         static string GetRangeProcessor(IHttpHeaders query)
         {
             int skip = query.TryGetByName("skipRecords", out int skipResult) ? skipResult : 0;
             int count = query.TryGetByName("countRecords", out int countResult) ? countResult : -1;
+            string column = query.TryGetByName("column", out string columnResult) ? columnResult : null;
             List<Tuple<string, object>> whereParams = new List<Tuple<string, object>>();
             foreach (var current in query)
                 if (current.Key.StartsWith("where"))
                     whereParams.Add(new Tuple<string, object>(current.Key.Split(new[] { "where" }, StringSplitOptions.RemoveEmptyEntries)[0], current.Value));
             return query.TryGetByName("table", out string table) ?
-                JsonConvert.SerializeObject(DBHolderSQL.GetRange(table, skip, count, whereParams.ToArray()), Formatting.Indented) :
-                null;
-        }
-
-        static string GetByIDProcessor(IHttpHeaders query)
-        {
-            int id = query.TryGetByName("id", out int idResult) ? idResult : -1;
-            return query.TryGetByName("table", out string table) ?
-                JsonConvert.SerializeObject(DBHolderSQL.GetByID(table, id), Formatting.Indented) :
+                JsonConvert.SerializeObject(DBHolderSQL.GetRange(table, column, skip, count, whereParams.ToArray()), Formatting.Indented) :
                 null;
         }
     }
