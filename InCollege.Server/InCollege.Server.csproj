@@ -38,6 +38,9 @@
   <PropertyGroup>
     <StartupObject>InCollege.Server.Program</StartupObject>
   </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationIcon>server1600.png.ico</ApplicationIcon>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="Newtonsoft.Json, Version=10.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>..\packages\Newtonsoft.Json.10.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
@@ -45,6 +48,7 @@
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Data" />
+    <Reference Include="System.Drawing" />
     <Reference Include="System.Xml" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Core" />
@@ -62,12 +66,12 @@
     <Reference Include="PresentationFramework" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AuthorizationHandler.cs" />
+    <Compile Include="FaviconHandler.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="DataHandler.cs" />
     <Compile Include="HomeHandler.cs" />
     <Compile Include="InCollegeServer.cs" />
-    <Compile Include="SignInHandler.cs" />
-    <Compile Include="SignUpHandler.cs" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs">
@@ -103,6 +107,9 @@
       <Project>{b4275e83-12d6-4856-b9d7-6965d4098cfe}</Project>
       <Name>InCollege.Core</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="server1600.png.ico" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
