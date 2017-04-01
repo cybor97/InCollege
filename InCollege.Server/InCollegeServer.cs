@@ -25,9 +25,9 @@ namespace InCollege.Server
 
                 Server.Use(new HttpRouter()
                 .With(String.Empty, new HomeHandler())
-                .With("SignIn", new SignInHandler())
-                .With("SignUp", new SignUpHandler())
-                .With("Data", new DataHandler()));
+                .With("Auth", new AuthorizationHandler())
+                .With("Data", new DataHandler())
+                .With("favicon.ico", new FaviconHandler()));
 
                 Server.Start();
             }
