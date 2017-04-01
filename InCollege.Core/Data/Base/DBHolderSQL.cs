@@ -27,12 +27,14 @@ namespace InCollege.Core.Data.Base
                 Adapters.Add(current[2].ToString(), new SQLiteDataAdapter("SELECT * FROM {0} LIMIT {1}, {2}", DataConnection));
         }
 
-        public static DataSet GetRange(string table, int skip, int count, params Tuple<string, object>[] whereParams)
+        public static DataSet GetRange(string table, string column, int skip, int count, params Tuple<string, object>[] whereParams)
         {
             if (count == -1)
                 count = DBHolderORM.DEFAULT_LIMIT;
             if (table == null)
                 table = "master_table";
+            if (string.IsNullOrWhiteSpace(column))
+                column = "*";
             DataSet result = new DataSet(table);
             string whereString = null;
             if (whereParams != null)
@@ -40,21 +42,17 @@ namespace InCollege.Core.Data.Base
                 whereString = "";
                 for (int i = 0; i < whereParams.Length; i++)
                 {
-                    whereString += string.Format(whereParams[i].Item2 is string?"instr({0}, '{1}') > 0":"{0} LIKE {1}", whereParams[i].Item1, whereParams[i].Item2);
+                    whereString += string.Format(whereParams[i].Item2 is string ? "instr({0}, '{1}') > 0" : "{0} LIKE {1}", whereParams[i].Item1, whereParams[i].Item2);
                     if (i < whereParams.Length - 1)
                         whereString += " AND ";
                 }
             }
-            string debug = string.Format("SELECT * FROM {0} " +
-                (string.IsNullOrWhiteSpace(whereString) ? "" : "WHERE {3} ") +
-                                        "LIMIT {1}, {2} ",
-                                        table, skip, count, whereString);
             Adapters[table].SelectCommand =
                 new SQLiteCommand(
-                    string.Format("SELECT * FROM {0} " +
-                                  (string.IsNullOrWhiteSpace(whereString) ? "" : "WHERE {3} ") +
-                                  "LIMIT {1}, {2} ",
-                                  table, skip, count, whereString),
+                    string.Format("SELECT {0} FROM {1} " +
+                                  (string.IsNullOrWhiteSpace(whereString) ? "" : "WHERE {4} ") +
+                                  "LIMIT {2}, {3} ",
+                                  column, table, skip, count, whereString),
                     DataConnection);
             Adapters[table].Fill(result);
             return result;
@@ -85,6 +83,7 @@ namespace InCollege.Core.Data.Base
                 row = data.Rows.Find(id);
             else
                 row = data.NewRow();
+
             foreach (var current in columns)
                 if ((current.Item1 != "ID" || isLocal) && current.Item1 != "IsLocal")
                     row[current.Item1] = current.Item2;
