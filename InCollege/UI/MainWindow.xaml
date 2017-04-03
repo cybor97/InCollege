@@ -18,6 +18,33 @@
                 <MenuItem Header="Импорт"/>
                 <MenuItem Header="Выход" Command="{StaticResource WindowCloseCommand}"/>
             </MenuItem>
+            <MenuItem Header="Вывод">
+                <MenuItem Header="Подробнее"/>
+                <MenuItem Header="Создать сводную ведомость"/>
+                <MenuItem Header="Печать"/>
+            </MenuItem>
+
+            <MenuItem Header="Словари">
+                <MenuItem Header="Виды аттестации"/>
+                <MenuItem Header="Должность в коммиссии"/>
+            </MenuItem>
+            <MenuItem Header="Учетные записи">
+                <MenuItem Header="Студенты"/>
+                <MenuItem Header="Заведующие отделениями"/>
+                <MenuItem Header="Преподаватели"/>
+                <MenuItem Header="Прочие"/>
+            </MenuItem>
+            <MenuItem Header="Сеть">
+                <MenuItem Header="Синхронизировать"/>
+                <MenuItem Header="Аккаунт"/>
+                <MenuItem Header="Настройки"/>
+            </MenuItem>
+            
+            <MenuItem Header="Помощь">
+                <MenuItem Header="Справка"/>
+                <MenuItem Header="О программе"/>
+            </MenuItem>
+
         </Menu>
         <ListView Grid.Row="1">
             <ListView.View>
@@ -30,5 +57,7 @@
                 </GridView>
             </ListView.View>
         </ListView>
+        <Button Grid.Row="1" FontWeight="Bold" Style="{StaticResource MaterialDesignFloatingActionMiniAccentButton}" Content="+" 
+                HorizontalAlignment="Right" VerticalAlignment="Bottom"/>
     </Grid>
 </Window>
