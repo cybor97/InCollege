@@ -82,7 +82,12 @@ namespace InCollege.Core.Data.Base
 
                 row = data.Rows.Find(id);
             else
+            {
                 row = data.NewRow();
+                row["ID"] = GetFreeID(table);
+            }
+
+            row["IsLocal"] = false;
 
             foreach (var current in columns)
                 if ((current.Item1 != "ID" || isLocal) && current.Item1 != "IsLocal")
@@ -105,7 +110,7 @@ namespace InCollege.Core.Data.Base
             int result = 0;
             foreach (DataRow current in data.Rows)
                 if ((int)current["ID"] > result) result = (int)current["ID"];
-            return result;
+            return result + 1;
         }
     }
 }
