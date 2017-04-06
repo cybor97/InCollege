@@ -11,7 +11,7 @@ namespace InCollege.Client
 
         private void LoginButton_Click(object sender, RoutedEventArgs e)
         {
-            this.DialogResult = true;
+            DialogResult = true;
         }
     }
 }
