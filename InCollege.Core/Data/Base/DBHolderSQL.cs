@@ -67,6 +67,11 @@ namespace InCollege.Core.Data.Base
             return result.Rows.Count > 0 ? result.Rows[0] : null;
         }
 
+        public static int Save(string table, params (string, object)[] columns)
+        {
+            return Save(table, columns);
+        }
+
         public static int Save(string table, params Tuple<string, object>[] columns)
         {
             var adapter = Adapters[table];
@@ -85,7 +90,7 @@ namespace InCollege.Core.Data.Base
             else
             {
                 row = data.NewRow();
-                row["ID"] = GetFreeID(table);
+                row["ID"] = id = GetFreeID(table);
             }
 
             row["IsLocal"] = false;
@@ -96,7 +101,7 @@ namespace InCollege.Core.Data.Base
                     row[current.Item1] = current.Item2;
             adapter.InsertCommand = new SQLiteCommandBuilder(adapter).GetInsertCommand(true);
             adapter.UpdateCommand = new SQLiteCommandBuilder(adapter).GetUpdateCommand(true);
-            return adapter.Update(data);
+            return id;
         }
 
         public static int Remove(string table, int id)
