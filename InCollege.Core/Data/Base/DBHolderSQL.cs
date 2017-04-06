@@ -27,7 +27,7 @@ namespace InCollege.Core.Data.Base
                 Adapters.Add(current[2].ToString(), new SQLiteDataAdapter("SELECT * FROM {0} LIMIT {1}, {2}", DataConnection));
         }
 
-        public static DataSet GetRange(string table, string column, int skip, int count, params Tuple<string, object>[] whereParams)
+        public static DataTable GetRange(string table, string column, int skip, int count, bool fixedString, params Tuple<string, object>[] whereParams)
         {
             if (count == -1)
                 count = DBHolderORM.DEFAULT_LIMIT;
@@ -35,14 +35,15 @@ namespace InCollege.Core.Data.Base
                 table = "master_table";
             if (string.IsNullOrWhiteSpace(column))
                 column = "*";
-            DataSet result = new DataSet(table);
+            DataTable result = new DataTable(table);
             string whereString = null;
             if (whereParams != null)
             {
                 whereString = "";
                 for (int i = 0; i < whereParams.Length; i++)
                 {
-                    whereString += string.Format(whereParams[i].Item2 is string ? "instr({0}, '{1}') > 0" : "{0} LIKE {1}", whereParams[i].Item1, whereParams[i].Item2);
+                    whereString += string.Format(whereParams[i].Item2 is string ? fixedString ? "{0} LIKE '{1}'" : "instr({0}, '{1}') > 0" :
+                        "{0} LIKE {1}", whereParams[i].Item1, whereParams[i].Item2);
                     if (i < whereParams.Length - 1)
                         whereString += " AND ";
                 }
@@ -88,6 +89,7 @@ namespace InCollege.Core.Data.Base
             }
 
             row["IsLocal"] = false;
+            row["Modified"] = false;
 
             foreach (var current in columns)
                 if ((current.Item1 != "ID" || isLocal) && current.Item1 != "IsLocal")

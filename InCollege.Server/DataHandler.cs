@@ -31,12 +31,13 @@ namespace InCollege.Server
             int skip = query.TryGetByName("skipRecords", out int skipResult) ? skipResult : 0;
             int count = query.TryGetByName("countRecords", out int countResult) ? countResult : -1;
             string column = query.TryGetByName("column", out string columnResult) ? columnResult : null;
+            bool fixedString = query.TryGetByName("fixedString", out bool fixedStringResult) && fixedStringResult;
             List<Tuple<string, object>> whereParams = new List<Tuple<string, object>>();
             foreach (var current in query)
                 if (current.Key.StartsWith("where"))
                     whereParams.Add(new Tuple<string, object>(current.Key.Split(new[] { "where" }, StringSplitOptions.RemoveEmptyEntries)[0], current.Value));
             return query.TryGetByName("table", out string table) ?
-                JsonConvert.SerializeObject(DBHolderSQL.GetRange(table, column, skip, count, whereParams.ToArray()), Formatting.Indented) :
+                JsonConvert.SerializeObject(DBHolderSQL.GetRange(table, column, skip, count, fixedString, whereParams.ToArray()), Formatting.Indented) :
                 null;
         }
     }

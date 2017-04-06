@@ -9,6 +9,8 @@ namespace InCollege.Core.Data.Base
         public int ID { get; set; } = -1;
         [NotNull]
         public bool IsLocal { get; set; } = true;
+        [NotNull]
+        public bool Modified { get; set; } = true;
 
         public string Serialize()
         {
