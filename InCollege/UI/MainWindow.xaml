@@ -7,12 +7,8 @@
     <Window.Resources>
         <sw:WindowCloseCommand x:Key="WindowCloseCommand"/>
     </Window.Resources>
-    <Grid>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="*"/>
-        </Grid.RowDefinitions>
-        <Menu Name="MainMenu" Grid.Row="0">
+    <Window.ContextMenu>
+        <ContextMenu Name="MainMenu" Grid.Row="0">
             <MenuItem Header="Файл">
                 <MenuItem Header="Экспорт"/>
                 <MenuItem Header="Импорт"/>
@@ -39,13 +35,20 @@
                 <MenuItem Header="Аккаунт"/>
                 <MenuItem Header="Настройки"/>
             </MenuItem>
-            
+
             <MenuItem Header="Помощь">
                 <MenuItem Header="Справка"/>
                 <MenuItem Header="О программе"/>
             </MenuItem>
 
-        </Menu>
+        </ContextMenu>
+    </Window.ContextMenu>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
         <ListView Grid.Row="1">
             <ListView.View>
                 <GridView>
@@ -57,7 +60,9 @@
                 </GridView>
             </ListView.View>
         </ListView>
-        <Button Grid.Row="1" FontWeight="Bold" Style="{StaticResource MaterialDesignFloatingActionMiniAccentButton}" Content="+" 
+        <Button Grid.Row="1" 
+                Foreground="WhiteSmoke" FontSize="30" FontStretch="Medium" 
+                Style="{StaticResource MaterialDesignFloatingActionMiniAccentButton}" Content="+" 
                 HorizontalAlignment="Right" VerticalAlignment="Bottom"/>
     </Grid>
 </Window>
