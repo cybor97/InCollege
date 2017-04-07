@@ -1,5 +1,6 @@
 ﻿using InCollege.Core.Data;
 using InCollege.Core.Data.Base;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
@@ -14,7 +15,7 @@ namespace InCollege.Server
 {
     class AuthorizationHandler : IHttpRequestHandler
     {
-        const string EncryptionKey = "Devil's deal. Joke for hebrew. Gruesome fate for devil.";
+        const string EncryptionKey = "Devil's deal. Joke for hebrew. Gruesome fate for devil. Conclusion? Don't make deals with hebrews!";
 
         public Task Handle(IHttpContext context, Func<Task> next)
         {
@@ -39,13 +40,11 @@ namespace InCollege.Server
                 query.TryGetByName("Password", out string password))
             {
                 var rows = DBHolderSQL.GetRange("Account", null, 0, 1, true,
-                    new Tuple<string, object>("UserName", userName),
-                    new Tuple<string, object>("Password", password)).Rows;
+                    ("UserName", userName),
+                    ("Password", password)).Rows;
 
                 if (rows.Count == 1)
-                {
-                    return new HttpResponse(HttpResponseCode.Ok, CreateToken((int)rows[0]["ID"], userName, password), false);
-                }
+                    return new HttpResponse(HttpResponseCode.Ok, CreateToken(int.Parse(rows[0]["ID"].ToString()), userName, password), false);
                 else if (rows.Count > 1)
                     return new HttpResponse(HttpResponseCode.InternalServerError, "Ошибка! Найдено более 1 аккаунта. Обратитесь к администратору.", false);
                 else
@@ -58,21 +57,25 @@ namespace InCollege.Server
         {
             if (query.TryGetByName("UserName", out string userName) &&
                 query.TryGetByName("Password", out string password) &&
-                query.TryGetByName("AccountType", out AccountType accountType) &&
+                query.TryGetByName("AccountType", out byte accountType) &&
                 query.TryGetByName("BirthDate", out DateTime birthDate) &&
-                query.TryGetByName("ProfileImage", out string profileImage) &&
                 query.TryGetByName("FullName", out string fullName))
             {
                 switch (Account.Validate(userName, password, birthDate, fullName))
                 {
                     case AccountValidationResult.OK:
+                        query.TryGetByName("ProfileImage", out byte[] profileImage);
                         return new HttpResponse(HttpResponseCode.Ok, CreateToken(DBHolderSQL.Save("Account",
                             ("UserName", userName),
                             ("Password", password),
                             ("AccountType", accountType),
                             ("BirthDate", birthDate),
                             ("ProfileImage", profileImage),
-                            ("FullName", fullName)),
+                            ("FullName", fullName),
+
+                            ("IsLocal", true),
+                            ("ID", -1)
+                            ),
                             userName, password), false);
                     case AccountValidationResult.UserNameEmpty:
                         return new HttpResponse(HttpResponseCode.BadRequest, "Имя пользователя не может быть пустым.", false);
@@ -97,7 +100,10 @@ namespace InCollege.Server
         {
             var handler = new JwtSecurityTokenHandler();
 
-            return Convert.ToBase64String(Encoding.UTF8.GetBytes(PackData(Encrypt(handler.WriteToken(handler
+            return //Convert.ToBase64String(Encoding.UTF8.GetBytes(
+                   //PackData(
+                   //Encrypt(
+                    handler.WriteToken(handler
                         .CreateJwtSecurityToken(
                         issuer: "InCollege_Auth",
                         audience: "InCollege_Auth",
@@ -111,15 +117,34 @@ namespace InCollege.Server
                         expires: DateTime.Now.AddMonths(1),
                         signingCredentials: new Microsoft.IdentityModel.Tokens.SigningCredentials(
                             new Microsoft.IdentityModel.Tokens.SymmetricSecurityKey(Encoding.UTF8.GetBytes(EncryptionKey)),
-                            Microsoft.IdentityModel.Tokens.SecurityAlgorithms.HmacSha256))), GetKey(EncryptionKey)))));
+                            Microsoft.IdentityModel.Tokens.SecurityAlgorithms.HmacSha256)));
+            //, GetKey(EncryptionKey)))));
+        }
+
+        public static (bool valid, Account account) VerifyToken(string tokenString)
+        {
+            var data = GetToken(tokenString);
+            var rows = DBHolderSQL.GetRange("Account", null, 0, 1, true,
+                ("ID", data.id),
+                ("UserName", data.userName),
+                ("Password", data.password)).Rows;
+
+            if (rows.Count == 1)
+                return (true, DBRecord.DeSerialize<Account>(JsonConvert.SerializeObject(rows[0])));
+            else if (rows.Count > 1)
+                return (false, null);
+            else
+                return (false, null);
         }
 
         public static (int id, string userName, string password) GetToken(string tokenString)
         {
             JwtSecurityToken token = new JwtSecurityTokenHandler().ReadJwtToken(
-                Decrypt(
-                    GetData(
-                        Encoding.UTF8.GetString(Convert.FromBase64String(tokenString))), GetKey(EncryptionKey)));
+                        //Decrypt(
+                        // GetData(
+                        //Encoding.UTF8.GetString(
+                        //Convert.FromBase64String(
+                        tokenString);//, GetKey(EncryptionKey)));
 
             int id = -1;
             string userName = null, password = null;
