@@ -25,7 +25,7 @@ namespace InCollege.Core.Data
         public virtual int AccountDataID { get; set; }
         public string UserName { get; set; }
         public string Password { get; set; }
-        public AccountType AccountType { get; set; }
+        public int AccountType { get; set; }
         public virtual DateTime BirthDate { get; set; }
         public virtual byte[] ProfileImage { get; set; }
         public string FullName { get; set; }
@@ -42,7 +42,7 @@ namespace InCollege.Core.Data
                 password.Length < 5 ? AccountValidationResult.PasswordTooShort :
                 birthDate == null ? AccountValidationResult.BirthDateUndefined :
                 age.Equals(TimeSpan.Zero) ? AccountValidationResult.BirthDateAfterNow :
-                (decimal)age.TotalDays * DaysInAYear > MaxAge ? AccountValidationResult.AgeTooBig :
+                (decimal)age.TotalDays / DaysInAYear > MaxAge ? AccountValidationResult.AgeTooBig :
                 AccountValidationResult.OK;
         }
 
