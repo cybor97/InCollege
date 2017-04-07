@@ -27,7 +27,7 @@ namespace InCollege.Core.Data.Base
                 Adapters.Add(current[2].ToString(), new SQLiteDataAdapter("SELECT * FROM {0} LIMIT {1}, {2}", DataConnection));
         }
 
-        public static DataTable GetRange(string table, string column, int skip, int count, bool fixedString, params Tuple<string, object>[] whereParams)
+        public static DataTable GetRange(string table, string column, int skip, int count, bool fixedString, params (string, object)[] whereParams)
         {
             if (count == -1)
                 count = DBHolderORM.DEFAULT_LIMIT;
@@ -69,24 +69,24 @@ namespace InCollege.Core.Data.Base
 
         public static int Save(string table, params (string, object)[] columns)
         {
-            return Save(table, columns);
-        }
-
-        public static int Save(string table, params Tuple<string, object>[] columns)
-        {
             var adapter = Adapters[table];
+            adapter.SelectCommand = new SQLiteCommand(string.Format("SELECT * FROM {0}", table), DataConnection);
             var data = new DataTable(table);
-            data.PrimaryKey = new[] { data.Columns["ID"] };
             adapter.Fill(data);
+            data.PrimaryKey = new[] { data.Columns["ID"] };
+
 
             DataRow row;
             int id;
-            bool isLocal;
-            if (!(isLocal = (bool)columns.First(c => c.Item1.Equals("IsLocal")).Item2) &&
-                (id = (int)columns.First(c => c.Item1.Equals("ID")).Item2) > 0 &&
+            bool isLocal = true, addMode = true;
+            if (columns.Any(c => c.Item1.Equals("IsLocal")) &&
+                !(isLocal = bool.Parse(columns.First(c => c.Item1.Equals("IsLocal")).Item2.ToString())) &&
+                (id = int.Parse(columns.First(c => c.Item1.Equals("ID")).Item2.ToString())) > 0 &&
                 data.Rows.Contains(id))
-
+            {
                 row = data.Rows.Find(id);
+                addMode = false;
+            }
             else
             {
                 row = data.NewRow();
@@ -99,14 +99,23 @@ namespace InCollege.Core.Data.Base
             foreach (var current in columns)
                 if ((current.Item1 != "ID" || isLocal) && current.Item1 != "IsLocal")
                     row[current.Item1] = current.Item2;
+
+            Adapters[table].SelectCommand = new SQLiteCommand(string.Format("SELECT * FROM {0}", table), DataConnection);
+
+            if (addMode)
+                data.Rows.Add(row);
+
             adapter.InsertCommand = new SQLiteCommandBuilder(adapter).GetInsertCommand(true);
             adapter.UpdateCommand = new SQLiteCommandBuilder(adapter).GetUpdateCommand(true);
+
+            adapter.Update(data);
+
             return id;
         }
 
         public static int Remove(string table, int id)
         {
-            return new SQLiteCommand(string.Format("DELETE FROM {0} WHERE ID={1}"), DataConnection).ExecuteNonQuery();
+            return new SQLiteCommand(string.Format("DELETE FROM {0} WHERE ID={1}",table,id), DataConnection).ExecuteNonQuery();
         }
 
         static int GetFreeID(string table)
@@ -116,7 +125,7 @@ namespace InCollege.Core.Data.Base
             Adapters[table].Fill(data);
             int result = 0;
             foreach (DataRow current in data.Rows)
-                if ((int)current["ID"] > result) result = (int)current["ID"];
+                if (int.Parse(current["ID"].ToString()) > result) result = int.Parse(current["ID"].ToString());
             return result + 1;
         }
     }
