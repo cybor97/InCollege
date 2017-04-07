@@ -6,6 +6,7 @@ namespace InCollege.Core.Data.Base
     public abstract class DBRecord
     {
         [PrimaryKey]
+        [AutoIncrement]
         public int ID { get; set; } = -1;
         [NotNull]
         public bool IsLocal { get; set; } = true;
@@ -17,7 +18,7 @@ namespace InCollege.Core.Data.Base
             return JsonConvert.SerializeObject(this, Formatting.Indented);//TODO:Remove this debug staff.
         }
 
-        public static DBRecord DeSerialize<T>(string json) where T : DBRecord
+        public static T DeSerialize<T>(string json) where T : DBRecord
         {
             return JsonConvert.DeserializeObject<T>(json);
         }
