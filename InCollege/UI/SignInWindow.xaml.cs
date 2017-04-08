@@ -1,17 +1,17 @@
 ﻿using System.Windows;
 
-namespace InCollege.Client
+namespace InCollege.UI
 {
-    public partial class LoginWindow : Window
+    public partial class SignInWindow : Window
     {
-        public LoginWindow()
+        public SignInWindow()
         {
             InitializeComponent();
         }
 
         private void LoginButton_Click(object sender, RoutedEventArgs e)
         {
-            DialogResult = true;
+
         }
     }
 }
