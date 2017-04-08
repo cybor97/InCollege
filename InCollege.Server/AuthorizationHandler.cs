@@ -9,7 +9,6 @@ using System.Text;
 using System.Threading.Tasks;
 using uhttpsharp;
 using uhttpsharp.Headers;
-using static CyborTools.StringEncryptor;
 
 namespace InCollege.Server
 {
@@ -64,19 +63,24 @@ namespace InCollege.Server
                 switch (Account.Validate(userName, password, birthDate, fullName))
                 {
                     case AccountValidationResult.OK:
-                        query.TryGetByName("ProfileImage", out byte[] profileImage);
-                        return new HttpResponse(HttpResponseCode.Ok, CreateToken(DBHolderSQL.Save("Account",
-                            ("UserName", userName),
-                            ("Password", password),
-                            ("AccountType", accountType),
-                            ("BirthDate", birthDate),
-                            ("ProfileImage", profileImage),
-                            ("FullName", fullName),
+                        var rows = DBHolderSQL.GetRange("Account", null, 0, 1, true, ("UserName", userName)).Rows;
+                        if (rows.Count == 0)
+                        {
+                            query.TryGetByName("ProfileImage", out byte[] profileImage);
+                            return new HttpResponse(HttpResponseCode.Ok, CreateToken(DBHolderSQL.Save("Account",
+                                ("UserName", userName),
+                                ("Password", password),
+                                ("AccountType", accountType),
+                                ("BirthDate", birthDate),
+                                ("ProfileImage", profileImage),
+                                ("FullName", fullName),
 
-                            ("IsLocal", true),
-                            ("ID", -1)
-                            ),
-                            userName, password), false);
+                                ("IsLocal", true),
+                                ("ID", -1)
+                                ),
+                                userName, password), false);
+                        }
+                        else return new HttpResponse(HttpResponseCode.BadRequest, "Ошибка! Регистрация невозможна, т.к. пользователь с этим именем пользователя уже зарегистирован в системе!", false);
                     case AccountValidationResult.UserNameEmpty:
                         return new HttpResponse(HttpResponseCode.BadRequest, "Имя пользователя не может быть пустым.", false);
                     case AccountValidationResult.UserNameTooShort:
@@ -96,14 +100,14 @@ namespace InCollege.Server
             }
             return null;
         }
+
+
+        //TODO:Implement device-specific "secret" to ensure token isn't stolen
         static string CreateToken(int id, string userName, string password)
         {
             var handler = new JwtSecurityTokenHandler();
 
-            return //Convert.ToBase64String(Encoding.UTF8.GetBytes(
-                   //PackData(
-                   //Encrypt(
-                    handler.WriteToken(handler
+            return handler.WriteToken(handler
                         .CreateJwtSecurityToken(
                         issuer: "InCollege_Auth",
                         audience: "InCollege_Auth",
@@ -118,7 +122,6 @@ namespace InCollege.Server
                         signingCredentials: new Microsoft.IdentityModel.Tokens.SigningCredentials(
                             new Microsoft.IdentityModel.Tokens.SymmetricSecurityKey(Encoding.UTF8.GetBytes(EncryptionKey)),
                             Microsoft.IdentityModel.Tokens.SecurityAlgorithms.HmacSha256)));
-            //, GetKey(EncryptionKey)))));
         }
 
         public static (bool valid, Account account) VerifyToken(string tokenString)
@@ -139,12 +142,7 @@ namespace InCollege.Server
 
         public static (int id, string userName, string password) GetToken(string tokenString)
         {
-            JwtSecurityToken token = new JwtSecurityTokenHandler().ReadJwtToken(
-                        //Decrypt(
-                        // GetData(
-                        //Encoding.UTF8.GetString(
-                        //Convert.FromBase64String(
-                        tokenString);//, GetKey(EncryptionKey)));
+            JwtSecurityToken token = new JwtSecurityTokenHandler().ReadJwtToken(tokenString);
 
             int id = -1;
             string userName = null, password = null;
