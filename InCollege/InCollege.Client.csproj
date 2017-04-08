@@ -63,6 +63,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="CommonVariables.cs" />
     <Compile Include="UI\Base\StyleableWindow\ControlDoubleClickBehavior.cs" />
     <Compile Include="UI\Base\StyleableWindow\ShowSystemMenuBehavior.cs" />
     <Compile Include="UI\Base\StyleableWindow\SystemMenuManager.cs" />
@@ -74,6 +75,9 @@
     <Compile Include="UI\ParticipantsWindow.xaml.cs">
       <DependentUpon>ParticipantsWindow.xaml</DependentUpon>
     </Compile>
+    <Compile Include="UI\SignInWindow.xaml.cs">
+      <DependentUpon>SignInWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="UI\StudyObjectsWindow.xaml.cs">
       <DependentUpon>StudyObjectsWindow.xaml</DependentUpon>
     </Compile>
@@ -82,7 +86,7 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="UI\LoginWindow.xaml">
+    <Page Include="UI\SignUpWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -97,14 +101,18 @@
     <Compile Include="UI\DictionariesWindow.xaml.cs">
       <DependentUpon>DictionariesWindow.xaml</DependentUpon>
     </Compile>
-    <Compile Include="UI\LoginWindow.xaml.cs">
-      <DependentUpon>LoginWindow.xaml</DependentUpon>
+    <Compile Include="UI\SignUpWindow.xaml.cs">
+      <DependentUpon>SignUpWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="UI\MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
     <Page Include="UI\ParticipantsWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\SignInWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
