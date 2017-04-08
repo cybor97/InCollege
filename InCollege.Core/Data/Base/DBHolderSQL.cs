@@ -115,18 +115,15 @@ namespace InCollege.Core.Data.Base
 
         public static int Remove(string table, int id)
         {
-            return new SQLiteCommand(string.Format("DELETE FROM {0} WHERE ID={1}",table,id), DataConnection).ExecuteNonQuery();
+            return new SQLiteCommand(string.Format("DELETE FROM {0} WHERE ID={1}", table, id), DataConnection).ExecuteNonQuery();
         }
 
         static int GetFreeID(string table)
         {
-            Adapters[table].SelectCommand = new SQLiteCommand(string.Format("SELECT ID FROM {0}", table), DataConnection);
-            DataTable data = new DataTable();
+            Adapters[table].SelectCommand = new SQLiteCommand(string.Format("SELECT Max(ID) FROM {0}", table), DataConnection);
+            var data = new DataTable();
             Adapters[table].Fill(data);
-            int result = 0;
-            foreach (DataRow current in data.Rows)
-                if (int.Parse(current["ID"].ToString()) > result) result = int.Parse(current["ID"].ToString());
-            return result + 1;
+            return data.Rows.Count == 0 ? 1 : string.IsNullOrWhiteSpace(data.Rows[0][0].ToString()) ? 1 : int.Parse(data.Rows[0][0].ToString()) + 1;
         }
     }
 }
