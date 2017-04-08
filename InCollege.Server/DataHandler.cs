@@ -37,6 +37,8 @@ namespace InCollege.Server
             { "Remove", RemoveProcessor }
         };
 
+        //TODO:Improve data protection
+        #region Here
         static HttpResponse GetRangeProcessor(IHttpHeaders query, Account account)
         {
             int skip = query.TryGetByName("skipRecords", out int skipResult) ? skipResult : 0;
@@ -55,24 +57,29 @@ namespace InCollege.Server
 
         static HttpResponse SaveProcessor(IHttpHeaders query, Account account)
         {
-            if (query.TryGetByName("table", out string table))
-            {
-                var fields = new List<(string, object)>();
-                foreach (var current in query)
-                    if (current.Key.StartsWith("field"))
-                        fields.Add((current.Key.Split(new[] { "field" }, StringSplitOptions.RemoveEmptyEntries)[0], current.Value));
-                return new HttpResponse(HttpResponseCode.Ok, DBHolderSQL.Save(table, fields.ToArray()).ToString(), false);
-            }
-            return new HttpResponse(HttpResponseCode.BadRequest, "Куда сохранять???", false);
+            if (account.AccountType > AccountType.Student && account.AccountDataID != -1)
+                if (query.TryGetByName("table", out string table))
+                {
+                    var fields = new List<(string, object)>();
+                    foreach (var current in query)
+                        if (current.Key.StartsWith("field"))
+                            fields.Add((current.Key.Split(new[] { "field" }, StringSplitOptions.RemoveEmptyEntries)[0], current.Value));
+                    return new HttpResponse(HttpResponseCode.Ok, DBHolderSQL.Save(table, fields.ToArray()).ToString(), false);
+                }
+                else return new HttpResponse(HttpResponseCode.BadRequest, "Куда сохранять???", false);
+            else return new HttpResponse(HttpResponseCode.Forbidden, "У вас нет прав на изменение данных!", false);
         }
 
         static HttpResponse RemoveProcessor(IHttpHeaders query, Account account)
         {
-            if (query.TryGetByName("table", out string table))
-                if (query.TryGetByName("id", out int id))
-                    return new HttpResponse(HttpResponseCode.Ok, DBHolderSQL.Remove(table, id).ToString(), false);
-                else return new HttpResponse(HttpResponseCode.BadRequest, "Откуда удалять???", false);
-            else return new HttpResponse(HttpResponseCode.BadRequest, "Что удалять???", false);
+            if (account.AccountType > AccountType.Student && account.AccountDataID != -1)
+                if (query.TryGetByName("table", out string table))
+                    if (query.TryGetByName("id", out int id))
+                        return new HttpResponse(HttpResponseCode.Ok, DBHolderSQL.Remove(table, id).ToString(), false);
+                    else return new HttpResponse(HttpResponseCode.BadRequest, "Откуда удалять???", false);
+                else return new HttpResponse(HttpResponseCode.BadRequest, "Что удалять???", false);
+            else return new HttpResponse(HttpResponseCode.Forbidden, "У вас нет прав на удаление данных!", false);
         }
+        #endregion
     }
 }
