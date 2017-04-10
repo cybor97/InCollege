@@ -59,10 +59,11 @@
     <Reference Include="PresentationFramework" />
   </ItemGroup>
   <ItemGroup>
-    <ApplicationDefinition Include="UI\Base\Styles\App.xaml">
+    <ApplicationDefinition Include="App.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="ClientConfiguration.cs" />
     <Compile Include="CommonVariables.cs" />
     <Compile Include="UI\Base\StyleableWindow\ControlDoubleClickBehavior.cs" />
     <Compile Include="UI\Base\StyleableWindow\ShowSystemMenuBehavior.cs" />
@@ -75,18 +76,19 @@
     <Compile Include="UI\ParticipantsWindow.xaml.cs">
       <DependentUpon>ParticipantsWindow.xaml</DependentUpon>
     </Compile>
-    <Compile Include="UI\SignInWindow.xaml.cs">
-      <DependentUpon>SignInWindow.xaml</DependentUpon>
-    </Compile>
     <Compile Include="UI\StudyObjectsWindow.xaml.cs">
       <DependentUpon>StudyObjectsWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="UI\Util\GridViewSort.cs" />
+    <Page Include="UI\Base\Styles\InCollegeWindowStyle.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="UI\DictionariesWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="UI\SignUpWindow.xaml">
+    <Page Include="UI\AuthorizationWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -94,25 +96,21 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Compile Include="UI\Base\Styles\App.xaml.cs">
+    <Compile Include="App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="UI\DictionariesWindow.xaml.cs">
       <DependentUpon>DictionariesWindow.xaml</DependentUpon>
     </Compile>
-    <Compile Include="UI\SignUpWindow.xaml.cs">
-      <DependentUpon>SignUpWindow.xaml</DependentUpon>
+    <Compile Include="UI\AuthorizationWindow.xaml.cs">
+      <DependentUpon>AuthorizationWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="UI\MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
     <Page Include="UI\ParticipantsWindow.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="UI\SignInWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
