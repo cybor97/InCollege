@@ -21,7 +21,7 @@ namespace InCollege.Server
             var request = context.Request;
             //FIXME:Change to POST
             if (request.Method == HttpMethods.Get)
-                if (request.QueryString.TryGetByName("action", out string action))
+                if (request.QueryString.TryGetByName("Action", out string action))
                     context.Response = Actions[action]?.Invoke(request.QueryString);
                 else context.Response = new HttpResponse(HttpResponseCode.MethodNotAllowed, "Ошибка! Неверный запрос.", true);
             return Task.Factory.GetCompleted();
