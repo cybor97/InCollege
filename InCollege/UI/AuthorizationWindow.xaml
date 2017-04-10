@@ -1,0 +1,81 @@
+﻿<Window x:Class="InCollege.Client.UI.AuthorizationWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:material="http://materialdesigninxaml.net/winfx/xaml/themes"
+        Style="{StaticResource BaseWindow}"
+        x:Name="_this"
+        WindowStartupLocation="CenterScreen"
+        ResizeMode="NoResize"
+        KeyDown="_this_KeyDown"
+        Title="Вход" Height="350" Width="250">
+    <Window.Resources>
+        <Storyboard x:Key="SwitchModeStoryboard">
+            <DoubleAnimation Storyboard.TargetName="_this" Storyboard.TargetProperty="Height"
+                             Duration="0:0:0.3"/>
+        </Storyboard>
+    </Window.Resources>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <TextBox x:Name="FullNameTB" Margin="0 0 0 10" Grid.Row="0" 
+                 material:HintAssist.Hint="ФИО"
+                 Style="{StaticResource MaterialDesignFloatingHintTextBox}"
+                 Visibility="{Binding ElementName=_this, Path=SignUpElementsVisibility}"/>
+
+        <TextBox x:Name="UserNameTB" 
+                 material:HintAssist.Hint="Имя пользователя"
+                 Style="{StaticResource MaterialDesignFloatingHintTextBox}"
+                 Margin="0 0 0 10" Grid.Row="1"/>
+
+        <TextBox x:Name="PasswordTB" Margin="0 0 0 10"
+                 material:HintAssist.Hint="Пароль"
+                 Style="{StaticResource MaterialDesignFloatingHintTextBox}"
+                 Grid.Row="2"/>
+
+        <DatePicker x:Name="BirthdateTB" Margin="0 0 0 10" Grid.Row="3"
+                    material:HintAssist.Hint="Дата рождения"
+                    Style="{StaticResource MaterialDesignFloatingHintDatePicker}"
+                    Visibility="{Binding ElementName=_this, Path=SignUpElementsVisibility}"/>
+
+        <ComboBox x:Name="AccountTypeCB" SelectedIndex="0"
+                  Margin="0 0 0 10" Grid.Row="4"
+                  Visibility="{Binding ElementName=_this, Path=SignUpElementsVisibility}">
+            <ComboBoxItem Content="Гость"/>
+            <ComboBoxItem Content="Студент"/>
+            <ComboBoxItem Content="Преподаватель"/>
+            <ComboBoxItem Content="Заведующий отделением"/>
+            <ComboBoxItem Content="Администратор"/>
+        </ComboBox>
+
+        <Button HorizontalAlignment="Center" Style="{StaticResource MaterialDesignFlatAccentButton}" 
+                Content="Войти" Name="LoginButton"
+                Grid.Row="6" Click="LoginButton_Click"/>
+        <ProgressBar Name="LoginProgressBar" Grid.Row="11"  IsIndeterminate="True" Visibility="Collapsed"/>
+
+        <Button HorizontalAlignment="Center" 
+                Content="Зарегистрироваться" Name="ChangeModeButton"
+                Grid.Row="7" Click="ChangeModeButton_Click" Foreground="Gray"
+                Cursor="Hand">
+            <Button.Style>
+                <Style TargetType="Button">
+                    <Setter Property="Template">
+                        <Setter.Value>
+                            <ControlTemplate TargetType="Button">
+                                <ContentPresenter/>
+                            </ControlTemplate>
+                        </Setter.Value>
+                    </Setter>
+                </Style>
+            </Button.Style>
+        </Button>
+    </Grid>
+</Window>
