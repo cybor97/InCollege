@@ -1,4 +1,4 @@
-﻿<Window x:Class="InCollege.Client.MainWindow"
+﻿<Window x:Class="InCollege.Client.UI.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:sw="clr-namespace:WpfStyleableWindow.StyleableWindow"
@@ -12,7 +12,7 @@
             <MenuItem Header="Файл">
                 <MenuItem Header="Экспорт"/>
                 <MenuItem Header="Импорт"/>
-                <MenuItem Header="Выход" Command="{StaticResource WindowCloseCommand}"/>
+                <MenuItem Header="Выход" Click="ExitItem_Click"/>
             </MenuItem>
             <MenuItem Header="Вывод">
                 <MenuItem Header="Подробнее"/>
@@ -21,8 +21,8 @@
             </MenuItem>
 
             <MenuItem Header="Словари">
-                <MenuItem Header="Виды аттестации"/>
-                <MenuItem Header="Должность в коммиссии"/>
+                <MenuItem Header="Виды аттестации" Click="DictionariesItem_Click"/>
+                <MenuItem Header="Должность в коммиссии" Click="DictionariesItem_Click"/>
             </MenuItem>
             <MenuItem Header="Учетные записи">
                 <MenuItem Header="Студенты"/>
