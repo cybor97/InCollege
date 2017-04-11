@@ -19,5 +19,10 @@ namespace InCollege.Client.UI
         {
             new DictionariesWindow().ShowDialog();
         }
+
+        private void Window_MouseDoubleClick(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        {
+            WindowState = WindowState == WindowState.Normal ? WindowState.Maximized : WindowState.Normal;
+        }
     }
 }
