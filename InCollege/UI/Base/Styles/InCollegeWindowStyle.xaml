@@ -48,10 +48,11 @@
     <ControlTemplate x:Key="BaseWindowTemplate" TargetType="{x:Type Window}">
         <Grid>
             <Border CornerRadius="10" Background="{DynamicResource MaterialDesignPaper}"
-                                sw:WindowDragBehavior.LeftMouseButtonDrag="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}}"
-                                sw:ControlDoubleClickBehavior.ExecuteCommand="{StaticResource MaximizeCommand}"
-                                sw:ControlDoubleClickBehavior.ExecuteCommandParameter="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}}"
-                                sw:ShowSystemMenuBehavior.TargetWindow="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}}">
+                    sw:WindowDragBehavior.LeftMouseButtonDrag="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}}"
+                    sw:ControlDoubleClickBehavior.ExecuteCommand="{StaticResource MaximizeCommand}"
+                    sw:ControlDoubleClickBehavior.ExecuteCommandParameter="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}}"
+                    sw:ShowSystemMenuBehavior.TargetWindow="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}}"
+                    BorderThickness="5">
                 <Border.Resources>
                     <Storyboard x:Key="ClosingStoryboard">
                         <DoubleAnimation Storyboard.TargetName="_this"
@@ -64,13 +65,13 @@
                         <RowDefinition Height="Auto"/>
                         <RowDefinition Height="*"/>
                     </Grid.RowDefinitions>
-                    <Grid Name="Header" Height="30" Margin="10 5 10 0">
+                    <Grid Name="Header" Height="30" Margin="5 0 5 0">
                         <Button HorizontalAlignment="Right"
                                             Style="{StaticResource WindowButton}" 
                                             Command="{StaticResource CloseCommand}"
                                             CommandParameter="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}}"/>
                     </Grid>
-                    <Grid Name="ContentGrid" Margin="10 0 10 10" Grid.Row="1">
+                    <Grid Name="ContentGrid" Margin="5 0 5 5" Grid.Row="1">
                         <AdornerDecorator>
                             <ContentPresenter x:Name="WindowContent"/>
                         </AdornerDecorator>

@@ -1,15 +1,12 @@
 ﻿<Window x:Class="InCollege.Client.UI.DictionariesWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-                Style="{StaticResource BaseWindow}"
-        Title="DictionariesWindow" Height="300" Width="300">
+        xmlns:dragablz="http://dragablz.net/winfx/xaml/dragablz"
+        Style="{StaticResource BaseWindow}"
+        Title="DictionariesWindow" Height="500" Width="400">
     <Grid>
-        <TabControl>
-            <TabControl.Items>
-                <TabItem Header="123"/>
-                <TabItem Header="123"/>
-                <TabItem Header="123"/>
-            </TabControl.Items>
-        </TabControl>
+        <dragablz:TabablzControl Style="{StaticResource MaterialDesignAlternateTabablzControlStyle}">
+            <TabItem Header="Виды аттестации"/>
+        </dragablz:TabablzControl>
     </Grid>
 </Window>
