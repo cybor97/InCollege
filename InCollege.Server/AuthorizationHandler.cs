@@ -19,10 +19,9 @@ namespace InCollege.Server
         public Task Handle(IHttpContext context, Func<Task> next)
         {
             var request = context.Request;
-            //FIXME:Change to POST
-            if (request.Method == HttpMethods.Get)
-                if (request.QueryString.TryGetByName("Action", out string action))
-                    context.Response = Actions[action]?.Invoke(request.QueryString);
+            if (request.Method == HttpMethods.Post)
+                if (request.Post.Parsed.TryGetByName("Action", out string action))
+                    context.Response = Actions[action]?.Invoke(request.Post.Parsed);
                 else context.Response = new HttpResponse(HttpResponseCode.MethodNotAllowed, "Ошибка! Неверный запрос.", true);
             return Task.Factory.GetCompleted();
         }

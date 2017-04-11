@@ -59,20 +59,20 @@ namespace InCollege.Client.UI
                 try
                 {
                     if ((response = (await new HttpClient()
-                          .GetAsync($"http://{ClientConfiguration.HostName}:{ClientConfiguration.Port}/Auth?" +
+                          .PostAsync($"http://{ClientConfiguration.HostName}:{ClientConfiguration.Port}/Auth",
+                          new StringContent(
                           $"Action={(SignUpMode ? "SignUp" : "SignIn")}&" +
                           (SignUpMode ? $"FullName={FullNameTB}&" : string.Empty) +
                           $"UserName={UserNameTB.Text}&" +
                           $"Password={PasswordTB.Text}&" +
                           (SignUpMode ? $"BirthDate={Uri.EscapeDataString(BirthdateTB.SelectedDate.Value.ToString("MM/dd/yyyy"))}&" : string.Empty) +
-                          (SignUpMode ? $"AccountType={AccountTypeCB.SelectedIndex}" : string.Empty)))).StatusCode == HttpStatusCode.OK)
+                          (SignUpMode ? $"AccountType={AccountTypeCB.SelectedIndex}" : string.Empty))))).StatusCode == HttpStatusCode.OK)
                     {
                         DialogResult = true;
                         Close();
                     }
                     else
                     {
-
                         MessageBox.Show(await response.Content.ReadAsStringAsync());
                     }
                 }
