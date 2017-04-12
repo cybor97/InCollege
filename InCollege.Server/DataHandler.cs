@@ -14,14 +14,13 @@ namespace InCollege.Server
         public Task Handle(IHttpContext context, Func<Task> next)
         {
             var request = context.Request;
-            //FIXME:Change to POST
-            if (request.Method == HttpMethods.Get)
-                if (request.QueryString.TryGetByName("token", out string tokenString))
+            if (request.Method == HttpMethods.Post)
+                if (request.Post.Parsed.TryGetByName("token", out string tokenString))
                 {
                     var validationResult = AuthorizationHandler.VerifyToken(tokenString);
                     if (validationResult.valid)
-                        if (request.QueryString.TryGetByName("action", out string action))
-                            context.Response = Actions[action]?.Invoke(request.QueryString, validationResult.account);
+                        if (request.Post.Parsed.TryGetByName("action", out string action))
+                            context.Response = Actions[action]?.Invoke(request.Post.Parsed, validationResult.account);
                         else context.Response = new HttpResponse(HttpResponseCode.MethodNotAllowed, "Эм.. что от меня требуется???", false);
                 }
                 else context.Response = new HttpResponse(HttpResponseCode.Ok, "Доступ запрещен! Нужен токен!", false);
@@ -79,6 +78,23 @@ namespace InCollege.Server
                     else return new HttpResponse(HttpResponseCode.BadRequest, "Откуда удалять???", false);
                 else return new HttpResponse(HttpResponseCode.BadRequest, "Что удалять???", false);
             else return new HttpResponse(HttpResponseCode.Forbidden, "У вас нет прав на удаление данных!", false);
+        }
+
+        static bool CheckAccess(IHttpHeaders query, Account account, bool write)
+        {
+            //TODO:Implement
+            throw new NotImplementedException();
+        }
+
+        static bool CheckTableAccess(string tableName, Account account)
+        {
+            //TODO:Implement
+            throw new NotImplementedException();
+        }
+        static bool CheckInTableAcess(IHttpHeaders query, Account account)
+        {
+            //TODO:Implement
+            throw new NotImplementedException();
         }
         #endregion
     }
