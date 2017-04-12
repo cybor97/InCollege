@@ -19,10 +19,10 @@
                                     <BeginStoryboard>
                                         <Storyboard>
                                             <ColorAnimation Storyboard.TargetName="CloseButton"
-                                                                            Storyboard.TargetProperty="(TextBlock.Foreground).(SolidColorBrush.Color)"
-                                                                            From="#232323"
-                                                                            Duration="0:0:0.3"
-                                                                            To="Red"/>
+                                                            Storyboard.TargetProperty="(TextBlock.Foreground).(SolidColorBrush.Color)"
+                                                            From="#232323"
+                                                            Duration="0:0:0.3"
+                                                            To="Red"/>
                                         </Storyboard>
                                     </BeginStoryboard>
                                 </EventTrigger>
@@ -30,8 +30,8 @@
                                     <BeginStoryboard>
                                         <Storyboard>
                                             <ColorAnimation Storyboard.TargetName="CloseButton"
-                                                                            Storyboard.TargetProperty="(TextBlock.Foreground).(SolidColorBrush.Color)"
-                                                                            To="#232323" Duration="0:0:0.3" From="Red"/>
+                                                            Storyboard.TargetProperty="(TextBlock.Foreground).(SolidColorBrush.Color)"
+                                                            To="#232323" Duration="0:0:0.3" From="Red"/>
                                         </Storyboard>
                                     </BeginStoryboard>
                                 </EventTrigger>
@@ -52,12 +52,13 @@
                     sw:ControlDoubleClickBehavior.ExecuteCommand="{StaticResource MaximizeCommand}"
                     sw:ControlDoubleClickBehavior.ExecuteCommandParameter="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}}"
                     sw:ShowSystemMenuBehavior.TargetWindow="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}}"
-                    BorderThickness="5">
+                    BorderBrush="#EEE"
+                    BorderThickness="2">
                 <Border.Resources>
                     <Storyboard x:Key="ClosingStoryboard">
                         <DoubleAnimation Storyboard.TargetName="_this"
-                                                     Storyboard.TargetProperty="Opacity"
-                                                     To="0" Duration="0:0:0.3"/>
+                                         Storyboard.TargetProperty="Opacity"
+                                         To="0" Duration="0:0:0.3"/>
                     </Storyboard>
                 </Border.Resources>
                 <Grid Name="MainContainer">
@@ -67,9 +68,9 @@
                     </Grid.RowDefinitions>
                     <Grid Name="Header" Height="30" Margin="5 0 5 0">
                         <Button HorizontalAlignment="Right"
-                                            Style="{StaticResource WindowButton}" 
-                                            Command="{StaticResource CloseCommand}"
-                                            CommandParameter="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}}"/>
+                                Style="{StaticResource WindowButton}" 
+                                Command="{StaticResource CloseCommand}"
+                                CommandParameter="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}}"/>
                     </Grid>
                     <Grid Name="ContentGrid" Margin="5 0 5 5" Grid.Row="1">
                         <AdornerDecorator>
@@ -106,6 +107,14 @@
                 </MultiTrigger.Conditions>
                 <Setter Property="Visibility" TargetName="WindowResizeGrip" Value="Visible"/>
             </MultiTrigger>
+
+            <Trigger Property="WindowState" Value="Maximized">
+                <Setter Property="Background" Value="Black"/>
+            </Trigger>
+            <Trigger Property="WindowState" Value="Normal">
+                <Setter Property="Padding" Value="0"/>
+            </Trigger>
+
         </ControlTemplate.Triggers>
     </ControlTemplate>
 

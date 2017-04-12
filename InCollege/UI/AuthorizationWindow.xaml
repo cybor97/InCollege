@@ -88,28 +88,37 @@
             </material:HintAssist.Hint>
         </ComboBox>
 
-        <Button HorizontalAlignment="Center" Style="{StaticResource MaterialDesignFlatAccentButton}" 
+        <Grid Name="ButtonsPanel" Grid.Row="6">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+                <Button HorizontalAlignment="Center" Style="{StaticResource MaterialDesignFlatAccentButton}" 
                 Content="Войти" Name="LoginButton"
-                Grid.Row="6" Click="LoginButton_Click"/>
-        <ProgressBar Name="LoginProgressBar" Grid.Row="11" 
-                     Style="{StaticResource MaterialDesignCircularProgressBar}"
-                     IsIndeterminate="True" Visibility="Collapsed"/>
+                Grid.Row="0" Click="LoginButton_Click"/>
 
-        <Button HorizontalAlignment="Center" 
+                <Button HorizontalAlignment="Center" 
                 Content="Зарегистрироваться" Name="ChangeModeButton"
-                Grid.Row="7" Click="ChangeModeButton_Click" Foreground="Gray"
+                Grid.Row="1" Click="ChangeModeButton_Click" Foreground="Gray"
                 Cursor="Hand">
-            <Button.Style>
-                <Style TargetType="Button">
-                    <Setter Property="Template">
-                        <Setter.Value>
-                            <ControlTemplate TargetType="Button">
-                                <ContentPresenter/>
-                            </ControlTemplate>
-                        </Setter.Value>
-                    </Setter>
-                </Style>
-            </Button.Style>
-        </Button>
+                    <Button.Style>
+                        <Style TargetType="Button">
+                            <Setter Property="Template">
+                                <Setter.Value>
+                                    <ControlTemplate TargetType="Button">
+                                        <ContentPresenter/>
+                                    </ControlTemplate>
+                                </Setter.Value>
+                            </Setter>
+                        </Style>
+                    </Button.Style>
+                </Button>
+            </Grid>
+            <ProgressBar Name="LoginProgressBar"
+                         Style="{StaticResource MaterialDesignCircularProgressBar}"
+                         HorizontalAlignment="Center" VerticalAlignment="Center"
+                         IsIndeterminate="True" Visibility="Collapsed"/>
+        </Grid>
     </Grid>
 </Window>
