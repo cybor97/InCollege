@@ -1,8 +1,6 @@
-﻿using InCollege.Core.Data;
-using System;
+﻿using System;
 using System.Net;
 using System.Net.Http;
-using System.Net.NetworkInformation;
 using System.Windows;
 using System.Windows.Media.Animation;
 
@@ -64,17 +62,17 @@ namespace InCollege.Client.UI
                           $"Action={(SignUpMode ? "SignUp" : "SignIn")}&" +
                           (SignUpMode ? $"FullName={FullNameTB}&" : string.Empty) +
                           $"UserName={UserNameTB.Text}&" +
-                          $"Password={PasswordTB.Text}&" +
+                          $"Password={PasswordTB.Password}&" +
                           (SignUpMode ? $"BirthDate={Uri.EscapeDataString(BirthdateTB.SelectedDate.Value.ToString("MM/dd/yyyy"))}&" : string.Empty) +
                           (SignUpMode ? $"AccountType={AccountTypeCB.SelectedIndex}" : string.Empty))))).StatusCode == HttpStatusCode.OK)
                     {
+                        App.Token = await response.Content.ReadAsStringAsync();
+                        //TODO:Implement token storing for later sessions.
                         DialogResult = true;
                         Close();
                     }
                     else
-                    {
                         MessageBox.Show(await response.Content.ReadAsStringAsync());
-                    }
                 }
                 catch (HttpRequestException exc)
                 {

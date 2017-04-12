@@ -48,16 +48,16 @@
             </material:HintAssist.Hint>
         </TextBox>
 
-        <TextBox x:Name="PasswordTB" Margin="0 0 0 15"
-                 Style="{StaticResource MaterialDesignFloatingHintTextBox}"
-                 Grid.Row="2">
+        <PasswordBox x:Name="PasswordTB" Margin="0 0 0 15"
+                 Style="{StaticResource MaterialDesignFloatingHintPasswordBox}"
+                 Grid.Row="2" ContextMenu="{Binding ElementName=UserNameTB, Path=ContextMenu}">
             <material:HintAssist.Hint>
                 <StackPanel Orientation="Horizontal">
                     <material:PackIcon Kind="Lock" Margin="0 0 3 0"/>
                     <TextBlock>Пароль</TextBlock>
                 </StackPanel>
             </material:HintAssist.Hint>
-        </TextBox>
+        </PasswordBox>
 
         <DatePicker x:Name="BirthdateTB" Margin="0 0 0 10" Grid.Row="3"
                     Style="{StaticResource MaterialDesignFloatingHintDatePicker}"
