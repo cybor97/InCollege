@@ -28,7 +28,7 @@ namespace InCollege.Client.UI
             }
         }
 
-        DependencyProperty SignUpElementsVisibilityProperty = DependencyProperty.Register("SignUpElementsVisibility", typeof(Visibility), typeof(AuthorizationWindow));
+        public static DependencyProperty SignUpElementsVisibilityProperty = DependencyProperty.Register("SignUpElementsVisibility", typeof(Visibility), typeof(AuthorizationWindow));
 
         Visibility SignUpElementsVisibility
         {
@@ -93,6 +93,16 @@ namespace InCollege.Client.UI
         {
             if (e.Key == System.Windows.Input.Key.Enter)
                 LoginButton_Click(null, null);
+        }
+
+        private void CloseItem_Click(object sender, RoutedEventArgs e)
+        {
+            Close();
+        }
+
+        private void SysadminModeItem_Click(object sender, RoutedEventArgs e)
+        {
+            MessageBox.Show("Не верю!");
         }
     }
 }
