@@ -19,7 +19,7 @@ namespace InCollege.Core.Data.Base
             //I hope this isn't shit-code-design.
             DBHolderORM.Init(filename);
 
-            DataConnection = new SQLiteConnection(string.Format("Data Source={0}; Version=3;", filename));
+            DataConnection = new SQLiteConnection($"Data Source={filename}; Version=3;");
             DataConnection.Open();
             Adapters = new Dictionary<string, SQLiteDataAdapter>();
 
@@ -27,7 +27,7 @@ namespace InCollege.Core.Data.Base
                 Adapters.Add(current[2].ToString(), new SQLiteDataAdapter("SELECT * FROM {0} LIMIT {1}, {2}", DataConnection));
         }
 
-        public static DataTable GetRange(string table, string column, int skip, int count, bool fixedString, params (string, object)[] whereParams)
+        public static DataTable GetRange(string table, string column, int skip, int count, bool fixedString, params (string name, object value)[] whereParams)
         {
             if (count == -1)
                 count = DBHolderORM.DEFAULT_LIMIT;
@@ -36,24 +36,23 @@ namespace InCollege.Core.Data.Base
             if (string.IsNullOrWhiteSpace(column))
                 column = "*";
             DataTable result = new DataTable(table);
-            string whereString = null;
+            string whereString = "";
             if (whereParams != null)
-            {
-                whereString = "";
                 for (int i = 0; i < whereParams.Length; i++)
                 {
-                    whereString += string.Format(whereParams[i].Item2 is string ? fixedString ? "{0} LIKE '{1}'" : "instr({0}, '{1}') > 0" :
-                        "{0} LIKE {1}", whereParams[i].Item1, whereParams[i].Item2);
+                    object name = whereParams[i].name,
+                        value = whereParams[i].value;
+                    whereString += value is string ? fixedString ?
+                        $"{name} LIKE '{value}'" :
+                        $"instr({name}, '{value}') > 0" :
+                        $"{name} LIKE {value}";
                     if (i < whereParams.Length - 1)
                         whereString += " AND ";
                 }
-            }
             Adapters[table].SelectCommand =
-                new SQLiteCommand(
-                    string.Format("SELECT {0} FROM {1} " +
-                                  (string.IsNullOrWhiteSpace(whereString) ? "" : "WHERE {4} ") +
-                                  "LIMIT {2}, {3} ",
-                                  column, table, skip, count, whereString),
+                new SQLiteCommand($"SELECT {column} FROM {table} " +
+                                  (string.IsNullOrWhiteSpace(whereString) ? $"" : $"WHERE {whereString} ") +
+                                  $"LIMIT {skip}, {count} ",
                     DataConnection);
             Adapters[table].Fill(result);
             return result;
@@ -62,15 +61,18 @@ namespace InCollege.Core.Data.Base
         public static DataRow GetByID(string table, int id)
         {
             DataTable result = new DataTable();
-            Adapters[table].SelectCommand = new SQLiteCommand(string.Format("SELECT * FROM {0} WHERE ID={1}", table, id), DataConnection);
+            Adapters[table].SelectCommand = new SQLiteCommand($"SELECT * FROM {table} WHERE ID={id}", DataConnection);
             Adapters[table].Fill(result);
             return result.Rows.Count > 0 ? result.Rows[0] : null;
         }
 
-        public static int Save(string table, params (string, object)[] columns)
+        public static int Save(string table, params (string key, object value)[] columns)
         {
+            if (columns.Any(c => c.key.Equals("Removed") && (bool)c.value == true))
+                return -1;
+
             var adapter = Adapters[table];
-            adapter.SelectCommand = new SQLiteCommand(string.Format("SELECT * FROM {0}", table), DataConnection);
+            adapter.SelectCommand = new SQLiteCommand($"SELECT * FROM {table}", DataConnection);
             var data = new DataTable(table);
             adapter.Fill(data);
             data.PrimaryKey = new[] { data.Columns["ID"] };
@@ -79,9 +81,9 @@ namespace InCollege.Core.Data.Base
             DataRow row;
             int id;
             bool isLocal = true, addMode = true;
-            if (columns.Any(c => c.Item1.Equals("IsLocal")) &&
-                !(isLocal = bool.Parse(columns.First(c => c.Item1.Equals("IsLocal")).Item2.ToString())) &&
-                (id = int.Parse(columns.First(c => c.Item1.Equals("ID")).Item2.ToString())) > 0 &&
+            if (columns.Any(c => c.key.Equals("IsLocal")) &&
+                !(isLocal = bool.Parse(columns.First(c => c.key.Equals("IsLocal")).value.ToString())) &&
+                (id = int.Parse(columns.First(c => c.key.Equals("ID")).value.ToString())) > 0 &&
                 data.Rows.Contains(id))
             {
                 row = data.Rows.Find(id);
@@ -97,10 +99,10 @@ namespace InCollege.Core.Data.Base
             row["Modified"] = false;
 
             foreach (var current in columns)
-                if ((current.Item1 != "ID" || isLocal) && current.Item1 != "IsLocal")
-                    row[current.Item1] = current.Item2;
+                if ((current.key != "ID" || isLocal) && current.key != "IsLocal" && current.key != "Modified")
+                    row[current.key] = current.value;
 
-            Adapters[table].SelectCommand = new SQLiteCommand(string.Format("SELECT * FROM {0}", table), DataConnection);
+            Adapters[table].SelectCommand = new SQLiteCommand($"SELECT * FROM {table} WHERE ID={id}", DataConnection);
 
             if (addMode)
                 data.Rows.Add(row);
@@ -115,15 +117,14 @@ namespace InCollege.Core.Data.Base
 
         public static int Remove(string table, int id)
         {
-            return new SQLiteCommand(string.Format("DELETE FROM {0} WHERE ID={1}", table, id), DataConnection).ExecuteNonQuery();
+            return new SQLiteCommand($"DELETE FROM {table} WHERE ID={id}", DataConnection).ExecuteNonQuery();
         }
 
         static int GetFreeID(string table)
         {
-            Adapters[table].SelectCommand = new SQLiteCommand(string.Format("SELECT Max(ID) FROM {0}", table), DataConnection);
+            Adapters[table].SelectCommand = new SQLiteCommand($"SELECT Max(Count(*),Max(ID)) FROM {table}", DataConnection);
             var data = new DataTable();
-            Adapters[table].Fill(data);
-            return data.Rows.Count == 0 ? 1 : string.IsNullOrWhiteSpace(data.Rows[0][0].ToString()) ? 1 : int.Parse(data.Rows[0][0].ToString()) + 1;
+            return Adapters[table].Fill(data) == 0 ? 1 : string.IsNullOrWhiteSpace(data.Rows[0][0].ToString()) ? 1 : Convert.ToInt32(data.Rows[0][0]) + 1;
         }
     }
 }
