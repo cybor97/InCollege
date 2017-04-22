@@ -48,15 +48,20 @@
     <Reference Include="MaterialDesignThemes.Wpf, Version=2.3.0.823, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\MaterialDesignThemes.2.3.0.823\lib\net45\MaterialDesignThemes.Wpf.dll</HintPath>
     </Reference>
+    <Reference Include="Newtonsoft.Json, Version=10.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.10.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Data" />
+    <Reference Include="System.Drawing" />
     <Reference Include="System.Net.Http" />
+    <Reference Include="System.ValueTuple, Version=4.0.1.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.ValueTuple.4.3.0\lib\netstandard1.0\System.ValueTuple.dll</HintPath>
+    </Reference>
     <Reference Include="System.Xaml">
       <RequiredTargetFramework>4.0</RequiredTargetFramework>
     </Reference>
-    <Reference Include="System.Xml" />
-    <Reference Include="System.Xml.Linq" />
     <Reference Include="WindowsBase" />
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
@@ -68,14 +73,17 @@
     </ApplicationDefinition>
     <Compile Include="ClientConfiguration.cs" />
     <Compile Include="CommonVariables.cs" />
+    <Compile Include="SyncManager.cs" />
     <Compile Include="UI\Base\StyleableWindow\ControlDoubleClickBehavior.cs" />
     <Compile Include="UI\Base\StyleableWindow\ShowSystemMenuBehavior.cs" />
     <Compile Include="UI\Base\StyleableWindow\SystemMenuManager.cs" />
+    <Compile Include="UI\Base\StyleableWindow\OpenContextMenuCommand.cs" />
     <Compile Include="UI\Base\StyleableWindow\WindowCloseCommand.cs" />
     <Compile Include="UI\Base\StyleableWindow\WindowDragBehavior.cs" />
     <Compile Include="UI\Base\StyleableWindow\WindowMaximizeCommand.cs" />
     <Compile Include="UI\Base\StyleableWindow\WindowMinimizeCommand.cs" />
     <Compile Include="UI\Base\StyleableWindow\WindowResizeBehavior.cs" />
+    <Compile Include="UI\Base\Styles\WindowButton.cs" />
     <Compile Include="UI\ParticipantsWindow.xaml.cs">
       <DependentUpon>ParticipantsWindow.xaml</DependentUpon>
     </Compile>
@@ -83,6 +91,7 @@
       <DependentUpon>StudyObjectsWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="UI\Util\GridViewSort.cs" />
+    <Compile Include="UI\Util\ImageToSourceConverter.cs" />
     <Page Include="UI\Base\Styles\InCollegeWindowStyle.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
