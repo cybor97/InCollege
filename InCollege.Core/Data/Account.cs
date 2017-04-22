@@ -29,6 +29,7 @@ namespace InCollege.Core.Data
         public virtual DateTime BirthDate { get; set; }
         public virtual byte[] ProfileImage { get; set; }
         public string FullName { get; set; }
+        public bool Approved { get; set; }
 
         public static AccountValidationResult Validate(string userName, string password, DateTime birthDate, string fullName)
         {
