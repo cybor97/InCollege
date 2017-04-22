@@ -1,12 +1,17 @@
-﻿<Window x:Class="InCollege.UI.ParticipantsWindow"
+﻿<Window x:Class="InCollege.Client.UI.ParticipantsWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        Style="{StaticResource BaseWindow}"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:InCollege.UI"
-        mc:Ignorable="d"
-        Title="ParticipantsWindow" Height="300" Width="300">
+        xmlns:dragablz="http://dragablz.net/winfx/xaml/dragablz"
+        Title="ParticipantsWindow" Height="500" Width="650">
     <Grid>
-        
+        <dragablz:TabablzControl Style="{StaticResource MaterialDesignAlternateTabablzControlStyle}">
+            <TabItem Header="Не назначенные"/>
+            <TabItem Header="Студенты"/>
+            <TabItem Header="Преподаватели"/>
+            <TabItem Header="Заведующиее отделениями"/>
+            <TabItem Header="Администраторы"/>
+        </dragablz:TabablzControl>
+
     </Grid>
 </Window>
