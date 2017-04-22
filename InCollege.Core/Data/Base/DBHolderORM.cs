@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System;
 using SQLite;
+using System.IO;
 
 namespace InCollege.Core.Data.Base
 {
@@ -10,7 +11,12 @@ namespace InCollege.Core.Data.Base
         public const int DEFAULT_LIMIT = 100;
         public static void Init(string filename)
         {
+            DirectoryInfo parentDirectory;
+            if (!Directory.Exists((parentDirectory = Directory.GetParent(filename)).FullName))
+                Directory.CreateDirectory(parentDirectory.FullName);
+
             DataConnection = new SQLiteConnection(filename);
+
             CreateTables(
                 typeof(Account),
                 typeof(AttestationType),
@@ -27,8 +33,10 @@ namespace InCollege.Core.Data.Base
                 typeof(CommissionMember),
                 typeof(Specialty),
                 typeof(Statement),
+                typeof(StatementAttestationType),
                 typeof(Student),
-                typeof(Subject));
+                typeof(Subject),
+                typeof(Teacher));
         }
 
         public static List<T> GetAll<T>() where T : DBRecord, new()
