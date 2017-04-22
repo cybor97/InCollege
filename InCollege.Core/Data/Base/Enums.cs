@@ -9,11 +9,11 @@
 
     public enum AccountType : byte
     {
-        Guest,
-        Student,
-        Professor,
-        DepartmentHead,
-        Admin
+        Guest = 1,
+        Student = 2,
+        Professor = 3,
+        DepartmentHead = 4,
+        Admin = 5
     }
 
     public enum TechnicalMarkValue : byte
