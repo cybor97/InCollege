@@ -1,8 +1,10 @@
 ﻿using InCollege.Core.Data;
 using InCollege.Core.Data.Base;
 using Newtonsoft.Json;
+using SG.Algoritma;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
@@ -29,7 +31,8 @@ namespace InCollege.Server
         static Dictionary<string, Func<IHttpHeaders, IHttpResponse>> Actions = new Dictionary<string, Func<IHttpHeaders, IHttpResponse>>()
         {
             { "SignIn", SignIn },
-            { "SignUp", SignUp }
+            { "SignUp", SignUp },
+            { "ValidateToken", ValidateToken }
         };
 
         private static IHttpResponse SignIn(IHttpHeaders query)
@@ -59,45 +62,50 @@ namespace InCollege.Server
                 query.TryGetByName("BirthDate", out DateTime birthDate) &&
                 query.TryGetByName("FullName", out string fullName))
             {
-                switch (Account.Validate(userName, password, birthDate, fullName))
+                var validationResult = Account.Validate(userName, password, birthDate, fullName);
+                if (validationResult == AccountValidationResult.OK)
                 {
-                    case AccountValidationResult.OK:
-                        var rows = DBHolderSQL.GetRange("Account", null, 0, 1, true, ("UserName", userName)).Rows;
-                        if (rows.Count == 0)
-                        {
-                            query.TryGetByName("ProfileImage", out byte[] profileImage);
-                            return new HttpResponse(HttpResponseCode.Ok, CreateToken(DBHolderSQL.Save("Account",
-                                ("UserName", userName),
-                                ("Password", password),
-                                ("AccountType", accountType),
-                                ("BirthDate", birthDate),
-                                ("ProfileImage", profileImage),
-                                ("FullName", fullName),
-
-                                ("IsLocal", true),
-                                ("ID", -1)
-                                ),
-                                userName, password), false);
-                        }
-                        else return new HttpResponse(HttpResponseCode.BadRequest, "Ошибка! Регистрация невозможна, т.к. пользователь с этим именем пользователя уже зарегистирован в системе!", false);
-                    case AccountValidationResult.UserNameEmpty:
-                        return new HttpResponse(HttpResponseCode.BadRequest, "Имя пользователя не может быть пустым.", false);
-                    case AccountValidationResult.UserNameTooShort:
-                        return new HttpResponse(HttpResponseCode.BadRequest, "Имя пользователя должно содержать не менее 5 символов.", false);
-                    case AccountValidationResult.PasswordEmpty:
-                        return new HttpResponse(HttpResponseCode.BadRequest, "Пароль не может быть пустым.", false);
-                    case AccountValidationResult.PasswordTooShort:
-                        return new HttpResponse(HttpResponseCode.BadRequest, "Пароль должен содержать не менее 5 символов.", false);
-                    case AccountValidationResult.BirthDateUndefined:
-                        return new HttpResponse(HttpResponseCode.BadRequest, "Необходимо указать дату рождения.", false);
-                    case AccountValidationResult.BirthDateAfterNow:
-                        return new HttpResponse(HttpResponseCode.BadRequest, "Дата рождения не может быть больше текущей.", false);
-                    case AccountValidationResult.AgeTooBig:
-                        return new HttpResponse(HttpResponseCode.BadRequest, "ПО разработано для особей вида Homo Sapiens, т.е. людей.<br>" +
-                                                                             "На момент разработки ПО и в перспективе люди столько не живут.", false);
+                    var rows = DBHolderSQL.GetRange("Account", null, 0, 1, true, ("UserName", userName)).Rows;
+                    if (rows.Count == 0)
+                    {
+                        query.TryGetByName("ProfileImage", out byte[] profileImage);
+                        return new HttpResponse(HttpResponseCode.Ok, CreateToken(DBHolderSQL.Save("Account",
+                            ("UserName", userName),
+                            ("Password", password),
+                            ("AccountType", accountType),
+                            ("BirthDate", birthDate),
+                            ("ProfileImage", profileImage),
+                            ("FullName", fullName),
+                            ("AccountDataID", -1),
+                            ("Approved", false),
+                            ("IsLocal", true),
+                            ("ID", -1)
+                            ),
+                            userName, password), false);
+                    }
+                    else return new HttpResponse(HttpResponseCode.BadRequest, "Ошибка! Регистрация невозможна, т.к. пользователь с этим именем пользователя уже зарегистирован в системе!", false);
                 }
+                else return new HttpResponse(HttpResponseCode.BadRequest, ErrorMessages[validationResult], false);
             }
             return null;
+        }
+
+        static Dictionary<AccountValidationResult, string> ErrorMessages = new Dictionary<AccountValidationResult, string>()
+        {
+            { AccountValidationResult.UserNameEmpty, "Имя пользователя не может быть пустым." },
+            { AccountValidationResult.UserNameTooShort,"Имя пользователя должно содержать не менее 5 символов." },
+            { AccountValidationResult.PasswordEmpty, "Пароль не может быть пустым." },
+            { AccountValidationResult.PasswordTooShort,  "Пароль должен содержать не менее 5 символов." },
+            { AccountValidationResult.BirthDateUndefined, "Необходимо указать дату рождения." },
+            { AccountValidationResult.BirthDateAfterNow, "Дата рождения не может быть больше текущей." },
+            { AccountValidationResult.AgeTooBig,"ПО разработано для особей вида Homo Sapiens, т.е. людей.<br>На момент разработки ПО и в перспективе люди столько не живут."  },
+        };
+
+        private static IHttpResponse ValidateToken(IHttpHeaders query)
+        {
+            if (query.TryGetByName("token", out string token))
+                return new HttpResponse(VerifyToken(token).valid ? HttpResponseCode.Ok : HttpResponseCode.NotAcceptable, string.Empty, false);
+            else return new HttpResponse(HttpResponseCode.BadRequest, string.Empty, false);
         }
 
 
@@ -106,7 +114,7 @@ namespace InCollege.Server
         {
             var handler = new JwtSecurityTokenHandler();
 
-            return handler.WriteToken(handler
+            return Cipher.Encrypt(handler.WriteToken(handler
                         .CreateJwtSecurityToken(
                         issuer: "InCollege_Auth",
                         audience: "InCollege_Auth",
@@ -120,20 +128,24 @@ namespace InCollege.Server
                         expires: DateTime.Now.AddMonths(1),
                         signingCredentials: new Microsoft.IdentityModel.Tokens.SigningCredentials(
                             new Microsoft.IdentityModel.Tokens.SymmetricSecurityKey(Encoding.UTF8.GetBytes(EncryptionKey)),
-                            Microsoft.IdentityModel.Tokens.SecurityAlgorithms.HmacSha256)));
+                            Microsoft.IdentityModel.Tokens.SecurityAlgorithms.HmacSha256))), EncryptionKey);
         }
 
         public static (bool valid, Account account) VerifyToken(string tokenString)
         {
             var data = GetToken(tokenString);
-            var rows = DBHolderSQL.GetRange("Account", null, 0, 1, true,
+
+            if (data.id == -1 || string.IsNullOrWhiteSpace(data.userName) || string.IsNullOrWhiteSpace(data.password))
+                return (false, null);
+
+            DataTable table = DBHolderSQL.GetRange("Account", null, 0, 1, true,
                 ("ID", data.id),
                 ("UserName", data.userName),
-                ("Password", data.password)).Rows;
+                ("Password", data.password));
 
-            if (rows.Count == 1)
-                return (true, DBRecord.DeSerialize<Account>(JsonConvert.SerializeObject(rows[0])));
-            else if (rows.Count > 1)
+            if (table.Rows.Count == 1)
+                return (true, JsonConvert.DeserializeObject<List<Account>>(JsonConvert.SerializeObject(table, new JsonSerializerSettings() { NullValueHandling = NullValueHandling.Ignore }))[0]);
+            else if (table.Rows.Count > 1)
                 return (false, null);
             else
                 return (false, null);
@@ -141,20 +153,27 @@ namespace InCollege.Server
 
         public static (int id, string userName, string password) GetToken(string tokenString)
         {
-            JwtSecurityToken token = new JwtSecurityTokenHandler().ReadJwtToken(tokenString);
+            try
+            {
+                JwtSecurityToken token = new JwtSecurityTokenHandler().ReadJwtToken(Cipher.Decrypt(tokenString.Replace(' ', '+'), EncryptionKey));
 
-            int id = -1;
-            string userName = null, password = null;
+                int id = -1;
+                string userName = null, password = null;
 
-            foreach (var current in token.Claims)
-                if (current.Type.Equals("ID"))
-                    int.TryParse(current.Value, out id);
-                else if (current.Type.Equals("UserName"))
-                    userName = current.Value;
-                else if (current.Type.Equals("Password"))
-                    password = current.Value;
+                foreach (var current in token.Claims)
+                    if (current.Type.Equals("ID"))
+                        int.TryParse(current.Value, out id);
+                    else if (current.Type.Equals("UserName"))
+                        userName = current.Value;
+                    else if (current.Type.Equals("Password"))
+                        password = current.Value;
 
-            return (id, userName, password);
+                return (id, userName, password);
+            }
+            catch (FormatException)
+            {
+                return (-1, null, null);
+            }
         }
     }
 }
