@@ -6,6 +6,6 @@ namespace InCollege.Core.Data
     {
         public int MiddleStatementID { get; set; }
         public int QualificationStatementID { get; set; }
-        public int DayRecordID { get; set; }
+        public int MarkID { get; set; }
     }
 }
