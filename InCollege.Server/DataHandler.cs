@@ -23,7 +23,7 @@ namespace InCollege.Server
                             context.Response = Actions[action]?.Invoke(request.Post.Parsed, validationResult.account);
                         else context.Response = new HttpResponse(HttpResponseCode.MethodNotAllowed, "Эм.. что от меня требуется???", false);
                 }
-                else context.Response = new HttpResponse(HttpResponseCode.Ok, "Доступ запрещен! Нужен токен!", false);
+                else context.Response = new HttpResponse(HttpResponseCode.Forbidden, "Доступ запрещен! Нужен токен!", false);
             else context.Response = new HttpResponse(HttpResponseCode.MethodNotAllowed, "Метод недоступен!", false);
 
             return Task.Factory.GetCompleted();
@@ -40,23 +40,27 @@ namespace InCollege.Server
         #region Here
         static HttpResponse GetRangeProcessor(IHttpHeaders query, Account account)
         {
-            int skip = query.TryGetByName("skipRecords", out int skipResult) ? skipResult : 0;
-            int count = query.TryGetByName("countRecords", out int countResult) ? countResult : -1;
-            string column = query.TryGetByName("column", out string columnResult) ? columnResult : null;
-            bool fixedString = query.TryGetByName("fixedString", out bool fixedStringResult) && fixedStringResult;
-            var whereParams = new List<(string, object)>();
-            foreach (var current in query)
-                if (current.Key.StartsWith("where"))
-                    whereParams.Add((current.Key.Split(new[] { "where" }, StringSplitOptions.RemoveEmptyEntries)[0], current.Value));
-            return new HttpResponse(HttpResponseCode.Ok,
-                query.TryGetByName("table", out string table) ?
-                JsonConvert.SerializeObject(DBHolderSQL.GetRange(table, column, skip, count, fixedString, whereParams.ToArray()), Formatting.Indented).Replace("\n", "<br>") :
-                "Ошибка! Таблица не найдена!", false);
+            if (CheckAccess(query, account, false))
+            {
+                int skip = query.TryGetByName("skipRecords", out int skipResult) ? skipResult : 0;
+                int count = query.TryGetByName("countRecords", out int countResult) ? countResult : -1;
+                string column = query.TryGetByName("column", out string columnResult) ? columnResult : null;
+                bool fixedString = query.TryGetByName("fixedString", out bool fixedStringResult) && fixedStringResult;
+                var whereParams = new List<(string, object)>();
+                foreach (var current in query)
+                    if (current.Key.StartsWith("where"))
+                        whereParams.Add((current.Key.Split(new[] { "where" }, StringSplitOptions.RemoveEmptyEntries)[0], current.Value));
+                return new HttpResponse(HttpResponseCode.Ok,
+                    query.TryGetByName("table", out string table) ?
+                    JsonConvert.SerializeObject(DBHolderSQL.GetRange(table, column, skip, count, fixedString, whereParams.ToArray()), new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore }) :
+                    "Ошибка! Таблица не найдена!", false);
+            }
+            else return new HttpResponse(HttpResponseCode.Forbidden, "У вас нет прав на получение данных!", false);
         }
 
         static HttpResponse SaveProcessor(IHttpHeaders query, Account account)
         {
-            if (account.AccountType > AccountType.Student && account.AccountDataID != -1)
+            if (CheckAccess(query, account, true))
                 if (query.TryGetByName("table", out string table))
                 {
                     var fields = new List<(string, object)>();
@@ -71,7 +75,7 @@ namespace InCollege.Server
 
         static HttpResponse RemoveProcessor(IHttpHeaders query, Account account)
         {
-            if (account.AccountType > AccountType.Student && account.AccountDataID != -1)
+            if (CheckAccess(query, account, true))
                 if (query.TryGetByName("table", out string table))
                     if (query.TryGetByName("id", out int id))
                         return new HttpResponse(HttpResponseCode.Ok, DBHolderSQL.Remove(table, id).ToString(), false);
@@ -82,8 +86,7 @@ namespace InCollege.Server
 
         static bool CheckAccess(IHttpHeaders query, Account account, bool write)
         {
-            //TODO:Implement
-            throw new NotImplementedException();
+            return account.AccountType > AccountType.Student && account.AccountDataID != -1 && account.Approved;
         }
 
         static bool CheckTableAccess(string tableName, Account account)
@@ -91,7 +94,7 @@ namespace InCollege.Server
             //TODO:Implement
             throw new NotImplementedException();
         }
-        static bool CheckInTableAcess(IHttpHeaders query, Account account)
+        static bool CheckInTableAcess(string tableName, IHttpHeaders query, Account account)
         {
             //TODO:Implement
             throw new NotImplementedException();
