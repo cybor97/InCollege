@@ -7,13 +7,21 @@
         WindowStartupLocation="CenterScreen"
         ResizeMode="NoResize"
         KeyDown="_this_KeyDown"
-        Title="Вход" Height="350" Width="250">
+        Title="Авторизация" Height="350" Width="250">
     <Window.Resources>
         <Storyboard x:Key="SwitchModeStoryboard">
             <DoubleAnimation Storyboard.TargetName="_this" Storyboard.TargetProperty="Height"
                              Duration="0:0:0.3"/>
         </Storyboard>
     </Window.Resources>
+
+    <Window.ContextMenu>
+        <ContextMenu>
+            <MenuItem Header="Я сисадмин" Click="SysadminModeItem_Click"/>
+            <MenuItem Header="Выйти" Click="CloseItem_Click"/>
+        </ContextMenu>
+    </Window.ContextMenu>
+    
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
