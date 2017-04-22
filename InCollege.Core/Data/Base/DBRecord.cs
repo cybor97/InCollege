@@ -8,10 +8,22 @@ namespace InCollege.Core.Data.Base
         [PrimaryKey]
         [AutoIncrement]
         public int ID { get; set; } = -1;
-        [NotNull]
+        // [NotNull]
         public bool IsLocal { get; set; } = true;
-        [NotNull]
+        // [NotNull]
         public bool Modified { get; set; } = true;
+        // [NotNull]
+        public bool Removed { get; set; } = false;
+
+        [Ignore]
+        [JsonIgnore]
+        public string StateIconURI
+        {
+            get
+            {
+                return Removed ? "RemovedIcon" : IsLocal || Modified ? "ModifiedIcon" : "OkIcon";
+            }
+        }
 
         public string Serialize()
         {
