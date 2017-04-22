@@ -15,7 +15,7 @@
                 <MenuItem Header="Импорт"/>
                 <MenuItem Header="Выход" Click="ExitItem_Click"/>
             </MenuItem>
-            <MenuItem Header="Вывод">
+            <MenuItem Header="Вывод" IsEnabled="False">
                 <MenuItem Header="Подробнее"/>
                 <MenuItem Header="Создать сводную ведомость"/>
                 <MenuItem Header="Печать"/>
@@ -24,13 +24,13 @@
             <MenuItem Header="Словари">
                 <MenuItem Header="Виды аттестации" Click="DictionariesItem_Click"/>
             </MenuItem>
-            <MenuItem Header="Учетные записи">
+            <MenuItem Header="Учетные записи" Click="ParticipantsItem_Click">
                 <MenuItem Header="Студенты"/>
                 <MenuItem Header="Заведующие отделениями"/>
                 <MenuItem Header="Преподаватели"/>
                 <MenuItem Header="Прочие"/>
             </MenuItem>
-            <MenuItem Header="Сеть">
+            <MenuItem Header="Сеть" IsEnabled="False">
                 <MenuItem Header="Синхронизировать"/>
                 <MenuItem Header="Аккаунт"/>
                 <MenuItem Header="Настройки"/>
@@ -40,7 +40,8 @@
                 <MenuItem Header="Справка"/>
                 <MenuItem Header="О программе"/>
             </MenuItem>
-
+            <MenuItem Header="Выйти из учетной записи" Click="AccountExitItem_Click"/>
+            <MenuItem Header="Выйти" Click="ExitItem_Click"/>
         </ContextMenu>
     </Window.ContextMenu>
     <Grid>
@@ -49,7 +50,7 @@
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
-        <ListView Grid.Row="1">
+        <ListView Grid.Row="1" Name="StatementsLV">
             <ListView.View>
                 <GridView>
                     <GridViewColumn Header="Номер" Width="100"/>
