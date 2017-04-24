@@ -4,6 +4,7 @@
         xmlns:sw="clr-namespace:WpfStyleableWindow.StyleableWindow"
         MouseDoubleClick="Window_MouseDoubleClick"
         Style="{StaticResource BaseWindow}"
+        Loaded="MainWindow_Loaded"
         Title="MainWindow" Height="500" Width="1000">
     <Window.Resources>
         <sw:WindowCloseCommand x:Key="WindowCloseCommand"/>
@@ -53,11 +54,11 @@
         <ListView Grid.Row="1" Name="StatementsLV">
             <ListView.View>
                 <GridView>
-                    <GridViewColumn Header="Номер" Width="100"/>
-                    <GridViewColumn Header="Дата" Width="150"/>
-                    <GridViewColumn Header="Тип" Width="100"/>
-                    <GridViewColumn Header="Семестр" Width="100"/>
-                    <GridViewColumn Header="Примечание" Width="300"/>
+                    <GridViewColumn Header="Номер" DisplayMemberBinding="{Binding StatementNumber}" Width="100"/>
+                    <GridViewColumn Header="Дата" DisplayMemberBinding="{Binding StatementDate, StringFormat=dd\\.MM\\.yyyy}" Width="150"/>
+                    <GridViewColumn Header="Тип" Width="100" DisplayMemberBinding="{Binding StatementTypeString}"/>
+                    <GridViewColumn Header="Семестр" Width="100" DisplayMemberBinding="{Binding Semester}"/>
+                    <GridViewColumn Header="Примечание" Width="300" DisplayMemberBinding="{Binding Note}"/>
                 </GridView>
             </ListView.View>
         </ListView>

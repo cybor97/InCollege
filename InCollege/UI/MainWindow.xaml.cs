@@ -75,5 +75,10 @@ namespace InCollege.Client.UI
             Process.Start(Assembly.GetExecutingAssembly().Location);
             Process.GetCurrentProcess().Kill();
         }
+
+        private async void MainWindow_Loaded(object sender, RoutedEventArgs e)
+        {
+            await UpdateDisplayData();
+        }
     }
 }
