@@ -60,7 +60,7 @@ namespace InCollege.Client.UI
                           .PostAsync($"http://{ClientConfiguration.HostName}:{ClientConfiguration.Port}/Auth",
                           new StringContent(
                           $"Action={(SignUpMode ? "SignUp" : "SignIn")}&" +
-                          (SignUpMode ? $"FullName={FullNameTB}&" : string.Empty) +
+                          (SignUpMode ? $"FullName={FullNameTB.Text}&" : string.Empty) +
                           $"UserName={UserNameTB.Text}&" +
                           $"Password={PasswordTB.Password}&" +
                           (SignUpMode ? $"BirthDate={Uri.EscapeDataString(BirthdateTB.SelectedDate.Value.ToString("MM/dd/yyyy"))}&" : string.Empty) +
