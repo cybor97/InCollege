@@ -4,15 +4,11 @@
         Style="{StaticResource BaseWindow}"
         Title="Виды аттестации"
         xmlns:material="http://materialdesigninxaml.net/winfx/xaml/themes"
-        xmlns:util="clr-namespace:InCollege.UI.Util"
         Loaded="DictionariesWindow_Loaded"
         Name="_this"
         KeyDown="DictionariesWindow_KeyDown"
         ResizeMode="NoResize"
         Height="500" Width="400">
-    <Window.Resources>
-        <util:ImageToSourceConverter x:Key="ImageToSourceConverter"/>
-    </Window.Resources>
     <Window.ContextMenu>
         <ContextMenu>
             <MenuItem Header="Обновить" Click="UpdateItem_Click"/>
