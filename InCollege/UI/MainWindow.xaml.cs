@@ -42,6 +42,21 @@ namespace InCollege.Client.UI
                 }
                 else
                     MessageBox.Show(await response.Content.ReadAsStringAsync());
+                //TODO:Process. It should be account info fetching.
+                if ((response = (await new HttpClient()
+                    .PostAsync($"http://{ClientConfiguration.HostName}:{ClientConfiguration.Port}/Auth",
+                    new StringContent(
+                    $"Action=WhoAmI&" +
+                    $"token={App.Token}")))).StatusCode == HttpStatusCode.OK)
+                {
+                    var result = JsonConvert.DeserializeObject<IEnumerable<Statement>>(await response.Content.ReadAsStringAsync());
+                    //Yeah, 2 times, to prevent multiplying
+                    StatementsLV.Items.Clear();
+                    foreach (var current in result)
+                        StatementsLV.Items.Add(current);
+                }
+                else
+                    MessageBox.Show(await response.Content.ReadAsStringAsync());
             }
             catch (HttpRequestException exc)
             {
@@ -79,6 +94,27 @@ namespace InCollege.Client.UI
         private async void MainWindow_Loaded(object sender, RoutedEventArgs e)
         {
             await UpdateDisplayData();
+        }
+
+        private async void MainWindow_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
+        {
+            if (e.Key == System.Windows.Input.Key.F5)
+                await UpdateDisplayData();
+        }
+
+        private void EditItem_Click(object sender, RoutedEventArgs e)
+        {
+            MessageBox.Show("Sorry, still unimplemented :(");
+        }
+
+        private void RemoveItem_Click(object sender, RoutedEventArgs e)
+        {
+            MessageBox.Show("Sorry, still unimplemented :(");
+        }
+
+        private void ProfileDialog_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
+        {
+
         }
     }
 }
