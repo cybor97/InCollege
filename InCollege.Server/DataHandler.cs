@@ -17,7 +17,7 @@ namespace InCollege.Server
             if (request.Method == HttpMethods.Post)
                 if (request.Post.Parsed.TryGetByName("token", out string tokenString))
                 {
-                    var validationResult = AuthorizationHandler.VerifyToken(tokenString);
+                    var validationResult = AuthorizationHandler.VerifyToken(tokenString, false);
                     if (validationResult.valid)
                         if (request.Post.Parsed.TryGetByName("action", out string action))
                             context.Response = Actions[action]?.Invoke(request.Post.Parsed, validationResult.account);
