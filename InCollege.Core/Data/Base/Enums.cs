@@ -2,9 +2,14 @@
 {
     public enum StatementType : byte
     {
-        ExamStatement,
-        MiddleStatement,
-        TotalStatement
+        Middle,
+        Exam,
+        QualificationExam,
+        StudyPractice,
+        IndustrialPractice,
+        CourceProject,
+        Total,
+        Other
     }
 
     public enum AccountType : byte
@@ -16,9 +21,9 @@
         Admin = 5
     }
 
-    public enum TechnicalMarkValue : byte
+    public enum TechnicalMarkValue : sbyte
     {
-        Absent,
+        Absent = -1,
 
     }
 }
