@@ -32,8 +32,22 @@ namespace InCollege.Server
         {
             { "SignIn", SignIn },
             { "SignUp", SignUp },
-            { "ValidateToken", ValidateToken }
+            { "ValidateToken", ValidateToken },
+            { "WhoAmI", WhoAmI }
         };
+
+        private static IHttpResponse WhoAmI(IHttpHeaders arg)
+        {
+            if (arg.TryGetByName("token", out string tokenString))
+            {
+                //Nope! I won't send password with account info!
+                var token = VerifyTokenString(tokenString, true);
+                if (token.valid)
+                    return new HttpResponse(HttpResponseCode.Ok, token.accountJSON, false);
+                else return new HttpResponse(HttpResponseCode.Forbidden, "Токен невалидный. Проверьте правильность или запросите новый.", false);
+            }
+            else return new HttpResponse(HttpResponseCode.Forbidden, "Не удалось получить данные об аккаунте. Нужен токен!", false);
+        }
 
         private static IHttpResponse SignIn(IHttpHeaders query)
         {
@@ -104,7 +118,7 @@ namespace InCollege.Server
         private static IHttpResponse ValidateToken(IHttpHeaders query)
         {
             if (query.TryGetByName("token", out string token))
-                return new HttpResponse(VerifyToken(token).valid ? HttpResponseCode.Ok : HttpResponseCode.NotAcceptable, string.Empty, false);
+                return new HttpResponse(VerifyToken(token, false, true).valid ? HttpResponseCode.Ok : HttpResponseCode.NotAcceptable, string.Empty, false);
             else return new HttpResponse(HttpResponseCode.BadRequest, string.Empty, false);
         }
 
@@ -124,14 +138,26 @@ namespace InCollege.Server
                             new Claim("UserName",userName,typeof(string).Name,"InCollege_Auth","InCollege_Auth"),
                             new Claim("Password",password,typeof(string).Name,"InCollege_Auth","InCollege_Auth"),
                         }),
-                        notBefore: DateTime.Now.AddDays(1),
+                        notBefore: DateTime.Now,
                         expires: DateTime.Now.AddMonths(1),
                         signingCredentials: new Microsoft.IdentityModel.Tokens.SigningCredentials(
                             new Microsoft.IdentityModel.Tokens.SymmetricSecurityKey(Encoding.UTF8.GetBytes(EncryptionKey)),
                             Microsoft.IdentityModel.Tokens.SecurityAlgorithms.HmacSha256))), EncryptionKey);
         }
 
-        public static (bool valid, Account account) VerifyToken(string tokenString)
+        public static (bool valid, Account account) VerifyToken(string tokenString, bool wipePassword)
+        {
+            var token = VerifyToken(tokenString, true, wipePassword);
+            return (token.valid, (Account)token.account);
+        }
+
+        public static (bool valid, string accountJSON) VerifyTokenString(string tokenString, bool wipePassword)
+        {
+            var token = VerifyToken(tokenString, false, wipePassword);
+            return (token.valid, (string)token.account);
+        }
+
+        public static (bool valid, object account) VerifyToken(string tokenString, bool deSerializeAccount, bool wipePassword)
         {
             var data = GetToken(tokenString);
 
@@ -144,13 +170,19 @@ namespace InCollege.Server
                 ("Password", data.password));
 
             if (table.Rows.Count == 1)
-                return (true, JsonConvert.DeserializeObject<List<Account>>(JsonConvert.SerializeObject(table, new JsonSerializerSettings() { NullValueHandling = NullValueHandling.Ignore }))[0]);
+            {
+                if (wipePassword)
+                    table.Rows[0]["Password"] = null;
+                var accountString = JsonConvert.SerializeObject(table, new JsonSerializerSettings() { NullValueHandling = NullValueHandling.Ignore });
+                return (true, deSerializeAccount ? (object)JsonConvert.DeserializeObject<List<Account>>(accountString)[0] : accountString);
+            }
             else if (table.Rows.Count > 1)
                 return (false, null);
             else
                 return (false, null);
         }
 
+        //TODO:Implement "expires" checking.
         public static (int id, string userName, string password) GetToken(string tokenString)
         {
             try
