@@ -21,12 +21,12 @@ namespace InCollege.Client.UI
             EditStatementDialog.OnCancel += EditStatementDialog_OnCancel;
         }
 
-        private async void MainWindow_Loaded(object sender, RoutedEventArgs e)
+        async void MainWindow_Loaded(object sender, RoutedEventArgs e)
         {
             await UpdateDisplayData();
         }
 
-        private async Task UpdateDisplayData()
+        async Task UpdateDisplayData()
         {
             try
             {
@@ -79,54 +79,54 @@ namespace InCollege.Client.UI
             }
         }
 
-        private void ExitItem_Click(object sender, RoutedEventArgs e)
+        void ExitItem_Click(object sender, RoutedEventArgs e)
         {
             Close();
         }
 
-        private void DictionariesItem_Click(object sender, RoutedEventArgs e)
+        void DictionariesItem_Click(object sender, RoutedEventArgs e)
         {
             new DictionariesWindow().ShowDialog();
         }
 
-        private void Window_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+        void Window_MouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
             WindowState = WindowState == WindowState.Normal ? WindowState.Maximized : WindowState.Normal;
         }
 
-        private void ParticipantsItem_Click(object sender, RoutedEventArgs e)
+        void ParticipantsItem_Click(object sender, RoutedEventArgs e)
         {
             new ParticipantsWindow().ShowDialog();
         }
 
-        private void AccountExitItem_Click(object sender, RoutedEventArgs e)
+        void AccountExitItem_Click(object sender, RoutedEventArgs e)
         {
             AccountExit();
         }
 
-        private async void MainWindow_KeyDown(object sender, KeyEventArgs e)
+        async void MainWindow_KeyDown(object sender, KeyEventArgs e)
         {
             if (e.Key == Key.F5)
                 await UpdateDisplayData();
         }
 
-        private void EditItem_Click(object sender, RoutedEventArgs e)
+        void EditItem_Click(object sender, RoutedEventArgs e)
         {
             MessageBox.Show("Sorry, still unimplemented :(");
         }
 
-        private void RemoveItem_Click(object sender, RoutedEventArgs e)
+        void RemoveItem_Click(object sender, RoutedEventArgs e)
         {
             MessageBox.Show("Sorry, still unimplemented :(");
         }
 
-        private void ProfileDialog_KeyDown(object sender, KeyEventArgs e)
+        void ProfileDialog_KeyDown(object sender, KeyEventArgs e)
         {
             if (e.Key == Key.Escape)
                 ProfileDialog.IsOpen = false;
         }
 
-        private void CurrentAccountItem_Click(object sender, RoutedEventArgs e)
+        void CurrentAccountItem_Click(object sender, RoutedEventArgs e)
         {
             ProfileDialog.IsOpen = true;
         }
@@ -138,17 +138,17 @@ namespace InCollege.Client.UI
             Process.GetCurrentProcess().Kill();
         }
 
-        private void ProfileSaveButton_Click(object sender, RoutedEventArgs e)
+        void ProfileSaveButton_Click(object sender, RoutedEventArgs e)
         {
             ProfileDialog.IsOpen = false;
         }
 
-        private void ProfileCancelButton_Click(object sender, RoutedEventArgs e)
+        void ProfileCancelButton_Click(object sender, RoutedEventArgs e)
         {
             ProfileDialog.IsOpen = false;
         }
 
-        private void AccountTypeCB_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
+        void AccountTypeCB_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
         {
             if ((!(AccountTypeCB.Tag is bool) || (bool)AccountTypeCB.Tag) &&
                 e.RemovedItems.Count > 0 &&
@@ -163,18 +163,18 @@ namespace InCollege.Client.UI
             AccountTypeCB.Tag = true;
         }
 
-        private void AddButton_Click(object sender, RoutedEventArgs e)
+        void AddButton_Click(object sender, RoutedEventArgs e)
         {
             EditStatementDialogHost.IsOpen = true;
         }
 
-        private void EditStatementDialog_OnSave(object sender, RoutedEventArgs e)
+        void EditStatementDialog_OnSave(object sender, RoutedEventArgs e)
         {
             MessageBox.Show("Sorry, still unimplemented :(");
             EditStatementDialogHost.IsOpen = false;
         }
 
-        private void EditStatementDialog_OnCancel(object sender, RoutedEventArgs e)
+        void EditStatementDialog_OnCancel(object sender, RoutedEventArgs e)
         {
             EditStatementDialogHost.IsOpen = false;
         }
