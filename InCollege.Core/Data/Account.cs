@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 
 namespace InCollege.Core.Data
 {
@@ -15,6 +16,8 @@ namespace InCollege.Core.Data
         BirthDateUndefined,
         BirthDateAfterNow,
         AgeTooBig,
+        FullNameEmpty,
+        FullNameIncorrectFormat
     }
 
     public class Account : DBRecord
@@ -37,6 +40,8 @@ namespace InCollege.Core.Data
             if (birthDate != null)
                 age = DateTime.Now.Subtract(birthDate);
             return
+                string.IsNullOrWhiteSpace(fullName) ? AccountValidationResult.FullNameEmpty :
+                !Regex.IsMatch(fullName, "[A-я].* [A-я].* [A-я].*") ? AccountValidationResult.FullNameIncorrectFormat :
                 string.IsNullOrWhiteSpace(userName) ? AccountValidationResult.UserNameEmpty :
                 userName.Length < 5 ? AccountValidationResult.UserNameTooShort :
                 string.IsNullOrWhiteSpace(password) ? AccountValidationResult.PasswordEmpty :
