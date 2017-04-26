@@ -106,6 +106,8 @@ namespace InCollege.Server
 
         static Dictionary<AccountValidationResult, string> ErrorMessages = new Dictionary<AccountValidationResult, string>()
         {
+            { AccountValidationResult.FullNameEmpty, "Ваше имя не может быть пустым." },
+            { AccountValidationResult.FullNameIncorrectFormat, "ФИО не соответствует формату Имя Фамилия Отчество. Проверьте правильность введенных данных." },
             { AccountValidationResult.UserNameEmpty, "Имя пользователя не может быть пустым." },
             { AccountValidationResult.UserNameTooShort,"Имя пользователя должно содержать не менее 5 символов." },
             { AccountValidationResult.PasswordEmpty, "Пароль не может быть пустым." },
@@ -174,7 +176,7 @@ namespace InCollege.Server
                 if (wipePassword)
                     table.Rows[0]["Password"] = null;
                 var accountString = JsonConvert.SerializeObject(table, new JsonSerializerSettings() { NullValueHandling = NullValueHandling.Ignore });
-                return (true, deSerializeAccount ? (object)JsonConvert.DeserializeObject<List<Account>>(accountString)[0] : accountString);
+                return (true, deSerializeAccount ? (object)JsonConvert.DeserializeObject<IList<Account>>(accountString)[0] : accountString);
             }
             else if (table.Rows.Count > 1)
                 return (false, null);
