@@ -5,6 +5,7 @@ using SG.Algoritma;
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Globalization;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
@@ -24,7 +25,7 @@ namespace InCollege.Server
             if (request.Method == HttpMethods.Post)
                 if (request.Post.Parsed.TryGetByName("Action", out string action))
                     context.Response = Actions[action]?.Invoke(request.Post.Parsed);
-                else context.Response = new HttpResponse(HttpResponseCode.MethodNotAllowed, "Ошибка! Неверный запрос.", true);
+                else context.Response = new HttpResponse(HttpResponseCode.MethodNotAllowed, "Ошибка! Неверный запрос.", false);
             return Task.Factory.GetCompleted();
         }
 
@@ -73,9 +74,12 @@ namespace InCollege.Server
             if (query.TryGetByName("UserName", out string userName) &&
                 query.TryGetByName("Password", out string password) &&
                 query.TryGetByName("AccountType", out byte accountType) &&
-                query.TryGetByName("BirthDate", out DateTime birthDate) &&
+                query.TryGetByName("BirthDate", out string birthDateString) &&
+                DateTime.TryParseExact(birthDateString, "MM\\/dd\\/yyyy", new CultureInfo("en-US"), DateTimeStyles.None, out DateTime birthDate) &&
+
                 query.TryGetByName("FullName", out string fullName))
             {
+
                 var validationResult = Account.Validate(userName, password, birthDate, fullName);
                 if (validationResult == AccountValidationResult.OK)
                 {

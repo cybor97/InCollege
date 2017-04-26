@@ -63,7 +63,7 @@ namespace InCollege.Client.UI
                           (SignUpMode ? $"FullName={FullNameTB.Text}&" : string.Empty) +
                           $"UserName={UserNameTB.Text}&" +
                           $"Password={PasswordTB.Password}&" +
-                          (SignUpMode ? $"BirthDate={Uri.EscapeDataString(BirthdateTB.SelectedDate.Value.ToString("MM/dd/yyyy"))}&" : string.Empty) +
+                          (SignUpMode ? $"BirthDate={Uri.EscapeDataString(BirthdateTB.SelectedDate.Value.ToString("MM\\/dd\\/yyyy"))}&" : string.Empty) +
                           (SignUpMode ? $"AccountType={AccountTypeCB.SelectedIndex}" : string.Empty))))).StatusCode == HttpStatusCode.OK)
                     {
                         App.Token = await response.Content.ReadAsStringAsync();
