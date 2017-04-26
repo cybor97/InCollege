@@ -63,10 +63,31 @@ namespace InCollege.Server
             if (CheckAccess(query, account, true))
                 if (query.TryGetByName("table", out string table))
                 {
-                    var fields = new List<(string, object)>();
+                    var fields = new List<(string name, object value)>();
                     foreach (var current in query)
                         if (current.Key.StartsWith("field"))
                             fields.Add((current.Key.Split(new[] { "field" }, StringSplitOptions.RemoveEmptyEntries)[0], current.Value));
+
+                    //Special rules for accounts. Need to be optimized.
+                    if (table.Equals(nameof(Account)))
+                    {
+                        //Empty password field means that user don't want to change password.
+                        for (int i = 0; i < fields.Count; i++)
+                            if (fields[i].name.Equals("Password") && string.IsNullOrWhiteSpace((string)fields[i].value))
+                                fields[i] = ("Password", account.Password);
+
+                        //If account type isn't Admin, it cannot switch "Approved" status.
+                        if (account.AccountType != AccountType.Admin || !account.Approved)
+                            for (int i = 0; i < fields.Count; i++)
+                                if (fields[i].name.Equals("Approved")) fields[i] = ("Approved", account.Approved);
+
+                        //Account shouldn't be approved after AccountType switch.
+                        if (query.TryGetByName("fieldAccountType", out byte accountType) &&
+                            accountType != (byte)account.AccountType)
+                            for (int i = 0; i < fields.Count; i++)
+                                if (fields[i].name.Equals("Approved")) fields[i] = ("Approved", false);
+                    }
+
                     return new HttpResponse(HttpResponseCode.Ok, DBHolderSQL.Save(table, fields.ToArray()).ToString(), false);
                 }
                 else return new HttpResponse(HttpResponseCode.BadRequest, "Куда сохранять???", false);
@@ -86,7 +107,9 @@ namespace InCollege.Server
 
         static bool CheckAccess(IHttpHeaders query, Account account, bool write)
         {
-            return account.AccountType > AccountType.Student && account.AccountDataID != -1 && account.Approved;
+            return account.AccountType > AccountType.Guest &&
+                (account.AccountDataID != -1 || account.AccountType == AccountType.Admin) &&
+                account.Approved;
         }
 
         static bool CheckTableAccess(string tableName, Account account)
