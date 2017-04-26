@@ -84,6 +84,9 @@
     <Compile Include="UI\Base\StyleableWindow\WindowMinimizeCommand.cs" />
     <Compile Include="UI\Base\StyleableWindow\WindowResizeBehavior.cs" />
     <Compile Include="UI\Base\Styles\WindowButton.cs" />
+    <Compile Include="UI\EditStatementDialog.xaml.cs">
+      <DependentUpon>EditStatementDialog.xaml</DependentUpon>
+    </Compile>
     <Compile Include="UI\ParticipantsWindow.xaml.cs">
       <DependentUpon>ParticipantsWindow.xaml</DependentUpon>
     </Compile>
@@ -101,6 +104,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="UI\AuthorizationWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\EditStatementDialog.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
