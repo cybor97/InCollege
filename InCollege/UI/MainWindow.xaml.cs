@@ -1,6 +1,5 @@
 ﻿using InCollege.Core.Data;
 using Newtonsoft.Json;
-using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Net;
@@ -17,6 +16,9 @@ namespace InCollege.Client.UI
         public MainWindow()
         {
             InitializeComponent();
+
+            EditStatementDialog.OnSave += EditStatementDialog_OnSave;
+            EditStatementDialog.OnCancel += EditStatementDialog_OnCancel;
         }
 
         private async void MainWindow_Loaded(object sender, RoutedEventArgs e)
@@ -42,8 +44,8 @@ namespace InCollege.Client.UI
                     AccountTypeCB.SelectedIndex = (byte)result.AccountType;
                     if (!result.Approved)
                     {
-                        ProfileDialog.IsOpen = true;
                         MessageBox.Show("Извините, ваша должность не подтверждена. Обратитесь к администратору.");
+                        AccountExit();
                     }
                 }
                 else
@@ -144,6 +146,37 @@ namespace InCollege.Client.UI
         private void ProfileCancelButton_Click(object sender, RoutedEventArgs e)
         {
             ProfileDialog.IsOpen = false;
+        }
+
+        private void AccountTypeCB_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
+        {
+            if ((!(AccountTypeCB.Tag is bool) || (bool)AccountTypeCB.Tag) &&
+                e.RemovedItems.Count > 0 &&
+                MessageBox.Show("Внимание!\n" +
+                "Изменение приведет к невозможности авторизации до подтверждения администратором вашей должности.\n" +
+                "Продолжить?", "Изменение должности", MessageBoxButton.YesNo) != MessageBoxResult.Yes)
+            {
+                AccountTypeCB.Tag = false;
+                AccountTypeCB.SelectedItem = e.RemovedItems[0];
+                return;
+            }
+            AccountTypeCB.Tag = true;
+        }
+
+        private void AddButton_Click(object sender, RoutedEventArgs e)
+        {
+            EditStatementDialogHost.IsOpen = true;
+        }
+
+        private void EditStatementDialog_OnSave(object sender, RoutedEventArgs e)
+        {
+            MessageBox.Show("Sorry, still unimplemented :(");
+            EditStatementDialogHost.IsOpen = false;
+        }
+
+        private void EditStatementDialog_OnCancel(object sender, RoutedEventArgs e)
+        {
+            EditStatementDialogHost.IsOpen = false;
         }
     }
 }
