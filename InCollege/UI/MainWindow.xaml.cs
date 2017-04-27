@@ -177,6 +177,6 @@ namespace InCollege.Client.UI
         void EditStatementDialog_OnCancel(object sender, RoutedEventArgs e)
         {
             EditStatementDialogHost.IsOpen = false;
-        } 
+        }
     }
 }
