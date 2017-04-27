@@ -261,9 +261,9 @@ namespace WpfStyleableWindow.StyleableWindow
 
             if (result <= window.MinWidth)
                 return 0;
-             else if(result >= window.MaxWidth)
+            else if (result >= window.MaxWidth)
                 return 0;
-             else if(result < 0)
+            else if (result < 0)
                 return 0;
             else
                 return change;

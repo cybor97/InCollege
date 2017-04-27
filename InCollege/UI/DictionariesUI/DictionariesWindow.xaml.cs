@@ -5,15 +5,10 @@ using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Data;
-using System;
-using System.Globalization;
-using System.Windows.Media;
-using MaterialDesignThemes.Wpf;
 using InCollege.Core.Data.Base;
 using System.Windows.Input;
 
-namespace InCollege.Client.UI
+namespace InCollege.Client.UI.DictionariesUI
 {
     public partial class DictionariesWindow : Window
     {

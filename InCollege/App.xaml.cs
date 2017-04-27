@@ -1,4 +1,5 @@
-﻿using InCollege.Client.UI;
+﻿using InCollege.Client.UI.AuthorizationUI;
+using InCollege.Client.UI.MainUI;
 using System;
 using System.IO;
 using System.Net;

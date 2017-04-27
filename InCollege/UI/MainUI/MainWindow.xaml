@@ -1,14 +1,15 @@
-﻿<Window x:Class="InCollege.Client.UI.MainWindow"
+﻿<Window x:Class="InCollege.Client.UI.MainUI.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:sw="clr-namespace:WpfStyleableWindow.StyleableWindow"
         xmlns:material="http://materialdesigninxaml.net/winfx/xaml/themes"
         xmlns:local="clr-namespace:InCollege.UI"
+        xmlns:statements="clr-namespace:InCollege.UI.StatementsUI"
         MouseDoubleClick="Window_MouseDoubleClick"
         Style="{StaticResource BaseWindow}"
         Loaded="MainWindow_Loaded"
         KeyDown="MainWindow_KeyDown"
-       ResizeMode="NoResize"
+        ResizeMode="NoResize"
         WindowStartupLocation="CenterScreen"
         Height="500" Width="1000">
     <Window.Resources>
@@ -172,7 +173,7 @@
         <!--#region EditStatementDialog-->
         <material:DialogHost Name="EditStatementDialogHost">
             <material:DialogHost.DialogContent>
-                <local:EditStatementDialog x:Name="EditStatementDialog"/>
+                <statements:EditStatementDialog x:Name="EditStatementDialog"/>
             </material:DialogHost.DialogContent>
         </material:DialogHost>
         <!--#endregion-->

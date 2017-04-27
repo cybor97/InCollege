@@ -18,14 +18,10 @@ namespace SG.Algoritma
         public static string Encrypt(string plainText, string password)
         {
             if (plainText == null)
-            {
                 return null;
-            }
 
             if (password == null)
-            {
                 password = String.Empty;
-            }
 
             // Get the bytes of the string
             var bytesToBeEncrypted = Encoding.UTF8.GetBytes(plainText);
@@ -48,14 +44,10 @@ namespace SG.Algoritma
         public static string Decrypt(string encryptedText, string password)
         {
             if (encryptedText == null)
-            {
                 return null;
-            }
 
             if (password == null)
-            {
                 password = String.Empty;
-            }
 
             // Get the bytes of the string
             var bytesToBeDecrypted = Convert.FromBase64String(encryptedText);
@@ -63,7 +55,7 @@ namespace SG.Algoritma
 
             passwordBytes = SHA256.Create().ComputeHash(passwordBytes);
 
-            var bytesDecrypted = Cipher.Decrypt(bytesToBeDecrypted, passwordBytes);
+            var bytesDecrypted = Decrypt(bytesToBeDecrypted, passwordBytes);
 
             return Encoding.UTF8.GetString(bytesDecrypted);
         }

@@ -1,4 +1,5 @@
-﻿using InCollege.Core.Data;
+﻿using InCollege.Client.UI.DictionariesUI;
+using InCollege.Core.Data;
 using Newtonsoft.Json;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -9,7 +10,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
 
-namespace InCollege.Client.UI
+namespace InCollege.Client.UI.MainUI
 {
     public partial class MainWindow : Window
     {

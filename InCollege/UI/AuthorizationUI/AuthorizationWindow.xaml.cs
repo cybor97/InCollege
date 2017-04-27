@@ -4,7 +4,7 @@ using System.Net.Http;
 using System.Windows;
 using System.Windows.Media.Animation;
 
-namespace InCollege.Client.UI
+namespace InCollege.Client.UI.AuthorizationUI
 {
     public partial class AuthorizationWindow : Window
     {

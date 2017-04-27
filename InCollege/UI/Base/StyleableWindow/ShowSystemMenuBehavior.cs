@@ -1,12 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Interop;
-using System.Runtime.InteropServices;
+﻿using System.Windows;
 using System.Windows.Media;
 using System.Windows.Input;
 
@@ -80,7 +72,7 @@ namespace WpfStyleableWindow.StyleableWindow
 
         static bool leftButtonToggle = true;
 
-        static void LeftButtonDownShow(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        static void LeftButtonDownShow(object sender, MouseButtonEventArgs e)
         {
             if (leftButtonToggle)
             {
@@ -114,7 +106,7 @@ namespace WpfStyleableWindow.StyleableWindow
             }
         }
 
-        static void RightButtonDownShow(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        static void RightButtonDownShow(object sender, MouseButtonEventArgs e)
         {
             var element = (UIElement)sender;
 

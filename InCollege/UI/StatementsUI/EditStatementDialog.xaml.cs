@@ -1,7 +1,7 @@
 ﻿using System.Windows;
 using System.Windows.Controls;
 
-namespace InCollege.UI
+namespace InCollege.UI.StatementsUI
 {
     public partial class EditStatementDialog : Grid
     {

@@ -76,7 +76,6 @@
     <Compile Include="DataHandler.cs" />
     <Compile Include="HomeHandler.cs" />
     <Compile Include="InCollegeServer.cs" />
-    <Compile Include="StringEncryptor.cs" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs">
