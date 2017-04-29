@@ -126,7 +126,7 @@ namespace InCollege.Core.Data.Base
             var adapter = Adapters["sqlite_sequence"];
             adapter.SelectCommand = new SQLiteCommand($"SELECT * FROM sqlite_sequence WHERE name LIKE '{table}';", DataConnection);
             adapter.Fill(data);
-            return Convert.ToInt32(data.Rows[0]["seq"]) + 1;
+            return data.Rows.Count == 0 ? 0 : Convert.ToInt32(data.Rows[0]["seq"]) + 1;
         }
     }
 }
