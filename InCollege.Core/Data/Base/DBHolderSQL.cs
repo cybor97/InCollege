@@ -68,14 +68,22 @@ namespace InCollege.Core.Data.Base
 
         public static int Save(string table, params (string key, object value)[] columns)
         {
-            if (columns.Any(c => c.key.Equals("Removed") && (bool)c.value == true))
+            for (int i = 0; i < columns.Length; i++)
+            {
+                var c = columns[i];
+                if ((c.key == "IsLocal" || c.key == "Modified" || c.key == "Removed") && !(c.value is bool))
+                    columns[i] = (c.key, (int.Parse(c.value.ToString()) == 1));
+            }
+
+            if (columns.Any(c => c.key.Equals("Removed") && (bool)c.value))
                 return -1;
 
             var adapter = Adapters[table];
             adapter.SelectCommand = new SQLiteCommand($"SELECT * FROM {table}", DataConnection);
             var data = new DataTable(table);
             adapter.Fill(data);
-            data.PrimaryKey = new[] { data.Columns["ID"] };
+            data.PrimaryKey = new[] { data.Columns["ID"]
+    };
 
 
             DataRow row;
@@ -100,7 +108,9 @@ namespace InCollege.Core.Data.Base
 
             foreach (var current in columns)
                 if ((current.key != "ID" || isLocal) && current.key != "IsLocal" && current.key != "Modified")
-                    row[current.key] = current.value;
+                    if (!current.value.ToString().StartsWith("raw_data"))
+                        row[current.key] = current.value;
+                    else row[current.key] = Convert.FromBase64String(current.value.ToString().Split(new[] { "raw_data" }, StringSplitOptions.RemoveEmptyEntries)[0]);
 
             Adapters[table].SelectCommand = new SQLiteCommand($"SELECT * FROM {table} WHERE ID={id}", DataConnection);
 
