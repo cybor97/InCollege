@@ -73,6 +73,9 @@
     </ApplicationDefinition>
     <Compile Include="ClientConfiguration.cs" />
     <Compile Include="CommonVariables.cs" />
+    <Compile Include="UI\AuthorizationUI\AccountEditDialog.xaml.cs">
+      <DependentUpon>AccountEditDialog.xaml</DependentUpon>
+    </Compile>
     <Compile Include="UI\Base\StyleableWindow\ControlDoubleClickBehavior.cs" />
     <Compile Include="UI\Base\StyleableWindow\ShowSystemMenuBehavior.cs" />
     <Compile Include="UI\Base\StyleableWindow\SystemMenuManager.cs" />
@@ -106,6 +109,10 @@
     </Compile>
     <Compile Include="UI\Util\GridViewSort.cs" />
     <Compile Include="UI\Util\ImageToSourceConverter.cs" />
+    <Page Include="UI\AuthorizationUI\AccountEditDialog.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="UI\Base\Styles\InCollegeWindowStyle.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
