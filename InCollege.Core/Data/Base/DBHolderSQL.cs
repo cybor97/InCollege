@@ -122,9 +122,11 @@ namespace InCollege.Core.Data.Base
 
         static int GetFreeID(string table)
         {
-            Adapters[table].SelectCommand = new SQLiteCommand($"SELECT Max(Count(*),Max(ID)) FROM {table}", DataConnection);
             var data = new DataTable();
-            return Adapters[table].Fill(data) == 0 ? 1 : string.IsNullOrWhiteSpace(data.Rows[0][0].ToString()) ? 1 : Convert.ToInt32(data.Rows[0][0]) + 1;
+            var adapter = Adapters["sqlite_sequence"];
+            adapter.SelectCommand = new SQLiteCommand($"SELECT * FROM sqlite_sequence WHERE name LIKE '{table}';", DataConnection);
+            adapter.Fill(data);
+            return Convert.ToInt32(data.Rows[0]["seq"]) + 1;
         }
     }
 }
