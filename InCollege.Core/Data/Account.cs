@@ -25,11 +25,11 @@ namespace InCollege.Core.Data
         private const decimal DaysInAYear = 365.242M;
         private const int MaxAge = 150;
 
-        public virtual int AccountDataID { get; set; }
+        public int AccountDataID { get; set; } = -1;
         public string UserName { get; set; }
         public string Password { get; set; }
         public AccountType AccountType { get; set; }
-        public virtual DateTime BirthDate { get; set; }
+        public virtual DateTime? BirthDate { get; set; }
         public virtual byte[] ProfileImage { get; set; }
         public string FullName { get; set; }
         public bool Approved { get; set; }
