@@ -1,5 +1,9 @@
 ﻿using Newtonsoft.Json;
 using SQLite;
+using System;
+using System.Linq;
+using System.Net;
+using System.Reflection;
 
 namespace InCollege.Core.Data.Base
 {
@@ -25,14 +29,32 @@ namespace InCollege.Core.Data.Base
             }
         }
 
-        public string Serialize()
+        public string POSTSerialized
         {
-            return JsonConvert.SerializeObject(this, Formatting.Indented);//TODO:Remove this debug staff.
+            get
+            {
+                return $"table={GetType().Name}&" + string.Join("&", GetType()
+                             .GetProperties(BindingFlags.Public | BindingFlags.Instance)
+                             .Where(c =>
+                             {
+                                 if (c.CanWrite)
+                                 {
+                                     object value = c.GetValue(this);
+                                     return value != null && (!(value is string) || !string.IsNullOrWhiteSpace((string)value));
+                                 }
+                                 return false;
+                             })
+                             .Select(c =>
+                             {
+                                 var value = c.GetValue(this);
+                                 return "field" + c.Name + "=" + WebUtility.UrlEncode(((value is byte[]) ? Convert.ToBase64String((byte[])value) :
+                                                        (value is bool) ? ((bool)value ? 1 : 0) :
+                                                        (value is Enum) ? (byte)value :
+                                                        (value is DateTime) ? ((DateTime)value).ToString("MM\\/dd\\/yyyy") :
+                                                        value).ToString());
+                             }));
+            }
         }
 
-        public static T DeSerialize<T>(string json) where T : DBRecord
-        {
-            return JsonConvert.DeserializeObject<T>(json);
-        }
     }
 }
