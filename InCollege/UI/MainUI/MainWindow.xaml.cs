@@ -39,10 +39,8 @@ namespace InCollege.Client.UI.MainUI
                 $"token={App.Token}")))).StatusCode == HttpStatusCode.OK)
                 {
                     var result = JsonConvert.DeserializeObject<IList<Account>>(await response.Content.ReadAsStringAsync())[0];
-                    CurrentAccountItem.Header = FullNameTB.Text = result.FullName;
-                    UserNameTB.Text = result.UserName;
-                    BirthDateTB.SelectedDate = result.BirthDate;
-                    AccountTypeCB.SelectedIndex = (byte)result.AccountType;
+                    CurrentAccountItem.Header = result.FullName;
+                    ProfileDialog.Account = result;
                     if (!result.Approved)
                     {
                         MessageBox.Show("Извините, ваша должность не подтверждена. Обратитесь к администратору.");
@@ -124,12 +122,12 @@ namespace InCollege.Client.UI.MainUI
         void ProfileDialog_KeyDown(object sender, KeyEventArgs e)
         {
             if (e.Key == Key.Escape)
-                ProfileDialog.IsOpen = false;
+                ProfileDialogHost.IsOpen = false;
         }
 
         void CurrentAccountItem_Click(object sender, RoutedEventArgs e)
         {
-            ProfileDialog.IsOpen = true;
+            ProfileDialogHost.IsOpen = true;
         }
 
         void AccountExit()
@@ -139,30 +137,6 @@ namespace InCollege.Client.UI.MainUI
             Process.GetCurrentProcess().Kill();
         }
 
-        void ProfileSaveButton_Click(object sender, RoutedEventArgs e)
-        {
-            ProfileDialog.IsOpen = false;
-        }
-
-        void ProfileCancelButton_Click(object sender, RoutedEventArgs e)
-        {
-            ProfileDialog.IsOpen = false;
-        }
-
-        void AccountTypeCB_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
-        {
-            if ((!(AccountTypeCB.Tag is bool) || (bool)AccountTypeCB.Tag) &&
-                e.RemovedItems.Count > 0 &&
-                MessageBox.Show("Внимание!\n" +
-                "Изменение приведет к невозможности авторизации до подтверждения администратором вашей должности.\n" +
-                "Продолжить?", "Изменение должности", MessageBoxButton.YesNo) != MessageBoxResult.Yes)
-            {
-                AccountTypeCB.Tag = false;
-                AccountTypeCB.SelectedItem = e.RemovedItems[0];
-                return;
-            }
-            AccountTypeCB.Tag = true;
-        }
 
         void AddButton_Click(object sender, RoutedEventArgs e)
         {
@@ -178,6 +152,34 @@ namespace InCollege.Client.UI.MainUI
         void EditStatementDialog_OnCancel(object sender, RoutedEventArgs e)
         {
             EditStatementDialogHost.IsOpen = false;
+        }
+
+        private async void ProfileDialog_OnSave(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                HttpResponseMessage response;
+                if ((response = (await new HttpClient()
+                      .PostAsync($"http://{ClientConfiguration.HostName}:{ClientConfiguration.Port}/Data",
+                      new StringContent(
+                      $"Action=Save&" +
+                      $"token={App.Token}&" +
+                      ProfileDialog.Account.POSTSerialized)))).StatusCode == HttpStatusCode.OK)
+                    await UpdateDisplayData();
+                else
+                    MessageBox.Show(await response.Content.ReadAsStringAsync());
+            }
+            catch (HttpRequestException exc)
+            {
+                MessageBox.Show($"Ошибка подключения к серверу. Проверьте:\n-запущен ли сервер\n-настройки брандмауэра\n-правильно ли указан адрес\nТехническая информация:\n\n{exc.Message}");
+            }
+
+            ProfileDialogHost.IsOpen = false;
+        }
+
+        private void ProfileDialog_OnCancel(object sender, RoutedEventArgs e)
+        {
+            ProfileDialogHost.IsOpen = false;
         }
     }
 }
