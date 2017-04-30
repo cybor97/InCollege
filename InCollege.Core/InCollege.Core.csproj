@@ -50,7 +50,6 @@
   <ItemGroup>
     <Compile Include="Data\Account.cs" />
     <Compile Include="Data\AttestationType.cs" />
-    <Compile Include="Data\Base\AccountData.cs" />
     <Compile Include="Data\Base\DBHolderORM.cs" />
     <Compile Include="Data\Base\DBHolderSQL.cs" />
     <Compile Include="Data\Base\DBRecord.cs" />
@@ -59,17 +58,14 @@
     <Compile Include="Data\Configuration.cs" />
     <Compile Include="Data\Mark.cs" />
     <Compile Include="Data\Department.cs" />
-    <Compile Include="Data\DepartmentHead.cs" />
     <Compile Include="Data\ExamStatementResult.cs" />
     <Compile Include="Data\Group.cs" />
     <Compile Include="Data\Log.cs" />
     <Compile Include="Data\Message.cs" />
     <Compile Include="Data\MiddleStatementResult.cs" />
-    <Compile Include="Data\Professor.cs" />
     <Compile Include="Data\Specialty.cs" />
     <Compile Include="Data\Statement.cs" />
     <Compile Include="Data\StatementAttestationType.cs" />
-    <Compile Include="Data\Student.cs" />
     <Compile Include="Data\Subject.cs" />
     <Compile Include="Data\Teacher.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
