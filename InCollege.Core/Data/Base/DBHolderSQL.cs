@@ -108,7 +108,7 @@ namespace InCollege.Core.Data.Base
 
             foreach (var current in columns)
                 if ((current.key != "ID" || isLocal) && current.key != "IsLocal" && current.key != "Modified")
-                    if (!current.value.ToString().StartsWith("raw_data"))
+                    if (current.value == null || !current.value.ToString().StartsWith("raw_data"))
                         row[current.key] = current.value;
                     else row[current.key] = Convert.FromBase64String(current.value.ToString().Split(new[] { "raw_data" }, StringSplitOptions.RemoveEmptyEntries)[0]);
 
