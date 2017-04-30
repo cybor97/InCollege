@@ -1,11 +1,12 @@
 ﻿using InCollege.Core.Data;
 using InCollege.Core.Data.Base;
+using MaterialDesignThemes.Wpf;
 using System.Windows;
 using System.Windows.Controls;
 
 namespace InCollege.UI.AuthorizationUI
 {
-    public partial class AccountEditDialog : Grid
+    public partial class AccountEditDialog : DialogHost
     {
         public static DependencyProperty ShowAccountChangeAlertProperty =
             DependencyProperty.Register("ShowAccountChangeAlert", typeof(Account), typeof(AccountEditDialog));

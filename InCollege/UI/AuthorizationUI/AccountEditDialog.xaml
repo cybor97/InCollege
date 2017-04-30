@@ -1,84 +1,89 @@
-﻿<Grid x:Class="InCollege.UI.AuthorizationUI.AccountEditDialog"
+﻿<material:DialogHost
+    x:Class="InCollege.UI.AuthorizationUI.AccountEditDialog"
       xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-      xmlns:material="http://materialdesigninxaml.net/winfx/xaml/themes"
+      xmlns:material="http://materialdesigninxaml.net/winfx/xaml/themes">
+    <material:DialogHost.DialogContent>
+        <Grid 
       MinWidth="500" MinHeight="350" Margin="10" VerticalAlignment="Center" HorizontalAlignment="Center">
-    <StackPanel Orientation="Vertical" VerticalAlignment="Top">
-        <TextBox Name="FullNameTB" material:HintAssist.IsFloating="True">
-            <material:HintAssist.Hint>
-                <StackPanel Orientation="Horizontal" Margin="-2 0 0 0">
-                    <material:PackIcon Kind="Account" />
-                    <TextBlock>ФИО</TextBlock>
-                </StackPanel>
-            </material:HintAssist.Hint>
-        </TextBox>
-        <TextBox Margin="0 15 0 0" Name="UserNameTB" material:HintAssist.IsFloating="True">
-            <material:HintAssist.Hint>
-                <StackPanel Orientation="Horizontal" Margin="-2 0 0 0">
-                    <material:PackIcon Kind="Account" />
-                    <TextBlock>Имя пользователя</TextBlock>
-                </StackPanel>
-            </material:HintAssist.Hint>
-        </TextBox>
-        <PasswordBox Margin="0 15 0 0" Name="PasswordTB" material:HintAssist.IsFloating="True">
-            <material:HintAssist.Hint>
-                <StackPanel Orientation="Horizontal" Margin="-2 0 0 0">
-                    <material:PackIcon Kind="Lock" />
-                    <TextBlock>Пароль</TextBlock>
-                </StackPanel>
-            </material:HintAssist.Hint>
-        </PasswordBox>
-        <DatePicker Margin="0 15 0 0" Name="BirthDateTB" material:HintAssist.IsFloating="True">
-            <material:HintAssist.Hint>
-                <StackPanel Orientation="Horizontal" >
-                    <material:PackIcon Kind="Calendar" Margin="0 0 3 0"/>
-                    <TextBlock>Дата рождения</TextBlock>
-                </StackPanel>
-            </material:HintAssist.Hint>
-        </DatePicker>
-        <Grid>
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="Auto"/>
-            </Grid.ColumnDefinitions>
+            <StackPanel Orientation="Vertical" VerticalAlignment="Top">
+                <TextBox Name="FullNameTB" material:HintAssist.IsFloating="True">
+                    <material:HintAssist.Hint>
+                        <StackPanel Orientation="Horizontal" Margin="-2 0 0 0">
+                            <material:PackIcon Kind="Account" />
+                            <TextBlock>ФИО</TextBlock>
+                        </StackPanel>
+                    </material:HintAssist.Hint>
+                </TextBox>
+                <TextBox Margin="0 15 0 0" Name="UserNameTB" material:HintAssist.IsFloating="True">
+                    <material:HintAssist.Hint>
+                        <StackPanel Orientation="Horizontal" Margin="-2 0 0 0">
+                            <material:PackIcon Kind="Account" />
+                            <TextBlock>Имя пользователя</TextBlock>
+                        </StackPanel>
+                    </material:HintAssist.Hint>
+                </TextBox>
+                <PasswordBox Margin="0 15 0 0" Name="PasswordTB" material:HintAssist.IsFloating="True">
+                    <material:HintAssist.Hint>
+                        <StackPanel Orientation="Horizontal" Margin="-2 0 0 0">
+                            <material:PackIcon Kind="Lock" />
+                            <TextBlock>Пароль</TextBlock>
+                        </StackPanel>
+                    </material:HintAssist.Hint>
+                </PasswordBox>
+                <DatePicker Margin="0 15 0 0" Name="BirthDateTB" material:HintAssist.IsFloating="True">
+                    <material:HintAssist.Hint>
+                        <StackPanel Orientation="Horizontal" >
+                            <material:PackIcon Kind="Calendar" Margin="0 0 3 0"/>
+                            <TextBlock>Дата рождения</TextBlock>
+                        </StackPanel>
+                    </material:HintAssist.Hint>
+                </DatePicker>
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
 
-            <ComboBox Margin="0 15 0 0" Name="AccountTypeCB" 
+                    <ComboBox Margin="0 15 0 0" Name="AccountTypeCB" 
                       material:HintAssist.IsFloating="True" 
                       SelectionChanged="AccountTypeCB_SelectionChanged">
-                <ComboBoxItem Content="Гость"/>
-                <ComboBoxItem Content="Студент"/>
-                <ComboBoxItem Content="Преподаватель"/>
-                <ComboBoxItem Content="Заведующий отделением"/>
-                <ComboBoxItem Content="Администратор"/>
-                <material:HintAssist.Hint>
-                    <StackPanel Orientation="Horizontal">
-                        <material:PackIcon Margin="0 0 3 0" Kind="AccountCardDetails" />
-                        <TextBlock>Должность</TextBlock>
-                    </StackPanel>
-                </material:HintAssist.Hint>
-            </ComboBox>
-            <material:PackIcon Kind="Check" 
+                        <ComboBoxItem Content="Гость"/>
+                        <ComboBoxItem Content="Студент"/>
+                        <ComboBoxItem Content="Преподаватель"/>
+                        <ComboBoxItem Content="Заведующий отделением"/>
+                        <ComboBoxItem Content="Администратор"/>
+                        <material:HintAssist.Hint>
+                            <StackPanel Orientation="Horizontal">
+                                <material:PackIcon Margin="0 0 3 0" Kind="AccountCardDetails" />
+                                <TextBlock>Должность</TextBlock>
+                            </StackPanel>
+                        </material:HintAssist.Hint>
+                    </ComboBox>
+                    <material:PackIcon Kind="Check" 
                                Foreground="Lime" 
                                Grid.Column="1" 
                                HorizontalAlignment="Center" 
                                Margin="5 0 5 0" 
                                VerticalAlignment="Center" 
                                Name="ApprovedIcon"/>
-        </Grid>
-    </StackPanel>
-    <Grid>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition/>
-            <ColumnDefinition/>
-        </Grid.ColumnDefinitions>
-        <Button Content="Отмена" 
+                </Grid>
+            </StackPanel>
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition/>
+                    <ColumnDefinition/>
+                </Grid.ColumnDefinitions>
+                <Button Content="Отмена" 
                                 Style="{StaticResource MaterialDesignFlatButton}" 
                                 VerticalAlignment="Bottom" 
                                 Click="ProfileCancelButton_Click"/>
-        <Button Content="Сохранить" 
+                <Button Content="Сохранить" 
                                 Grid.Column="1"
                                 Style="{StaticResource MaterialDesignFlatAccentButton}" 
                                 VerticalAlignment="Bottom" 
                                 Click="ProfileSaveButton_Click"/>
-    </Grid>
-</Grid>
+            </Grid>
+        </Grid>
+    </material:DialogHost.DialogContent>
+</material:DialogHost>

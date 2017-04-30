@@ -2,8 +2,6 @@
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:sw="clr-namespace:WpfStyleableWindow.StyleableWindow"
-        xmlns:material="http://materialdesigninxaml.net/winfx/xaml/themes"
-        xmlns:local="clr-namespace:InCollege.UI"
         xmlns:statements="clr-namespace:InCollege.UI.StatementsUI"
         xmlns:authorizationui="clr-namespace:InCollege.UI.AuthorizationUI"
         MouseDoubleClick="Window_MouseDoubleClick"
@@ -36,7 +34,8 @@
                 <MenuItem Header="Студенты" Click="ParticipantsItem_Click"/>
                 <MenuItem Header="Заведующие отделениями" Click="ParticipantsItem_Click"/>
                 <MenuItem Header="Преподаватели" Click="ParticipantsItem_Click"/>
-                <MenuItem Header="Прочие" Click="ParticipantsItem_Click"/>
+                <MenuItem Header="Администраторы" Click="ParticipantsItem_Click"/>
+                <MenuItem Header="Не назначенные" Click="ParticipantsItem_Click"/>
             </MenuItem>
             <MenuItem Header="Сеть" IsEnabled="False">
                 <MenuItem Header="Синхронизировать"/>
@@ -90,23 +89,13 @@
                 Click="AddButton_Click"
                 HorizontalAlignment="Right" VerticalAlignment="Bottom"/>
 
-        <!--#region ProfileDialog-->
-        <material:DialogHost Name="ProfileDialogHost"
-                             CloseOnClickAway="True"
-                             KeyDown="ProfileDialog_KeyDown">
-            <material:DialogHost.DialogContent>
-                <authorizationui:AccountEditDialog x:Name="ProfileDialog"
-                                                   OnSave="ProfileDialog_OnSave"
-                                                   OnCancel="ProfileDialog_OnCancel"/>
-            </material:DialogHost.DialogContent>
-        </material:DialogHost>
-        <!--#endregion-->
-        <!--#region EditStatementDialog-->
-        <material:DialogHost Name="EditStatementDialogHost">
-            <material:DialogHost.DialogContent>
-                <statements:EditStatementDialog x:Name="EditStatementDialog"/>
-            </material:DialogHost.DialogContent>
-        </material:DialogHost>
-        <!--#endregion-->
+        <authorizationui:AccountEditDialog x:Name="ProfileDialog"
+                                           KeyDown="ProfileDialog_KeyDown"
+                                           OnSave="ProfileDialog_OnSave"
+                                           OnCancel="ProfileDialog_OnCancel"
+                                           Background="Black"/>
+        <statements:EditStatementDialog x:Name="EditStatementDialog"
+                                        OnSave="EditStatementDialog_OnSave"
+                                        OnCancel="EditStatementDialog_OnCancel"/>
     </Grid>
 </Window>

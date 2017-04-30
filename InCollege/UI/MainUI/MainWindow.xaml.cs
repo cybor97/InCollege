@@ -1,5 +1,6 @@
 ﻿using InCollege.Client.UI.DictionariesUI;
 using InCollege.Core.Data;
+using InCollege.Core.Data.Base;
 using Newtonsoft.Json;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -8,6 +9,7 @@ using System.Net.Http;
 using System.Reflection;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Input;
 
 namespace InCollege.Client.UI.MainUI
@@ -38,10 +40,10 @@ namespace InCollege.Client.UI.MainUI
                 $"Action=WhoAmI&" +
                 $"token={App.Token}")))).StatusCode == HttpStatusCode.OK)
                 {
-                    var result = JsonConvert.DeserializeObject<IList<Account>>(await response.Content.ReadAsStringAsync())[0];
-                    CurrentAccountItem.Header = result.FullName;
-                    ProfileDialog.Account = result;
-                    if (!result.Approved)
+                    App.Account = JsonConvert.DeserializeObject<IList<Account>>(await response.Content.ReadAsStringAsync())[0];
+                    CurrentAccountItem.Header = App.Account.FullName;
+                    ProfileDialog.Account = App.Account;
+                    if (!App.Account.Approved)
                     {
                         MessageBox.Show("Извините, ваша должность не подтверждена. Обратитесь к администратору.");
                         AccountExit();
@@ -83,9 +85,10 @@ namespace InCollege.Client.UI.MainUI
             Close();
         }
 
-        void DictionariesItem_Click(object sender, RoutedEventArgs e)
+        async void DictionariesItem_Click(object sender, RoutedEventArgs e)
         {
             new DictionariesWindow().ShowDialog();
+            await UpdateDisplayData();
         }
 
         void Window_MouseDoubleClick(object sender, MouseButtonEventArgs e)
@@ -93,9 +96,10 @@ namespace InCollege.Client.UI.MainUI
             WindowState = WindowState == WindowState.Normal ? WindowState.Maximized : WindowState.Normal;
         }
 
-        void ParticipantsItem_Click(object sender, RoutedEventArgs e)
+        async void ParticipantsItem_Click(object sender, RoutedEventArgs e)
         {
-            new ParticipantsWindow().ShowDialog();
+            new ParticipantsWindow((AccountType)((MenuItem)(((MenuItem)sender).Parent)).Items.IndexOf(sender)).ShowDialog();
+            await UpdateDisplayData();
         }
 
         void AccountExitItem_Click(object sender, RoutedEventArgs e)
@@ -122,12 +126,12 @@ namespace InCollege.Client.UI.MainUI
         void ProfileDialog_KeyDown(object sender, KeyEventArgs e)
         {
             if (e.Key == Key.Escape)
-                ProfileDialogHost.IsOpen = false;
+                ProfileDialog.IsOpen = false;
         }
 
         void CurrentAccountItem_Click(object sender, RoutedEventArgs e)
         {
-            ProfileDialogHost.IsOpen = true;
+            ProfileDialog.IsOpen = true;
         }
 
         void AccountExit()
@@ -140,18 +144,18 @@ namespace InCollege.Client.UI.MainUI
 
         void AddButton_Click(object sender, RoutedEventArgs e)
         {
-            EditStatementDialogHost.IsOpen = true;
+            EditStatementDialog.IsOpen = true;
         }
 
         void EditStatementDialog_OnSave(object sender, RoutedEventArgs e)
         {
             MessageBox.Show("Sorry, still unimplemented :(");
-            EditStatementDialogHost.IsOpen = false;
+            EditStatementDialog.IsOpen = false;
         }
 
         void EditStatementDialog_OnCancel(object sender, RoutedEventArgs e)
         {
-            EditStatementDialogHost.IsOpen = false;
+            EditStatementDialog.IsOpen = false;
         }
 
         private async void ProfileDialog_OnSave(object sender, RoutedEventArgs e)
@@ -174,12 +178,12 @@ namespace InCollege.Client.UI.MainUI
                 MessageBox.Show($"Ошибка подключения к серверу. Проверьте:\n-запущен ли сервер\n-настройки брандмауэра\n-правильно ли указан адрес\nТехническая информация:\n\n{exc.Message}");
             }
 
-            ProfileDialogHost.IsOpen = false;
+            ProfileDialog.IsOpen = false;
         }
 
         private void ProfileDialog_OnCancel(object sender, RoutedEventArgs e)
         {
-            ProfileDialogHost.IsOpen = false;
+            ProfileDialog.IsOpen = false;
         }
     }
 }
