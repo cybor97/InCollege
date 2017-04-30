@@ -3,6 +3,7 @@ using InCollege.Core.Data.Base;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Threading.Tasks;
 using uhttpsharp;
 using uhttpsharp.Headers;
@@ -41,20 +42,26 @@ namespace InCollege.Server
         static HttpResponse GetRangeProcessor(IHttpHeaders query, Account account)
         {
             if (CheckAccess(query, account, false))
-            {
-                int skip = query.TryGetByName("skipRecords", out int skipResult) ? skipResult : 0;
-                int count = query.TryGetByName("countRecords", out int countResult) ? countResult : -1;
-                string column = query.TryGetByName("column", out string columnResult) ? columnResult : null;
-                bool fixedString = query.TryGetByName("fixedString", out bool fixedStringResult) && fixedStringResult;
-                var whereParams = new List<(string, object)>();
-                foreach (var current in query)
-                    if (current.Key.StartsWith("where"))
-                        whereParams.Add((current.Key.Split(new[] { "where" }, StringSplitOptions.RemoveEmptyEntries)[0], current.Value));
-                return new HttpResponse(HttpResponseCode.Ok,
-                    query.TryGetByName("table", out string table) ?
-                    JsonConvert.SerializeObject(DBHolderSQL.GetRange(table, column, skip, count, fixedString, whereParams.ToArray()), new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore }) :
-                    "Ошибка! Таблица не найдена!", false);
-            }
+                if (query.TryGetByName("table", out string table))
+                {
+                    int skip = query.TryGetByName("skipRecords", out int skipResult) ? skipResult : 0;
+                    int count = query.TryGetByName("countRecords", out int countResult) ? countResult : -1;
+                    string column = query.TryGetByName("column", out string columnResult) ? columnResult : null;
+                    bool fixedString = query.TryGetByName("fixedString", out bool fixedStringResult) && fixedStringResult;
+                    var whereParams = new List<(string, object)>();
+                    foreach (var current in query)
+                        if (current.Key.StartsWith("where"))
+                            whereParams.Add((current.Key.Split(new[] { "where" }, StringSplitOptions.RemoveEmptyEntries)[0], current.Value));
+
+                    //We never should send passwords.
+                    var range = DBHolderSQL.GetRange(table, column, skip, count, fixedString, whereParams.ToArray());
+                    if (table == nameof(Account))
+                        foreach (DataRow current in range.Rows)
+                            current[nameof(Account.Password)] = null;
+
+                    return new HttpResponse(HttpResponseCode.Ok, JsonConvert.SerializeObject(range, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore }), false);
+                }
+                else return new HttpResponse(HttpResponseCode.BadRequest, "Ошибка! Таблица не найдена!", false);
             else return new HttpResponse(HttpResponseCode.Forbidden, "У вас нет прав на получение данных!", false);
         }
 
@@ -76,16 +83,22 @@ namespace InCollege.Server
                             if (fields[i].name.Equals("Password") && string.IsNullOrWhiteSpace((string)fields[i].value))
                                 fields[i] = ("Password", account.Password);
 
-                        //If account type isn't Admin, it cannot switch "Approved" status.
+                        //Only admin can edit foreign accounts
+                        //Aand admin can do really anything with them
                         if (account.AccountType != AccountType.Admin || !account.Approved)
+                        {
+                            if (account.ID != (int)fields.Find(c => c.name == "ID").value)
+                                return new HttpResponse(HttpResponseCode.Forbidden, "Вы не можете редактировать данные другого аккаунта!", false);
+
                             for (int i = 0; i < fields.Count; i++)
                                 if (fields[i].name.Equals("Approved")) fields[i] = ("Approved", account.Approved);
 
-                        //Account shouldn't be approved after AccountType switch.
-                        if (query.TryGetByName("fieldAccountType", out byte accountType) &&
-                            accountType != (byte)account.AccountType)
-                            for (int i = 0; i < fields.Count; i++)
-                                if (fields[i].name.Equals("Approved")) fields[i] = ("Approved", false);
+                            //Account shouldn't be approved after AccountType switch.
+                            if (query.TryGetByName("fieldAccountType", out byte accountType) &&
+                                accountType != (byte)account.AccountType)
+                                for (int i = 0; i < fields.Count; i++)
+                                    if (fields[i].name.Equals("Approved")) fields[i] = ("Approved", false);
+                        }
                     }
 
                     return new HttpResponse(HttpResponseCode.Ok, DBHolderSQL.Save(table, fields.ToArray()).ToString(), false);
@@ -107,9 +120,7 @@ namespace InCollege.Server
 
         static bool CheckAccess(IHttpHeaders query, Account account, bool write)
         {
-            return account.AccountType > AccountType.Guest &&
-                (account.AccountDataID != -1 || account.AccountType == AccountType.Admin) &&
-                account.Approved;
+            return account.AccountType > AccountType.Guest && account.Approved;
         }
 
         static bool CheckTableAccess(string tableName, Account account)
