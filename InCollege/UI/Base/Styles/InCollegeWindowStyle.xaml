@@ -149,7 +149,6 @@
 
         <Setter Property="Template" Value="{StaticResource BaseWindowTemplate}"/>
 
-        <Setter Property="Background" Value="Transparent"/>
         <Setter Property="WindowStyle" Value="None"/>
     </Style>
 </ResourceDictionary>
