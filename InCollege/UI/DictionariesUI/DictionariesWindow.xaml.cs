@@ -24,7 +24,7 @@ namespace InCollege.Client.UI.DictionariesUI
             await UpdateDisplayData();
         }
 
-        private async Task UpdateDisplayData()
+        async Task UpdateDisplayData()
         {
             try
             {
@@ -44,7 +44,10 @@ namespace InCollege.Client.UI.DictionariesUI
                         AttestationTypesLV.Items.Add(current);
                 }
                 else
+                {
                     MessageBox.Show(await response.Content.ReadAsStringAsync());
+                    if (response.StatusCode == HttpStatusCode.Forbidden) Close();
+                }
             }
             catch (HttpRequestException exc)
             {
@@ -76,8 +79,8 @@ namespace InCollege.Client.UI.DictionariesUI
                       $"token={App.Token}&" +
                       (AttestationTypesLV.SelectedItem != null ? $"fieldID={((DBRecord)AttestationTypesLV.SelectedItem).ID}&" : $"") +
                       $"fieldTypeName={TypeNameTB.Text}&" +
-                      $"fieldIsLocal={AddMode}&" +
-                      $"fieldModified=True")))).StatusCode == HttpStatusCode.OK)
+                      $"fieldIsLocal={(AddMode ? 1 : 0)}&" +
+                      $"fieldModified=1")))).StatusCode == HttpStatusCode.OK)
                     await UpdateDisplayData();
                 else
                     MessageBox.Show(await response.Content.ReadAsStringAsync());
