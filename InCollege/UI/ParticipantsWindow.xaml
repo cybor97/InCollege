@@ -3,15 +3,68 @@
         Style="{StaticResource BaseWindow}"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:dragablz="http://dragablz.net/winfx/xaml/dragablz"
-        Title="ParticipantsWindow" Height="500" Width="650">
+        xmlns:authorizationui="clr-namespace:InCollege.UI.AuthorizationUI"
+        Title="Учетные записи" Height="500" Width="650"
+        Loaded="ParticipantsWindow_Loaded">
     <Grid>
-        <dragablz:TabablzControl Style="{StaticResource MaterialDesignAlternateTabablzControlStyle}">
-            <TabItem Header="Не назначенные"/>
-            <TabItem Header="Студенты"/>
-            <TabItem Header="Преподаватели"/>
-            <TabItem Header="Заведующиее отделениями"/>
-            <TabItem Header="Администраторы"/>
-        </dragablz:TabablzControl>
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition/>
+            </Grid.RowDefinitions>
+            <dragablz:TabablzControl Name="AccountTypesTabs"
+                                     SelectionChanged="AccountTypesTabs_SelectionChanged"
+                                     Style="{StaticResource MaterialDesignAlternateTabablzControlStyle}">
+                <TabItem Header="Не назначенные"/>
+                <TabItem Header="Студенты"/>
+                <TabItem Header="Преподаватели"/>
+                <TabItem Header="Заведующиее отделениями"/>
+                <TabItem Header="Администраторы"/>
+            </dragablz:TabablzControl>
 
+            <ListView Grid.Row="1" Name="AccountsLV">
+                <ListView.ContextMenu>
+                    <ContextMenu>
+                        <MenuItem Header="Редактировать" Click="EditItem_Click"/>
+                        <MenuItem Header="Удалить" Click="RemoveItem_Click"/>
+                    </ContextMenu>
+                </ListView.ContextMenu>
+                <ListView.View>
+                    <GridView>
+                        <GridViewColumn>
+                            <GridViewColumn.CellTemplate>
+                                <DataTemplate>
+                                    <Image Width="20"
+                                       Height="20"
+                                    Source="{Binding Path=StateIconURI, Converter={StaticResource ImageToSourceConverter}}"/>
+                                </DataTemplate>
+                            </GridViewColumn.CellTemplate>
+                        </GridViewColumn>
+                        <GridViewColumn Header="ФИО" DisplayMemberBinding="{Binding FullName}" Width="270"/>
+                        <GridViewColumn Header="Должность" DisplayMemberBinding="{Binding AccountTypeString}" Width="200"/>
+                        <GridViewColumn Header="Подтвержден" Width="120">
+                            <GridViewColumn.CellTemplate>
+                                <DataTemplate>
+                                    <CheckBox IsChecked="{Binding Approved, Mode=TwoWay}" 
+                                              Style="{StaticResource MaterialDesignAccentCheckBox}"
+                                              Checked="ApprovedCB_CheckChanged"
+                                              Unchecked="ApprovedCB_CheckChanged"/>
+                                </DataTemplate>
+                            </GridViewColumn.CellTemplate>
+                        </GridViewColumn>
+                    </GridView>
+                </ListView.View>
+            </ListView>
+        </Grid>
+
+        <Button Grid.Row="1" 
+                Foreground="WhiteSmoke" FontSize="30" FontStretch="Medium" 
+                Style="{StaticResource MaterialDesignFloatingActionMiniAccentButton}" Content="+" 
+                Click="AddButton_Click"
+                HorizontalAlignment="Right" VerticalAlignment="Bottom"/>
+
+        <authorizationui:AccountEditDialog x:Name="ProfileDialog"
+                                           OnSave="ProfileDialog_OnSave"
+                                           OnCancel="ProfileDialog_OnCancel"/>
     </Grid>
 </Window>
