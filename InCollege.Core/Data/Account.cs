@@ -26,7 +26,7 @@ namespace InCollege.Core.Data
         private const decimal DaysInAYear = 365.242M;
         private const int MaxAge = 150;
 
-        public int AccountDataID { get; set; } = -1;
+        public int GroupID { get; set; } = -1;
         public string UserName { get; set; }
         public string Password { get; set; }
         public AccountType AccountType { get; set; }

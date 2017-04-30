@@ -94,11 +94,9 @@ namespace InCollege.Server
                             ("BirthDate", birthDate),
                             ("ProfileImage", profileImage),
                             ("FullName", fullName),
-                            ("AccountDataID", -1),
                             ("Approved", false),
                             ("IsLocal", true),
-                            ("ID", -1)
-                            ),
+                            ("ID", -1)),
                             userName, password), false);
                     }
                     else return new HttpResponse(HttpResponseCode.BadRequest, "Ошибка! Регистрация невозможна, т.к. пользователь с этим именем пользователя уже зарегистирован в системе!", false);
