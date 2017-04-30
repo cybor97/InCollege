@@ -1,9 +1,9 @@
-﻿using System.Windows;
-using System.Windows.Controls;
+﻿using MaterialDesignThemes.Wpf;
+using System.Windows;
 
 namespace InCollege.UI.StatementsUI
 {
-    public partial class EditStatementDialog : Grid
+    public partial class EditStatementDialog : DialogHost
     {
         public event RoutedEventHandler OnSave;
         public event RoutedEventHandler OnCancel;
@@ -11,6 +11,11 @@ namespace InCollege.UI.StatementsUI
         public EditStatementDialog()
         {
             InitializeComponent();
+
+            for (int i = 1; i <= 12; i++)
+                SemesterCB.Items.Add(i);
+            for (int i = 1; i <= 6; i++)
+                CourseCB.Items.Add(i);
         }
 
         private void SaveButton_Click(object sender, RoutedEventArgs e)

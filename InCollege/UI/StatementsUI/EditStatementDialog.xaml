@@ -1,128 +1,133 @@
-﻿<Grid x:Class="InCollege.UI.StatementsUI.EditStatementDialog"
-             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:material="http://materialdesigninxaml.net/winfx/xaml/themes"
-             Margin="5"
-             Width="500" Height="600" Background="White">
-    <Grid.RowDefinitions>
-        <!--StatementType _ Number-->
-        <RowDefinition Height="Auto"/>
-        <!--Subject-->
-        <RowDefinition Height="Auto"/>
-        <!--Attestation types-->
-        <RowDefinition Height="Auto"/>
-        <!--Specialty-->
-        <RowDefinition Height="Auto"/>
-        <!--Group-->
-        <RowDefinition Height="Auto"/>
-        <!--Cource _ Semester-->
-        <RowDefinition Height="Auto"/>
-        <!--Commission members-->
-        <RowDefinition Height="Auto"/>
-        <!--Table of results-->
-        <RowDefinition Height="2*"/>
-        <!--Note-->
-        <RowDefinition Height="*"/>
-        <!--Statement date-->
-        <RowDefinition Height="Auto"/>
-        <!--Control buttons-->
-        <RowDefinition Height="Auto"/>
-    </Grid.RowDefinitions>
-    <StackPanel HorizontalAlignment="Center" Orientation="Horizontal">
-        <ComboBox material:HintAssist.Hint="Тип ведомости"
-                  material:HintAssist.IsFloating="True" 
-                  SelectedIndex="0"
-                  Foreground="Gray"
-                  Margin="0 0 5 0">
-            <ComboBoxItem Content="Промежуточная"/>
-            <ComboBoxItem Content="Экзаменационная"/>
-            <ComboBoxItem Content="Квалификационный экзамен"/>
-            <ComboBoxItem Content="Учебная практика"/>
-            <ComboBoxItem Content="Производственная практика"/>
-            <ComboBoxItem Content="Курсовой проект"/>
-            <ComboBoxItem Content="Сводная" IsEnabled="False"/>
-            <ComboBoxItem Content="Прочее"/>
-        </ComboBox>
-        <TextBox material:HintAssist.Hint="Номер ведомости"
+﻿<material:DialogHost x:Class="InCollege.UI.StatementsUI.EditStatementDialog"
+                     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                     xmlns:material="http://materialdesigninxaml.net/winfx/xaml/themes">
+    <material:DialogHost.DialogContent>
+        <Grid Margin="5"
+              Width="500" Height="500" Background="White">
+            <Grid.RowDefinitions>
+                <!--StatementType _ Number-->
+                <RowDefinition Height="Auto"/>
+                <!--Subject-->
+                <RowDefinition Height="Auto"/>
+                <!--Attestation types-->
+                <RowDefinition Height="Auto"/>
+                <!--Specialty-->
+                <RowDefinition Height="Auto"/>
+                <!--Group-->
+                <RowDefinition Height="Auto"/>
+                <!--Cource _ Semester-->
+                <RowDefinition Height="Auto"/>
+                <!--Commission members-->
+                <RowDefinition Height="Auto"/>
+                <!--Table of results-->
+                <RowDefinition Height="2*"/>
+                <!--Note-->
+                <RowDefinition Height="*"/>
+                <!--Statement date-->
+                <RowDefinition Height="Auto"/>
+                <!--Control buttons-->
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+            <StackPanel HorizontalAlignment="Center" Orientation="Horizontal">
+                <ComboBox material:HintAssist.Hint="Тип ведомости"
+                          material:HintAssist.IsFloating="True" 
+                          SelectedIndex="0"
+                          Foreground="Gray"
+                          Margin="0 0 5 0">
+                    <ComboBoxItem Content="Промежуточная"/>
+                    <ComboBoxItem Content="Экзаменационная"/>
+                    <ComboBoxItem Content="Квалификационный экзамен"/>
+                    <ComboBoxItem Content="Учебная практика"/>
+                    <ComboBoxItem Content="Производственная практика"/>
+                    <ComboBoxItem Content="Курсовой проект"/>
+                    <ComboBoxItem Content="Сводная" IsEnabled="False"/>
+                    <ComboBoxItem Content="Прочее"/>
+                </ComboBox>
+                <TextBox material:HintAssist.Hint="Номер ведомости"
                   material:HintAssist.IsFloating="True"/>
-    </StackPanel>
+            </StackPanel>
 
-    <ComboBox Grid.Row="1"
+            <ComboBox Grid.Row="1"
               IsEditable="True"
               material:HintAssist.Hint="Дисциплина/Профессиональный модуль"
               material:HintAssist.IsFloating="True"
               Margin="0 0 5 0"/>
 
-    <StackPanel Orientation="Vertical" Grid.Row="2">
-        <TextBlock Text="Виды аттестации" 
+            <StackPanel Orientation="Vertical" Grid.Row="2">
+                <TextBlock Text="Виды аттестации" 
                    Foreground="Gray"
                    Margin="0 10 0 0"/>
-        <StackPanel Name="AttestationTypesContainer" 
+                <StackPanel Name="AttestationTypesContainer" 
                     Orientation="Horizontal" 
                     CanHorizontallyScroll="True"/>
-    </StackPanel>
-    <ComboBox Grid.Row="3"
+            </StackPanel>
+            <ComboBox Grid.Row="3"
               IsEditable="True" 
               material:HintAssist.Hint="Специальность"
               material:HintAssist.IsFloating="True"/>
-    <ComboBox Grid.Row="4"
+            <ComboBox Grid.Row="4"
               IsEditable="True"
               material:HintAssist.Hint="Группа"
               material:HintAssist.IsFloating="True"/>
-    <Grid Grid.Row="5">
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition/>
-            <ColumnDefinition/>
-        </Grid.ColumnDefinitions>
-        <ComboBox Grid.Column="0"
+            <Grid Grid.Row="5">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition/>
+                    <ColumnDefinition/>
+                </Grid.ColumnDefinitions>
+                <ComboBox Grid.Column="0"
               IsEditable="True"
               material:HintAssist.Hint="Курс"
               material:HintAssist.IsFloating="True"
+                          Name="CourseCB"
               Margin="0 0 5 0"/>
-        <ComboBox Grid.Column="1"
-              IsEditable="True"
-              material:HintAssist.Hint="Семестр"
-              material:HintAssist.IsFloating="True"/>
-    </Grid>
+                <ComboBox Grid.Column="1"
+                          IsEditable="True"
+                          Name="SemesterCB"
+                          material:HintAssist.Hint="Семестр"
+                          material:HintAssist.IsFloating="True"/>
+            </Grid>
 
-    <StackPanel Orientation="Vertical" Grid.Row="6">
-        <TextBlock Text="Участники коммиссии" 
+            <StackPanel Orientation="Vertical" Grid.Row="6">
+                <TextBlock Text="Участники коммиссии" 
                    Foreground="Gray"
                    Margin="0 10 0 0"/>
-        <StackPanel Name="CommissionMembersContainer" 
+                <StackPanel Name="CommissionMembersContainer" 
                     Orientation="Horizontal" 
                     CanHorizontallyScroll="True"/>
-    </StackPanel>
+            </StackPanel>
 
-    <Grid Grid.Row="7">
+            <Grid Grid.Row="7">
 
-    </Grid>
+            </Grid>
 
-    <TextBox Grid.Row="8"
+            <TextBox Grid.Row="8"
              material:HintAssist.Hint="Примечание"
              AcceptsReturn="True"
              AcceptsTab="True"
              TextWrapping="Wrap"
              material:HintAssist.IsFloating="True"/>
 
-    <DatePicker Grid.Row="9"
+            <DatePicker Grid.Row="9"
                 material:HintAssist.Hint="Дата проведения"
                 material:HintAssist.IsFloating="True"
                 Margin="0 10 0 0"/>
 
-    <Grid Grid.Row="10">
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition/>
-            <ColumnDefinition/>
-        </Grid.ColumnDefinitions>
-        <Button Content="Отмена" 
-                                Style="{StaticResource MaterialDesignFlatButton}" 
-                                VerticalAlignment="Bottom" 
-                                Click="CancelButton_Click"/>
-        <Button Content="Сохранить" 
-                                Grid.Column="1"
-                                Style="{StaticResource MaterialDesignFlatAccentButton}" 
-                                VerticalAlignment="Bottom" 
-                                Click="SaveButton_Click"/>
-    </Grid>
-</Grid>
+            <Grid Grid.Row="10">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition/>
+                    <ColumnDefinition/>
+                </Grid.ColumnDefinitions>
+                <Button Content="Отмена" 
+                        Style="{StaticResource MaterialDesignFlatButton}" 
+                        VerticalAlignment="Bottom" 
+                        Click="CancelButton_Click"/>
+                <Button Content="Сохранить" 
+                        Grid.Column="1"
+                        Style="{StaticResource MaterialDesignFlatAccentButton}" 
+                        VerticalAlignment="Bottom" 
+                        Click="SaveButton_Click"/>
+            </Grid>
+        </Grid>
+    </material:DialogHost.DialogContent>
+</material:DialogHost>
