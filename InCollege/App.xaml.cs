@@ -1,5 +1,6 @@
 ﻿using InCollege.Client.UI.AuthorizationUI;
 using InCollege.Client.UI.MainUI;
+using InCollege.Core.Data;
 using System;
 using System.IO;
 using System.Net;
@@ -31,6 +32,7 @@ namespace InCollege.Client
                     File.Delete(CommonVariables.TokenFileName);
             }
         }
+        public static Account Account { get; set; }
 
         public App()
         {
