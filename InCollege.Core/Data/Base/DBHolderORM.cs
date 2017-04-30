@@ -21,7 +21,6 @@ namespace InCollege.Core.Data.Base
                 typeof(Account),
                 typeof(AttestationType),
                 typeof(ConfigurationParameter),
-                typeof(DepartmentHead),
                 typeof(Department),
                 typeof(ExamStatementResult),
                 typeof(Group),
@@ -29,12 +28,10 @@ namespace InCollege.Core.Data.Base
                 typeof(Mark),
                 typeof(Message),
                 typeof(MiddleStatementResult),
-                typeof(Professor),
                 typeof(CommissionMember),
                 typeof(Specialty),
                 typeof(Statement),
                 typeof(StatementAttestationType),
-                typeof(Student),
                 typeof(Subject),
                 typeof(Teacher));
         }
