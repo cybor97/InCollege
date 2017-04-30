@@ -1,4 +1,5 @@
 ﻿using InCollege.Core.Data.Base;
+using SQLite;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -33,6 +34,26 @@ namespace InCollege.Core.Data
         public virtual byte[] ProfileImage { get; set; }
         public string FullName { get; set; }
         public bool Approved { get; set; }
+
+        [Ignore]
+        public string AccountTypeString
+        {
+            get
+            {
+                if (Enum.IsDefined(typeof(AccountType), AccountType))
+                    return StatementTypeStrings[AccountType];
+                else return "Не определено";
+            }
+        }
+
+        static readonly Dictionary<AccountType, string> StatementTypeStrings = new Dictionary<AccountType, string>()
+        {
+            { AccountType.Guest, "Гость" },
+            { AccountType.Student, "Студент" },
+            { AccountType.Professor, "Преподаватель" },
+            { AccountType.DepartmentHead, "Заведующий отделением" },
+            { AccountType.Admin, "Администратор" },
+        };
 
         public static AccountValidationResult Validate(string userName, string password, DateTime birthDate, string fullName)
         {
