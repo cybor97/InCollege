@@ -1,5 +1,4 @@
 ﻿using InCollege.Core.Data;
-using System.Net.Http;
 using System.Threading.Tasks;
 using System.Windows;
 using InCollege.Core.Data.Base;
@@ -63,17 +62,10 @@ namespace InCollege.Client.UI.DictionariesUI
         {
             bool updateRequired = false;
             if (AttestationTypesLV.SelectedItems?.Count > 0)
-                try
-                {
-                    foreach (DBRecord current in AttestationTypesLV.SelectedItems)
-                        updateRequired = updateRequired ||
-                             (int.TryParse(await NetworkUtils.ExecuteDataAction<AttestationType>(null, current, DataAction.Remove), out int newID) &&
-                             newID > -1);
-                }
-                catch (HttpRequestException exc)
-                {
-                    MessageBox.Show($"Ошибка подключения к серверу. Проверьте:\n-запущен ли сервер\n-настройки брандмауэра\n-правильно ли указан адрес\nТехническая информация:\n\n{exc.Message}");
-                }
+                foreach (DBRecord current in AttestationTypesLV.SelectedItems)
+                    updateRequired = updateRequired ||
+                         (int.TryParse(await NetworkUtils.ExecuteDataAction<AttestationType>(null, current, DataAction.Remove), out int newID) &&
+                         newID > -1);
 
             if (updateRequired)
                 await UpdateData();
