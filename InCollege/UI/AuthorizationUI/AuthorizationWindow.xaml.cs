@@ -57,13 +57,13 @@ namespace InCollege.Client.UI.AuthorizationUI
                 try
                 {
                     if ((response = (await new HttpClient()
-                          .PostAsync($"http://{ClientConfiguration.HostName}:{ClientConfiguration.Port}/Auth",
+                          .PostAsync(ClientConfiguration.AuthHandlerPath,
                           new StringContent(
                           $"Action={(SignUpMode ? "SignUp" : "SignIn")}&" +
                           (SignUpMode ? $"FullName={FullNameTB.Text}&" : string.Empty) +
                           $"UserName={UserNameTB.Text}&" +
                           $"Password={PasswordTB.Password}&" +
-                          (SignUpMode ? $"BirthDate={Uri.EscapeDataString(BirthdateTB.SelectedDate.Value.ToString("MM\\/dd\\/yyyy"))}&" : string.Empty) +
+                          (SignUpMode ? $"BirthDate={Uri.EscapeDataString(BirthdateTB.SelectedDate.Value.ToString("yyyy-MM-dd"))}&" : string.Empty) +
                           (SignUpMode ? $"AccountType={AccountTypeCB.SelectedIndex}" : string.Empty))))).StatusCode == HttpStatusCode.OK)
                     {
                         App.Token = await response.Content.ReadAsStringAsync();

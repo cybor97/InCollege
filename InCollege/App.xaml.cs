@@ -51,9 +51,7 @@ namespace InCollege.Client
         {
             try
             {
-                Task<HttpResponseMessage> task = new HttpClient()
-                                                 .PostAsync($"http://{ClientConfiguration.HostName}:{ClientConfiguration.Port}/Auth",
-                                                 new StringContent($"Action=ValidateToken&token={Token}"));
+                var task = new HttpClient().PostAsync(ClientConfiguration.AuthHandlerPath, new StringContent($"Action=ValidateToken&token={Token}"));
                 task.Wait();
                 return task.Result.StatusCode == HttpStatusCode.OK;
             }
