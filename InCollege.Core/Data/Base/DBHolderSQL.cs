@@ -33,8 +33,9 @@ namespace InCollege.Core.Data.Base
                 count = DBHolderORM.DEFAULT_LIMIT;
             if (table == null)
                 table = "master_table";
-            if (string.IsNullOrWhiteSpace(column))
-                column = "*";
+
+            column = string.IsNullOrWhiteSpace(column) ? "*" : $"[{column}]";
+
             DataTable result = new DataTable(table);
             string whereString = "";
             if (whereParams != null)
@@ -50,7 +51,7 @@ namespace InCollege.Core.Data.Base
                         whereString += " AND ";
                 }
             Adapters[table].SelectCommand =
-                new SQLiteCommand($"SELECT {column} FROM {table} " +
+                new SQLiteCommand($"SELECT {column} FROM [{table}] " +
                                   (string.IsNullOrWhiteSpace(whereString) ? $"" : $"WHERE {whereString} ") +
                                   $"LIMIT {skip}, {count} ",
                     DataConnection);
@@ -61,7 +62,7 @@ namespace InCollege.Core.Data.Base
         public static DataRow GetByID(string table, int id)
         {
             DataTable result = new DataTable();
-            Adapters[table].SelectCommand = new SQLiteCommand($"SELECT * FROM {table} WHERE ID={id}", DataConnection);
+            Adapters[table].SelectCommand = new SQLiteCommand($"SELECT * FROM [{table}] WHERE ID={id}", DataConnection);
             Adapters[table].Fill(result);
             return result.Rows.Count > 0 ? result.Rows[0] : null;
         }
@@ -79,7 +80,7 @@ namespace InCollege.Core.Data.Base
                 return -1;
 
             var adapter = Adapters[table];
-            adapter.SelectCommand = new SQLiteCommand($"SELECT * FROM {table}", DataConnection);
+            adapter.SelectCommand = new SQLiteCommand($"SELECT * FROM [{table}]", DataConnection);
             var data = new DataTable(table);
             adapter.Fill(data);
             data.PrimaryKey = new[] { data.Columns["ID"]
@@ -112,7 +113,7 @@ namespace InCollege.Core.Data.Base
                         row[current.key] = current.value;
                     else row[current.key] = Convert.FromBase64String(current.value.ToString().Split(new[] { "raw_data" }, StringSplitOptions.RemoveEmptyEntries)[0]);
 
-            Adapters[table].SelectCommand = new SQLiteCommand($"SELECT * FROM {table} WHERE ID={id}", DataConnection);
+            Adapters[table].SelectCommand = new SQLiteCommand($"SELECT * FROM [{table}] WHERE ID={id}", DataConnection);
 
             if (addMode)
                 data.Rows.Add(row);
@@ -127,7 +128,7 @@ namespace InCollege.Core.Data.Base
 
         public static int Remove(string table, int id)
         {
-            return new SQLiteCommand($"DELETE FROM {table} WHERE ID={id}", DataConnection).ExecuteNonQuery();
+            return new SQLiteCommand($"DELETE FROM [{table}] WHERE ID={id}", DataConnection).ExecuteNonQuery();
         }
 
         static int GetFreeID(string table)
