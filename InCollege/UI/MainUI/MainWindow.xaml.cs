@@ -2,11 +2,7 @@
 using InCollege.Core.Data;
 using InCollege.Core.Data.Base;
 using InCollege.UI;
-using Newtonsoft.Json;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Net;
-using System.Net.Http;
 using System.Reflection;
 using System.Threading.Tasks;
 using System.Windows;
@@ -15,7 +11,7 @@ using System.Windows.Input;
 
 namespace InCollege.Client.UI.MainUI
 {
-    public partial class MainWindow : Window
+    public partial class MainWindow : Window, IUpdatable
     {
         public MainWindow()
         {
@@ -27,51 +23,26 @@ namespace InCollege.Client.UI.MainUI
 
         async void MainWindow_Loaded(object sender, RoutedEventArgs e)
         {
-            await UpdateDisplayData();
+            await UpdateData();
         }
 
-        async Task UpdateDisplayData()
+        public async Task UpdateData()
         {
-            try
+            CurrentAccountItem.Header = (ProfileDialog.Account = App.Account = await NetworkUtils.WhoAmI())?.FullName;
+
+            if (App.Account == null || !App.Account.Approved)
             {
-                HttpResponseMessage response;
-                if ((response = (await new HttpClient()
-                .PostAsync($"http://{ClientConfiguration.HostName}:{ClientConfiguration.Port}/Auth",
-                new StringContent(
-                $"Action=WhoAmI&" +
-                $"token={App.Token}")))).StatusCode == HttpStatusCode.OK)
-                {
-                    App.Account = JsonConvert.DeserializeObject<IList<Account>>(await response.Content.ReadAsStringAsync())[0];
-                    CurrentAccountItem.Header = App.Account.FullName;
-                    ProfileDialog.Account = App.Account;
-                    if (!App.Account.Approved)
-                    {
-                        MessageBox.Show("Извините, ваша должность не подтверждена. Обратитесь к администратору.");
-                        AccountExit();
-                    }
-                }
-                else
-                    MessageBox.Show(await response.Content.ReadAsStringAsync());
+                if (App.Account != null)
+                    MessageBox.Show("Извините, ваша должность не подтверждена. Обратитесь к администратору.");
+                AccountExit();
+            }
 
 
-                //TODO:
-                //if(teacher) request<statement>(teacher.subjects);
-                //else if (departmentHead) request<statement>(departmentHead.groups);
-                //else if (admin) request<statement>(all);
-                if ((response = (await new HttpClient()
-                      .PostAsync($"http://{ClientConfiguration.HostName}:{ClientConfiguration.Port}/Data",
-                      new StringContent(
-                      $"Action=GetRange&" +
-                      $"table={nameof(Statement)}&" +
-                      $"token={App.Token}")))).StatusCode == HttpStatusCode.OK)
-                    StatementsLV.ItemsSource = JsonConvert.DeserializeObject<IEnumerable<Statement>>(await response.Content.ReadAsStringAsync());
-                else
-                    MessageBox.Show(await response.Content.ReadAsStringAsync());
-            }
-            catch (HttpRequestException exc)
-            {
-                MessageBox.Show($"Ошибка подключения к серверу. Проверьте:\n-запущен ли сервер\n-настройки брандмауэра\n-правильно ли указан адрес\nТехническая информация:\n\n{exc.Message}");
-            }
+            //TODO:
+            //if(teacher) request<statement>(teacher.subjects);
+            //else if (departmentHead) request<statement>(departmentHead.groups);
+            //else if (admin) request<statement>(all);
+            StatementsLV.ItemsSource = await NetworkUtils.RequestData<Statement>(this);
         }
 
         void ExitItem_Click(object sender, RoutedEventArgs e)
@@ -84,7 +55,7 @@ namespace InCollege.Client.UI.MainUI
             int itemIndex = ((MenuItem)(((MenuItem)sender).Parent)).Items.IndexOf(sender);
             if (itemIndex == 0) new DictionariesWindow().ShowDialog();
             else new StudyObjectsWindow(itemIndex - 1).ShowDialog();
-            await UpdateDisplayData();
+            await UpdateData();
         }
 
         void Window_MouseDoubleClick(object sender, MouseButtonEventArgs e)
@@ -95,7 +66,7 @@ namespace InCollege.Client.UI.MainUI
         async void ParticipantsItem_Click(object sender, RoutedEventArgs e)
         {
             new ParticipantsWindow((AccountType)((MenuItem)(((MenuItem)sender).Parent)).Items.IndexOf(sender)).ShowDialog();
-            await UpdateDisplayData();
+            await UpdateData();
         }
 
         void AccountExitItem_Click(object sender, RoutedEventArgs e)
@@ -106,7 +77,7 @@ namespace InCollege.Client.UI.MainUI
         async void MainWindow_KeyDown(object sender, KeyEventArgs e)
         {
             if (e.Key == Key.F5)
-                await UpdateDisplayData();
+                await UpdateData();
         }
 
         void EditItem_Click(object sender, RoutedEventArgs e)
@@ -156,23 +127,8 @@ namespace InCollege.Client.UI.MainUI
 
         private async void ProfileDialog_OnSave(object sender, RoutedEventArgs e)
         {
-            try
-            {
-                HttpResponseMessage response;
-                if ((response = (await new HttpClient()
-                      .PostAsync($"http://{ClientConfiguration.HostName}:{ClientConfiguration.Port}/Data",
-                      new StringContent(
-                      $"Action=Save&" +
-                      $"token={App.Token}&" +
-                      ProfileDialog.Account.POSTSerialized)))).StatusCode == HttpStatusCode.OK)
-                    await UpdateDisplayData();
-                else
-                    MessageBox.Show(await response.Content.ReadAsStringAsync());
-            }
-            catch (HttpRequestException exc)
-            {
-                MessageBox.Show($"Ошибка подключения к серверу. Проверьте:\n-запущен ли сервер\n-настройки брандмауэра\n-правильно ли указан адрес\nТехническая информация:\n\n{exc.Message}");
-            }
+            if (ProfileDialog.Account != null)
+                await NetworkUtils.ExecuteDataAction<Account>(this, ProfileDialog.Account, DataAction.Save);
 
             ProfileDialog.IsOpen = false;
         }
