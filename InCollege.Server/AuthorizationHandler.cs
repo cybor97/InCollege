@@ -75,7 +75,7 @@ namespace InCollege.Server
                 query.TryGetByName("Password", out string password) &&
                 query.TryGetByName("AccountType", out byte accountType) &&
                 query.TryGetByName("BirthDate", out string birthDateString) &&
-                DateTime.TryParseExact(birthDateString, "MM\\/dd\\/yyyy", new CultureInfo("en-US"), DateTimeStyles.None, out DateTime birthDate) &&
+                DateTime.TryParseExact(birthDateString, "yyyy-MM-dd", CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime birthDate) &&
 
                 query.TryGetByName("FullName", out string fullName))
             {
