@@ -26,31 +26,25 @@ namespace InCollege.UI.AuthorizationUI
             remove { RemoveHandler(OnCancelEvent, value); }
         }
 
-        private Account _account;
+        Account AccountDataContext => DataContext as Account;
 
         public Account Account
         {
             get
             {
-                if (_account != null)
+                if (AccountDataContext != null)
                 {
-                    _account.FullName = FullNameTB.Text;
-                    _account.UserName = UserNameTB.Text;
-                    _account.Password = PasswordTB.Password;
-                    _account.BirthDate = BirthDateTB.SelectedDate;
-                    _account.AccountType = (AccountType)AccountTypeCB.SelectedIndex;
+                    AccountDataContext.Password = PasswordTB.Password;
+                    AccountDataContext.AccountType = (AccountType)AccountTypeCB.SelectedIndex;
                 }
-                return _account;
+                return AccountDataContext;
             }
             set
             {
-                _account = value;
+                DataContext = value;
                 if (value != null)
                 {
-                    FullNameTB.Text = value.FullName;
-                    UserNameTB.Text = value.UserName;
                     PasswordTB.Password = value.Password;
-                    BirthDateTB.SelectedDate = value.BirthDate;
                     AccountTypeCB.SelectedIndex = (byte)value.AccountType;
                 }
             }
@@ -80,7 +74,7 @@ namespace InCollege.UI.AuthorizationUI
 
         void ProfileSaveButton_Click(object sender, RoutedEventArgs e)
         {
-            _account.Modified = true;
+            AccountDataContext.Modified = true;
             RaiseEvent(new RoutedEventArgs(OnSaveEvent));
         }
 
