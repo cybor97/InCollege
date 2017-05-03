@@ -1,4 +1,6 @@
 ﻿using InCollege.Core.Data.Base;
+using Newtonsoft.Json;
+using SQLite;
 
 namespace InCollege.Core.Data
 {
@@ -7,5 +9,9 @@ namespace InCollege.Core.Data
         public int DepartmentHeadID { get; set; }
         public string DepartmentName { get; set; }
         public string DepartmentCode { get; set; }
+
+        [Ignore]
+        [JsonIgnore]
+        public string DepartmentHeadName { get; set; }
     }
 }
