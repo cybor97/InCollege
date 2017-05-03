@@ -1,16 +1,14 @@
 ﻿using InCollege.Core.Data;
-using Newtonsoft.Json;
-using System.Collections.Generic;
-using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using System.Windows;
 using InCollege.Core.Data.Base;
 using System.Windows.Input;
+using InCollege.UI;
 
 namespace InCollege.Client.UI.DictionariesUI
 {
-    public partial class DictionariesWindow : Window
+    public partial class DictionariesWindow : Window, IUpdatable
     {
         public DictionariesWindow()
         {
@@ -21,43 +19,18 @@ namespace InCollege.Client.UI.DictionariesUI
 
         private async void DictionariesWindow_Loaded(object sender, RoutedEventArgs e)
         {
-            await UpdateDisplayData();
+            await UpdateData();
         }
 
-        async Task UpdateDisplayData()
+        public async Task UpdateData()
         {
-            try
-            {
-                AttestationTypesLV.Items.Clear();
-                HttpResponseMessage response;
-                if ((response = (await new HttpClient()
-                      .PostAsync($"http://{ClientConfiguration.HostName}:{ClientConfiguration.Port}/Data",
-                      new StringContent(
-                      $"Action=GetRange&" +
-                      $"table={nameof(AttestationType)}&" +
-                      $"token={App.Token}")))).StatusCode == HttpStatusCode.OK)
-                {
-                    var result = JsonConvert.DeserializeObject<IEnumerable<AttestationType>>(await response.Content.ReadAsStringAsync());
-                    //Yeah, 2 times, to prevent multiplying
-                    AttestationTypesLV.Items.Clear();
-                    foreach (var current in result)
-                        AttestationTypesLV.Items.Add(current);
-                }
-                else
-                {
-                    MessageBox.Show(await response.Content.ReadAsStringAsync());
-                    if (response.StatusCode == HttpStatusCode.Forbidden) Close();
-                }
-            }
-            catch (HttpRequestException exc)
-            {
-                MessageBox.Show($"Ошибка подключения к серверу. Проверьте:\n-запущен ли сервер\n-настройки брандмауэра\n-правильно ли указан адрес\nТехническая информация:\n\n{exc.Message}");
-            }
+            AttestationTypesLV.ItemsSource = await NetworkUtils.RequestData<AttestationType>(this);
         }
 
         private void AddButton_Click(object sender, RoutedEventArgs e)
         {
             AddMode = true;
+            TypeNameTB.Text = null;
             AddAttestationTypeDialog.IsOpen = true;
         }
 
@@ -68,27 +41,10 @@ namespace InCollege.Client.UI.DictionariesUI
 
         private async void SaveButton_Click(object sender, RoutedEventArgs e)
         {
-            try
-            {
-                HttpResponseMessage response;
-                if ((response = (await new HttpClient()
-                      .PostAsync($"http://{ClientConfiguration.HostName}:{ClientConfiguration.Port}/Data",
-                      new StringContent(
-                      $"Action=Save&" +
-                      $"table={nameof(AttestationType)}&" +
-                      $"token={App.Token}&" +
-                      (AttestationTypesLV.SelectedItem != null ? $"fieldID={((DBRecord)AttestationTypesLV.SelectedItem).ID}&" : $"") +
-                      $"fieldTypeName={TypeNameTB.Text}&" +
-                      $"fieldIsLocal={(AddMode ? 1 : 0)}&" +
-                      $"fieldModified=1")))).StatusCode == HttpStatusCode.OK)
-                    await UpdateDisplayData();
-                else
-                    MessageBox.Show(await response.Content.ReadAsStringAsync());
-            }
-            catch (HttpRequestException exc)
-            {
-                MessageBox.Show($"Ошибка подключения к серверу. Проверьте:\n-запущен ли сервер\n-настройки брандмауэра\n-правильно ли указан адрес\nТехническая информация:\n\n{exc.Message}");
-            }
+            var attestationType = AddMode ? new AttestationType { TypeName = TypeNameTB.Text } : (AttestationType)AttestationTypesLV.SelectedItem;
+            attestationType.TypeName = TypeNameTB.Text;
+            attestationType.Modified = true;
+            await NetworkUtils.ExecuteDataAction<AttestationType>(this, attestationType, DataAction.Save);
 
             AddAttestationTypeDialog.IsOpen = false;
         }
@@ -110,19 +66,9 @@ namespace InCollege.Client.UI.DictionariesUI
                 try
                 {
                     foreach (DBRecord current in AttestationTypesLV.SelectedItems)
-                    {
-                        HttpResponseMessage response;
-                        if ((response = (await new HttpClient()
-                              .PostAsync($"http://{ClientConfiguration.HostName}:{ClientConfiguration.Port}/Data",
-                              new StringContent(
-                              $"Action=Remove&" +
-                              $"token={App.Token}&" +
-                              $"table={nameof(AttestationType)}&" +
-                              $"id={current.ID}")))).StatusCode == HttpStatusCode.OK)
-                            updateRequired = updateRequired || response.StatusCode == HttpStatusCode.OK;
-                        else
-                            MessageBox.Show(await response.Content.ReadAsStringAsync());
-                    }
+                        updateRequired = updateRequired ||
+                             (int.TryParse(await NetworkUtils.ExecuteDataAction<AttestationType>(null, current, DataAction.Remove), out int newID) &&
+                             newID > -1);
                 }
                 catch (HttpRequestException exc)
                 {
@@ -130,7 +76,7 @@ namespace InCollege.Client.UI.DictionariesUI
                 }
 
             if (updateRequired)
-                await UpdateDisplayData();
+                await UpdateData();
         }
 
         private void AddAttestationTypeDialog_KeyDown(object sender, KeyEventArgs e)
@@ -155,14 +101,14 @@ namespace InCollege.Client.UI.DictionariesUI
                     RemoveItem_Click(null, null);
                     break;
                 case Key.F5:
-                    await UpdateDisplayData();
+                    await UpdateData();
                     break;
             }
         }
 
         private async void UpdateItem_Click(object sender, RoutedEventArgs e)
         {
-            await UpdateDisplayData();
+            await UpdateData();
         }
 
         private void CloseItem_Click(object sender, RoutedEventArgs e)
