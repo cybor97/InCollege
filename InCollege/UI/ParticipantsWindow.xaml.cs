@@ -1,10 +1,7 @@
 ﻿using InCollege.Core.Data;
 using InCollege.Core.Data.Base;
 using InCollege.UI;
-using Newtonsoft.Json;
-using System.Collections.Generic;
 using System.Linq;
-using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using System.Windows;
@@ -26,7 +23,7 @@ namespace InCollege.Client.UI
         public async Task UpdateData()
         {
             AccountsLV.ItemsSource = (await NetworkUtils.RequestData<Account>(this))
-                .Where(c => (!c.Approved && AccountTypesTabs.SelectedIndex == 0) || (int)c.AccountType == AccountTypesTabs.SelectedIndex);
+                ?.Where(c => (!c.Approved && AccountTypesTabs.SelectedIndex == 0) || (int)c.AccountType == AccountTypesTabs.SelectedIndex);
         }
 
         async void ParticipantsWindow_Loaded(object sender, RoutedEventArgs e)
