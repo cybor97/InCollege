@@ -1,6 +1,7 @@
 ﻿using InCollege.Client.UI.DictionariesUI;
 using InCollege.Core.Data;
 using InCollege.Core.Data.Base;
+using InCollege.UI;
 using Newtonsoft.Json;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -53,7 +54,6 @@ namespace InCollege.Client.UI.MainUI
                     MessageBox.Show(await response.Content.ReadAsStringAsync());
 
 
-                StatementsLV.Items.Clear();
                 //TODO:
                 //if(teacher) request<statement>(teacher.subjects);
                 //else if (departmentHead) request<statement>(departmentHead.groups);
@@ -64,13 +64,7 @@ namespace InCollege.Client.UI.MainUI
                       $"Action=GetRange&" +
                       $"table={nameof(Statement)}&" +
                       $"token={App.Token}")))).StatusCode == HttpStatusCode.OK)
-                {
-                    var result = JsonConvert.DeserializeObject<IEnumerable<Statement>>(await response.Content.ReadAsStringAsync());
-                    //Yeah, 2 times, to prevent multiplying
-                    StatementsLV.Items.Clear();
-                    foreach (var current in result)
-                        StatementsLV.Items.Add(current);
-                }
+                    StatementsLV.ItemsSource = JsonConvert.DeserializeObject<IEnumerable<Statement>>(await response.Content.ReadAsStringAsync());
                 else
                     MessageBox.Show(await response.Content.ReadAsStringAsync());
             }
@@ -87,7 +81,9 @@ namespace InCollege.Client.UI.MainUI
 
         async void DictionariesItem_Click(object sender, RoutedEventArgs e)
         {
-            new DictionariesWindow().ShowDialog();
+            int itemIndex = ((MenuItem)(((MenuItem)sender).Parent)).Items.IndexOf(sender);
+            if (itemIndex == 0) new DictionariesWindow().ShowDialog();
+            else new StudyObjectsWindow(itemIndex - 1).ShowDialog();
             await UpdateDisplayData();
         }
 

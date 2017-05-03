@@ -28,6 +28,10 @@
             </MenuItem>
             <MenuItem Header="Словари">
                 <MenuItem Header="Виды аттестации" Click="DictionariesItem_Click"/>
+                <MenuItem Header="Отделения" Click="DictionariesItem_Click"/>
+                <MenuItem Header="Специальности" Click="DictionariesItem_Click"/>
+                <MenuItem Header="Группы" Click="DictionariesItem_Click"/>
+                <MenuItem Header="Дисциплины" Click="DictionariesItem_Click"/>
             </MenuItem>
             <MenuItem Header="Учетные записи" >
                 <MenuItem Name="CurrentAccountItem" Click="CurrentAccountItem_Click"/>
@@ -83,6 +87,7 @@
                 </GridView>
             </ListView.View>
         </ListView>
+        
         <Button Grid.Row="1" 
                 Foreground="WhiteSmoke" FontSize="30" FontStretch="Medium" 
                 Style="{StaticResource MaterialDesignFloatingActionMiniAccentButton}" Content="+" 

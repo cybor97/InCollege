@@ -1,12 +1,198 @@
 ﻿<Window x:Class="InCollege.UI.StudyObjectsWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        Style="{StaticResource BaseWindow}"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:InCollege.UI"
-        mc:Ignorable="d"
-        Title="StudyObjectsWindow" Height="300" Width="300">
+        xmlns:dragablz="http://dragablz.net/winfx/xaml/dragablz"
+        xmlns:material="http://materialdesigninxaml.net/winfx/xaml/themes"
+        Title="StudyObjectsWindow" 
+        Loaded="StudyObjectsWindow_Loaded"
+        Height="500" Width="600">
     <Grid>
-        
+        <dragablz:TabablzControl Name="StudyObjectsTabs"
+                                     SelectionChanged="AccountTypesTabs_SelectionChanged"
+                                     Style="{StaticResource MaterialDesignAlternateTabablzControlStyle}">
+            <TabItem Header="Отделения">
+                <ListView Name="DepartmentsLV">
+                    <ListView.View>
+                        <GridView>
+                            <GridViewColumn>
+                                <GridViewColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <Image Width="20"
+                                       Height="20"
+                                    Source="{Binding Path=StateIconURI, Converter={StaticResource ImageToSourceConverter}}"/>
+                                    </DataTemplate>
+                                </GridViewColumn.CellTemplate>
+                            </GridViewColumn>
+                            <GridViewColumn Header="Код"/>
+                            <GridViewColumn Header="Название"/>
+                            <GridViewColumn Header="Заведующий отделением"/>
+                        </GridView>
+                    </ListView.View>
+                </ListView>
+            </TabItem>
+            <TabItem Header="Специальности">
+                <ListView Name="SpecialtiesLV">
+                    <ListView.View>
+                        <GridView>
+                            <GridViewColumn>
+                                <GridViewColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <Image Width="20"
+                                       Height="20"
+                                    Source="{Binding Path=StateIconURI, Converter={StaticResource ImageToSourceConverter}}"/>
+                                    </DataTemplate>
+                                </GridViewColumn.CellTemplate>
+                            </GridViewColumn>
+                            <GridViewColumn Header="Код"/>
+                            <GridViewColumn Header="Название"/>
+                            <GridViewColumn Header="Отделение"/>
+                        </GridView>
+                    </ListView.View>
+                </ListView>
+            </TabItem>
+            <TabItem Header="Группы">
+                <ListView Name="GroupsLV">
+                    <ListView.View>
+                        <GridView>
+                            <GridViewColumn>
+                                <GridViewColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <Image Width="20"
+                                       Height="20"
+                                    Source="{Binding Path=StateIconURI, Converter={StaticResource ImageToSourceConverter}}"/>
+                                    </DataTemplate>
+                                </GridViewColumn.CellTemplate>
+                            </GridViewColumn>
+                            <GridViewColumn Header="Код"/>
+                            <GridViewColumn Header="Название"/>
+                            <GridViewColumn Header="Специальность"/>
+                        </GridView>
+                    </ListView.View>
+                </ListView>
+            </TabItem>
+            <TabItem Header="Дисциплины">
+                <ListView Name="SubjectsLV">
+                    <ListView.View>
+                        <GridView>
+                            <GridViewColumn>
+                                <GridViewColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <Image Width="20"
+                                       Height="20"
+                                    Source="{Binding Path=StateIconURI, Converter={StaticResource ImageToSourceConverter}}"/>
+                                    </DataTemplate>
+                                </GridViewColumn.CellTemplate>
+                            </GridViewColumn>
+                            <GridViewColumn Header="Индекс"/>
+                            <GridViewColumn Header="Название"/>
+                        </GridView>
+                    </ListView.View>
+                </ListView>
+            </TabItem>
+        </dragablz:TabablzControl>
+
+        <material:DialogHost Name="EditDepartmentDialog">
+            <material:DialogHost.DialogContent>
+                <StackPanel Orientation="Vertical" MinWidth="400" Margin="5">
+                    <TextBox material:HintAssist.Hint="Код" 
+                             Name="DepartmentCodeTB" 
+                             material:HintAssist.IsFloating="True"/>
+                    <TextBox material:HintAssist.Hint="Название" 
+                             Name="DepartmentNameTB" 
+                             material:HintAssist.IsFloating="True"/>
+                    <ComboBox material:HintAssist.Hint="Заведующий отделением" 
+                              Name="DepartmentHeadCB" 
+                              DisplayMemberPath="{Binding FullName}" material:HintAssist.IsFloating="True"/>
+
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition/>
+                            <ColumnDefinition/>
+                        </Grid.ColumnDefinitions>
+                        <Button Content="Сохранить" Style="{StaticResource MaterialDesignFlatAccentButton}" Click="SaveButton_Click" Tag="Department"/>
+                        <Button Content="Отменить" Style="{StaticResource MaterialDesignFlatButton}" Click="CancelButton_Click" Grid.Column="1" Tag="Department"/>
+                    </Grid>
+                </StackPanel>
+            </material:DialogHost.DialogContent>
+        </material:DialogHost>
+
+        <material:DialogHost Name="EditSpecialtyDialog" Margin="5">
+            <material:DialogHost.DialogContent>
+                <Grid>
+                    <TextBox material:HintAssist.Hint="Код" 
+                             Name="SpecialtyCodeTB"
+                             material:HintAssist.IsFloating="True"/>
+                    <TextBox material:HintAssist.Hint="Название" 
+                             Name="SpecialtyNameTB"
+                             material:HintAssist.IsFloating="True"/>
+                    <ComboBox material:HintAssist.Hint="Отделение" 
+                              Name="DepartmentCB"
+                              material:HintAssist.IsFloating="True"/>
+
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition/>
+                            <ColumnDefinition/>
+                        </Grid.ColumnDefinitions>
+                        <Button Content="Сохранить" Style="{StaticResource MaterialDesignFlatAccentButton}" Click="SaveButton_Click" Tag="Specialty"/>
+                        <Button Content="Отменить" Style="{StaticResource MaterialDesignFlatButton}" Click="CancelButton_Click" Grid.Column="1" Tag="Specialty"/>
+                    </Grid>
+                </Grid>
+            </material:DialogHost.DialogContent>
+        </material:DialogHost>
+
+        <material:DialogHost Name="EditGroupDialog" Margin="5">
+            <material:DialogHost.DialogContent>
+                <Grid>
+                    <TextBox material:HintAssist.Hint="Код" 
+                             Name="GroupCodeTB"
+                             material:HintAssist.IsFloating="True"/>
+                    <TextBox material:HintAssist.Hint="Название" 
+                             Name="GroupNameTB"
+                             material:HintAssist.IsFloating="True"/>
+                    <ComboBox material:HintAssist.Hint="Специальность"
+                              Name="SpecialtyCB"
+                              material:HintAssist.IsFloating="True"/>
+
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition/>
+                            <ColumnDefinition/>
+                        </Grid.ColumnDefinitions>
+                        <Button Content="Сохранить" Style="{StaticResource MaterialDesignFlatAccentButton}" Click="SaveButton_Click" Tag="Group"/>
+                        <Button Content="Отменить" Style="{StaticResource MaterialDesignFlatButton}" Click="CancelButton_Click" Grid.Column="1" Tag="Group"/>
+                    </Grid>
+                </Grid>
+            </material:DialogHost.DialogContent>
+        </material:DialogHost>
+
+        <material:DialogHost Name="EditSubjectDialog" Margin="5">
+            <material:DialogHost.DialogContent>
+                <Grid>
+                    <TextBox material:HintAssist.Hint="Индекс" 
+                             Name="SubjectIndexCB"
+                             material:HintAssist.IsFloating="True"/>
+                    <TextBox material:HintAssist.Hint="Название" 
+                             Name="SubjectNameCB"
+                             material:HintAssist.IsFloating="True"/>
+
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition/>
+                            <ColumnDefinition/>
+                        </Grid.ColumnDefinitions>
+                        <Button Content="Сохранить" Style="{StaticResource MaterialDesignFlatAccentButton}" Click="SaveButton_Click" Tag="Subject"/>
+                        <Button Content="Отменить" Style="{StaticResource MaterialDesignFlatButton}" Click="CancelButton_Click" Grid.Column="1" Tag="Subject"/>
+                    </Grid>
+                </Grid>
+            </material:DialogHost.DialogContent>
+        </material:DialogHost>
+
+        <Button Grid.Row="1" 
+                Foreground="WhiteSmoke" FontSize="30" FontStretch="Medium" 
+                Style="{StaticResource MaterialDesignFloatingActionMiniAccentButton}" Content="+" 
+                Click="AddButton_Click"
+                HorizontalAlignment="Right" VerticalAlignment="Bottom"/>
     </Grid>
 </Window>
