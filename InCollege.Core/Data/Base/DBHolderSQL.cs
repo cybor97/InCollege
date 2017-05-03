@@ -83,7 +83,7 @@ namespace InCollege.Core.Data.Base
             var data = new DataTable(table);
             adapter.Fill(data);
             data.PrimaryKey = new[] { data.Columns["ID"]
-    };
+            };
 
 
             DataRow row;
