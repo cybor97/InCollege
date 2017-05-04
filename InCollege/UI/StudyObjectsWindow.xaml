@@ -9,9 +9,9 @@
         Height="500" Width="600">
     <Grid>
         <dragablz:TabablzControl Name="StudyObjectsTabs"
-                                     SelectionChanged="AccountTypesTabs_SelectionChanged"
-                                     Style="{StaticResource MaterialDesignAlternateTabablzControlStyle}">
-            <TabItem Header="Отделения">
+                                 SelectionChanged="StudyObjectsTabs_SelectionChanged"
+                                 Style="{StaticResource MaterialDesignAlternateTabablzControlStyle}">
+            <TabItem Header="Отделения" Tag="Department">
                 <ListView Name="DepartmentsLV">
                     <ListView.View>
                         <GridView>
@@ -24,14 +24,14 @@
                                     </DataTemplate>
                                 </GridViewColumn.CellTemplate>
                             </GridViewColumn>
-                            <GridViewColumn Header="Код"/>
-                            <GridViewColumn Header="Название"/>
-                            <GridViewColumn Header="Заведующий отделением"/>
+                            <GridViewColumn Header="Код" DisplayMemberBinding="{Binding DepartmentCode}"/>
+                            <GridViewColumn Header="Название" DisplayMemberBinding="{Binding DepartmentName}"/>
+                            <GridViewColumn Header="Заведующий отделением" DisplayMemberBinding="{Binding DepartmentHeadName}"/>
                         </GridView>
                     </ListView.View>
                 </ListView>
             </TabItem>
-            <TabItem Header="Специальности">
+            <TabItem Header="Специальности" Tag="Specialty">
                 <ListView Name="SpecialtiesLV">
                     <ListView.View>
                         <GridView>
@@ -51,7 +51,7 @@
                     </ListView.View>
                 </ListView>
             </TabItem>
-            <TabItem Header="Группы">
+            <TabItem Header="Группы" Tag="Group">
                 <ListView Name="GroupsLV">
                     <ListView.View>
                         <GridView>
@@ -71,7 +71,7 @@
                     </ListView.View>
                 </ListView>
             </TabItem>
-            <TabItem Header="Дисциплины">
+            <TabItem Header="Дисциплины" Tag="Subject">
                 <ListView Name="SubjectsLV">
                     <ListView.View>
                         <GridView>
@@ -103,7 +103,8 @@
                              material:HintAssist.IsFloating="True"/>
                     <ComboBox material:HintAssist.Hint="Заведующий отделением" 
                               Name="DepartmentHeadCB" 
-                              DisplayMemberPath="{Binding FullName}" material:HintAssist.IsFloating="True"/>
+                              DisplayMemberPath="FullName" 
+                              material:HintAssist.IsFloating="True"/>
 
                     <Grid>
                         <Grid.ColumnDefinitions>
@@ -119,7 +120,7 @@
 
         <material:DialogHost Name="EditSpecialtyDialog" Margin="5">
             <material:DialogHost.DialogContent>
-                <Grid>
+                <StackPanel Orientation="Vertical" MinWidth="400" Margin="5">
                     <TextBox material:HintAssist.Hint="Код" 
                              Name="SpecialtyCodeTB"
                              material:HintAssist.IsFloating="True"/>
@@ -138,13 +139,13 @@
                         <Button Content="Сохранить" Style="{StaticResource MaterialDesignFlatAccentButton}" Click="SaveButton_Click" Tag="Specialty"/>
                         <Button Content="Отменить" Style="{StaticResource MaterialDesignFlatButton}" Click="CancelButton_Click" Grid.Column="1" Tag="Specialty"/>
                     </Grid>
-                </Grid>
+                </StackPanel>
             </material:DialogHost.DialogContent>
         </material:DialogHost>
 
         <material:DialogHost Name="EditGroupDialog" Margin="5">
             <material:DialogHost.DialogContent>
-                <Grid>
+                <StackPanel Orientation="Vertical" MinWidth="400" Margin="5">
                     <TextBox material:HintAssist.Hint="Код" 
                              Name="GroupCodeTB"
                              material:HintAssist.IsFloating="True"/>
@@ -163,13 +164,13 @@
                         <Button Content="Сохранить" Style="{StaticResource MaterialDesignFlatAccentButton}" Click="SaveButton_Click" Tag="Group"/>
                         <Button Content="Отменить" Style="{StaticResource MaterialDesignFlatButton}" Click="CancelButton_Click" Grid.Column="1" Tag="Group"/>
                     </Grid>
-                </Grid>
+                </StackPanel>
             </material:DialogHost.DialogContent>
         </material:DialogHost>
 
         <material:DialogHost Name="EditSubjectDialog" Margin="5">
             <material:DialogHost.DialogContent>
-                <Grid>
+                <StackPanel Orientation="Vertical" MinWidth="400" Margin="5">
                     <TextBox material:HintAssist.Hint="Индекс" 
                              Name="SubjectIndexCB"
                              material:HintAssist.IsFloating="True"/>
@@ -185,7 +186,7 @@
                         <Button Content="Сохранить" Style="{StaticResource MaterialDesignFlatAccentButton}" Click="SaveButton_Click" Tag="Subject"/>
                         <Button Content="Отменить" Style="{StaticResource MaterialDesignFlatButton}" Click="CancelButton_Click" Grid.Column="1" Tag="Subject"/>
                     </Grid>
-                </Grid>
+                </StackPanel>
             </material:DialogHost.DialogContent>
         </material:DialogHost>
 
