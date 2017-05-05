@@ -10,8 +10,13 @@ namespace InCollege.Core.Data
         public string DepartmentName { get; set; }
         public string DepartmentCode { get; set; }
 
+
         [Ignore]
         [JsonIgnore]
-        public string DepartmentHeadName { get; set; }
+        public Account DepartmentHead { get; set; }
+
+        [Ignore]
+        [JsonIgnore]
+        public string DepartmentHeadName { get => DepartmentHead?.FullName; }
     }
 }
