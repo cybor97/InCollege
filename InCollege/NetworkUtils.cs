@@ -35,7 +35,7 @@ namespace InCollege
             return null;
         }
 
-        public static async Task<IEnumerable<T>> RequestData<T>(Window context, params (string name, object value)[] whereParams) where T : DBRecord
+        public static async Task<List<T>> RequestData<T>(Window context, params (string name, object value)[] whereParams) where T : DBRecord
         {
             try
             {
@@ -56,7 +56,7 @@ namespace InCollege
                       //Not an error! Little more attension, & is  ' here
                       (!string.IsNullOrWhiteSpace(whereString) ? $"&{whereString}" : ""))))).StatusCode == HttpStatusCode.OK)
                     return JsonConvert
-                        .DeserializeObject<IEnumerable<T>>(await response.Content.ReadAsStringAsync());
+                        .DeserializeObject<List<T>>(await response.Content.ReadAsStringAsync());
                 else
                 {
                     MessageBox.Show(await response.Content.ReadAsStringAsync());
