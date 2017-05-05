@@ -12,7 +12,13 @@
                                  SelectionChanged="StudyObjectsTabs_SelectionChanged"
                                  Style="{StaticResource MaterialDesignAlternateTabablzControlStyle}">
             <TabItem Header="Отделения" Tag="Department">
-                <ListView Name="DepartmentsLV">
+                <ListView Name="DepartmentsLV" SelectionChanged="Something_SelectionChanged_Ignore">
+                    <ListView.ContextMenu>
+                        <ContextMenu>
+                            <MenuItem Header="Редактировать" Click="EditItem_Click"/>
+                            <MenuItem Header="Удалить" Click="RemoveItem_Click"/>
+                        </ContextMenu>
+                    </ListView.ContextMenu>
                     <ListView.View>
                         <GridView>
                             <GridViewColumn>
@@ -32,7 +38,13 @@
                 </ListView>
             </TabItem>
             <TabItem Header="Специальности" Tag="Specialty">
-                <ListView Name="SpecialtiesLV">
+                <ListView Name="SpecialtiesLV" SelectionChanged="Something_SelectionChanged_Ignore">
+                    <ListView.ContextMenu>
+                        <ContextMenu>
+                            <MenuItem Header="Редактировать" Click="EditItem_Click"/>
+                            <MenuItem Header="Удалить" Click="RemoveItem_Click"/>
+                        </ContextMenu>
+                    </ListView.ContextMenu>
                     <ListView.View>
                         <GridView>
                             <GridViewColumn>
@@ -52,7 +64,13 @@
                 </ListView>
             </TabItem>
             <TabItem Header="Группы" Tag="Group">
-                <ListView Name="GroupsLV">
+                <ListView Name="GroupsLV" SelectionChanged="Something_SelectionChanged_Ignore">
+                    <ListView.ContextMenu>
+                        <ContextMenu>
+                            <MenuItem Header="Редактировать" Click="EditItem_Click"/>
+                            <MenuItem Header="Удалить" Click="RemoveItem_Click"/>
+                        </ContextMenu>
+                    </ListView.ContextMenu>
                     <ListView.View>
                         <GridView>
                             <GridViewColumn>
@@ -72,7 +90,13 @@
                 </ListView>
             </TabItem>
             <TabItem Header="Дисциплины" Tag="Subject">
-                <ListView Name="SubjectsLV">
+                <ListView Name="SubjectsLV" SelectionChanged="Something_SelectionChanged_Ignore">
+                    <ListView.ContextMenu>
+                        <ContextMenu>
+                            <MenuItem Header="Редактировать" Click="EditItem_Click"/>
+                            <MenuItem Header="Удалить" Click="RemoveItem_Click"/>
+                        </ContextMenu>
+                    </ListView.ContextMenu>
                     <ListView.View>
                         <GridView>
                             <GridViewColumn>
@@ -97,13 +121,16 @@
                 <StackPanel Orientation="Vertical" MinWidth="400" Margin="5">
                     <TextBox material:HintAssist.Hint="Код" 
                              Name="DepartmentCodeTB" 
+                             Text="{Binding DepartmentCode}"
                              material:HintAssist.IsFloating="True"/>
                     <TextBox material:HintAssist.Hint="Название" 
                              Name="DepartmentNameTB" 
+                             Text="{Binding DepartmentName}"
                              material:HintAssist.IsFloating="True"/>
                     <ComboBox material:HintAssist.Hint="Заведующий отделением" 
                               Name="DepartmentHeadCB" 
                               DisplayMemberPath="FullName" 
+                              SelectedValue="{Binding DepartmentHead}"
                               material:HintAssist.IsFloating="True"/>
 
                     <Grid>
