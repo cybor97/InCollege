@@ -111,6 +111,7 @@
     <Compile Include="UI\Util\GridViewSort.cs" />
     <Compile Include="UI\Util\ImageToSourceConverter.cs" />
     <Compile Include="NetworkUtils.cs" />
+    <Compile Include="UI\Util\UIUtils.cs" />
     <Page Include="UI\AuthorizationUI\AccountEditDialog.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
