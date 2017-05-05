@@ -70,7 +70,12 @@ namespace InCollege
             return null;
         }
 
-        public static async Task<string> ExecuteDataAction<T>(IUpdatable context, DBRecord dataObject, DataAction action)
+        public static async Task<string> ExecuteDataAction<T>(IUpdatable context, DBRecord dataObject, DataAction action) where T : DBRecord
+        {
+            return await ExecuteDataAction(typeof(T).Name, context, dataObject, action);
+        }
+
+        public static async Task<string> ExecuteDataAction(string tableName, IUpdatable context, DBRecord dataObject, DataAction action)
         {
             try
             {
@@ -79,7 +84,7 @@ namespace InCollege
                       .PostAsync(ClientConfiguration.DataHandlerPath,
                       new StringContent(
                       $"Action={Enum.GetName(typeof(DataAction), action)}&" +
-                      $"table={typeof(T).Name}&" +
+                      $"table={tableName}&" +
                       $"token={App.Token}&" +
                       (action == DataAction.Save ? dataObject.POSTSerialized : $"id={dataObject.ID}"))))).StatusCode == HttpStatusCode.OK)
                 {
@@ -96,7 +101,6 @@ namespace InCollege
             }
             return "-1";
         }
-
 
     }
 }
