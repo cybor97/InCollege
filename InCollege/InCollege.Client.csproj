@@ -86,6 +86,9 @@
     <Compile Include="UI\Base\StyleableWindow\WindowMinimizeCommand.cs" />
     <Compile Include="UI\Base\StyleableWindow\WindowResizeBehavior.cs" />
     <Compile Include="UI\Base\Styles\WindowButton.cs" />
+    <Compile Include="UI\GroupStudentsWindow.xaml.cs">
+      <DependentUpon>GroupStudentsWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="UI\IUpdatable.cs" />
     <Compile Include="UI\StatementsUI\EditStatementDialog.xaml.cs">
       <DependentUpon>EditStatementDialog.xaml</DependentUpon>
@@ -108,6 +111,9 @@
     <Compile Include="UI\StatementsUI\TotalStatementFrame.xaml.cs">
       <DependentUpon>TotalStatementFrame.xaml</DependentUpon>
     </Compile>
+    <Compile Include="UI\SubjectTeachersWindow.xaml.cs">
+      <DependentUpon>SubjectTeachersWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="UI\Util\GridViewSort.cs" />
     <Compile Include="UI\Util\ImageToSourceConverter.cs" />
     <Compile Include="NetworkUtils.cs" />
@@ -125,6 +131,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="UI\AuthorizationUI\AuthorizationWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\GroupStudentsWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -171,6 +181,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="UI\StatementsUI\TotalStatementFrame.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\SubjectTeachersWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
