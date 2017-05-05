@@ -1,6 +1,7 @@
 ﻿using InCollege.Core.Data;
 using InCollege.Core.Data.Base;
 using InCollege.UI;
+using InCollege.UI.Util;
 using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
@@ -82,7 +83,7 @@ namespace InCollege.Client.UI
 
         async void ApprovedCB_CheckChanged(object sender, RoutedEventArgs e)
         {
-            var item = FindAncestorOrSelf<ListViewItem>(sender as CheckBox);
+            var item = UIUtils.FindAncestorOrSelf<ListViewItem>(sender as CheckBox);
 
             if (item != null)
             {
@@ -94,17 +95,6 @@ namespace InCollege.Client.UI
                     MessageBoxImage.Warning) == MessageBoxResult.Yes)
                     await SaveAccount(account);
             }
-        }
-
-        public static T FindAncestorOrSelf<T>(DependencyObject obj) where T : DependencyObject
-        {
-            while (obj != null)
-            {
-                if (obj is T objTest)
-                    return objTest;
-                obj = VisualTreeHelper.GetParent(obj);
-            }
-            return null;
         }
 
         async void AccountTypesTabs_SelectionChanged(object sender, SelectionChangedEventArgs e)
