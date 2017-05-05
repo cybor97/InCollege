@@ -1,0 +1,67 @@
+﻿<Window x:Class="InCollege.UI.GroupStudentsWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:material="http://materialdesigninxaml.net/winfx/xaml/themes"
+        Style="{StaticResource BaseWindow}"
+        Loaded="GroupStudentsWindow_Loaded"
+        Title="GroupStudentsWindow" Height="400" Width="400">
+    <Grid>
+        <ListView Name="StudentsLV">
+            <ListView.ContextMenu>
+                <ContextMenu>
+                    <MenuItem Header="Редактировать" Click="EditItem_Click"/>
+                    <MenuItem Header="Удалить" Click="RemoveItem_Click"/>
+                </ContextMenu>
+            </ListView.ContextMenu>
+            <ListView.View>
+                <GridView>
+                    <GridView.ColumnHeaderContainerStyle>
+                        <Style TargetType="GridViewColumnHeader">
+                            <Setter Property="Visibility" Value="Collapsed"/>
+                        </Style>
+                    </GridView.ColumnHeaderContainerStyle>
+                    <GridViewColumn>
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <Image Width="20"
+                                       Height="20"
+                                    Source="{Binding Path=StateIconURI, Converter={StaticResource ImageToSourceConverter}}"/>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+                    <GridViewColumn DisplayMemberBinding="{Binding FullName}" Width="300"/>
+                </GridView>
+            </ListView.View>
+        </ListView>
+
+        <Button Grid.Row="1" 
+                Foreground="WhiteSmoke" FontSize="30" FontStretch="Medium" 
+                Style="{StaticResource MaterialDesignFloatingActionMiniAccentButton}" Content="+" 
+                HorizontalAlignment="Right" VerticalAlignment="Bottom"
+                Click="AddButton_Click"/>
+
+        <material:DialogHost Name="StudentDialog"
+                             CloseOnClickAway="True"
+                             KeyDown="StudentDialog_KeyDown">
+            <material:DialogHost.DialogContent>
+                <StackPanel Orientation="Vertical" MinWidth="300">
+                    <ComboBox material:HintAssist.Hint="Студент"
+                              Name="StudentCB"
+                              material:HintAssist.IsFloating="True" 
+                              HorizontalContentAlignment="Center"
+                              DisplayMemberPath="FullName"
+                              Grid.Column="0"/>
+                    <Button Grid.Column="1"
+                            Click="SaveButton_Click"
+                            Style="{StaticResource MaterialDesignFlatAccentButton}"
+                            Content="Сохранить"/>
+                    <Button Grid.Column="2"
+                            Foreground="Red"
+                            Click="CancelButton_Click"
+                            Style="{StaticResource MaterialDesignFlatAccentButton}"
+                            Content="Отмена"/>
+                </StackPanel>
+            </material:DialogHost.DialogContent>
+        </material:DialogHost>
+    </Grid>
+</Window>
