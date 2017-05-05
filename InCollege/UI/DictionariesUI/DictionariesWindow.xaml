@@ -43,40 +43,36 @@
                 </GridView>
             </ListView.View>
         </ListView>
+
         <Button Grid.Row="1" 
                 Foreground="WhiteSmoke" FontSize="30" FontStretch="Medium" 
                 Style="{StaticResource MaterialDesignFloatingActionMiniAccentButton}" Content="+" 
                 HorizontalAlignment="Right" VerticalAlignment="Bottom"
                 Click="AddButton_Click"/>
 
-        <!--#region AddAttestationTypeDialog-->
-        <material:DialogHost Name="AddAttestationTypeDialog"
+        <material:DialogHost Name="AttestationTypeDialog"
                              CloseOnClickAway="True"
-                             KeyDown="AddAttestationTypeDialog_KeyDown">
+                             KeyDown="AttestationTypeDialog_KeyDown">
             <material:DialogHost.DialogContent>
-                <Grid MinWidth="350">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="Auto"/>
-                        <ColumnDefinition Width="Auto"/>
-                    </Grid.ColumnDefinitions>
+                <StackPanel Orientation="Vertical" MinWidth="300">
                     <TextBox material:HintAssist.Hint="Вид аттестации"
                              Name="TypeNameTB"
+                             Text="{Binding TypeName}"
                              material:HintAssist.IsFloating="True" 
                              HorizontalContentAlignment="Center"
                              Grid.Column="0"/>
                     <Button Grid.Column="1"
                             Click="SaveButton_Click"
                             Style="{StaticResource MaterialDesignFlatAccentButton}"
+                            Margin="0 15 0 0"
                             Content="Сохранить"/>
                     <Button Grid.Column="2"
                             Foreground="Red"
                             Click="CancelButton_Click"
                             Style="{StaticResource MaterialDesignFlatAccentButton}"
                             Content="Отмена"/>
-                </Grid>
+                </StackPanel>
             </material:DialogHost.DialogContent>
         </material:DialogHost>
-        <!--#endregion-->
     </Grid>
 </Window>
