@@ -14,8 +14,6 @@ namespace InCollege.Client.UI.DictionariesUI
             InitializeComponent();
         }
 
-        public bool AddMode = false;
-
         private async void DictionariesWindow_Loaded(object sender, RoutedEventArgs e)
         {
             await UpdateData();
@@ -28,50 +26,40 @@ namespace InCollege.Client.UI.DictionariesUI
 
         private void AddButton_Click(object sender, RoutedEventArgs e)
         {
-            AddMode = true;
-            TypeNameTB.Text = null;
-            AddAttestationTypeDialog.IsOpen = true;
+            AttestationTypeDialog.DataContext = new AttestationType();
+            AttestationTypeDialog.IsOpen = true;
         }
 
         private void CancelButton_Click(object sender, RoutedEventArgs e)
         {
-            AddAttestationTypeDialog.IsOpen = false;
+            AttestationTypeDialog.IsOpen = false;
         }
 
         private async void SaveButton_Click(object sender, RoutedEventArgs e)
         {
-            var attestationType = AddMode ? new AttestationType { TypeName = TypeNameTB.Text } : (AttestationType)AttestationTypesLV.SelectedItem;
-            attestationType.TypeName = TypeNameTB.Text;
-            attestationType.Modified = true;
-            await NetworkUtils.ExecuteDataAction<AttestationType>(this, attestationType, DataAction.Save);
-
-            AddAttestationTypeDialog.IsOpen = false;
+            await NetworkUtils.ExecuteDataAction<AttestationType>(this, (DBRecord)AttestationTypeDialog.DataContext, DataAction.Save);
+            AttestationTypeDialog.IsOpen = false;
         }
 
         private void EditItem_Click(object sender, RoutedEventArgs e)
         {
-            if (AttestationTypesLV.SelectedIndex != -1 && AttestationTypesLV.SelectedItems.Count == 1)
+            if (AttestationTypesLV.SelectedItem != null)
             {
-                AddAttestationTypeDialog.IsOpen = true;
-                TypeNameTB.Text = ((AttestationType)AttestationTypesLV.SelectedItem).TypeName;
-                AddMode = false;
+                AttestationTypeDialog.IsOpen = true;
+                AttestationTypeDialog.DataContext = (AttestationType)AttestationTypesLV.SelectedItem;
             }
         }
 
         private async void RemoveItem_Click(object sender, RoutedEventArgs e)
         {
-            bool updateRequired = false;
             if (AttestationTypesLV.SelectedItems?.Count > 0)
                 foreach (DBRecord current in AttestationTypesLV.SelectedItems)
-                    updateRequired = updateRequired ||
-                         (int.TryParse(await NetworkUtils.ExecuteDataAction<AttestationType>(null, current, DataAction.Remove), out int newID) &&
-                         newID > -1);
+                    await NetworkUtils.ExecuteDataAction<AttestationType>(null, current, DataAction.Remove);
 
-            if (updateRequired)
-                await UpdateData();
+            await UpdateData();
         }
 
-        private void AddAttestationTypeDialog_KeyDown(object sender, KeyEventArgs e)
+        private void AttestationTypeDialog_KeyDown(object sender, KeyEventArgs e)
         {
             if (e.Key == Key.Enter)
                 SaveButton_Click(null, null);
