@@ -56,9 +56,9 @@
                                     </DataTemplate>
                                 </GridViewColumn.CellTemplate>
                             </GridViewColumn>
-                            <GridViewColumn Header="Код"/>
-                            <GridViewColumn Header="Название"/>
-                            <GridViewColumn Header="Отделение"/>
+                            <GridViewColumn Header="Код" DisplayMemberBinding="{Binding SpecialtyCode}"/>
+                            <GridViewColumn Header="Название" DisplayMemberBinding="{Binding SpecialtyName}"/>
+                            <GridViewColumn Header="Отделение" DisplayMemberBinding="{Binding DepartmentName}"/>
                         </GridView>
                     </ListView.View>
                 </ListView>
@@ -67,6 +67,7 @@
                 <ListView Name="GroupsLV" SelectionChanged="Something_SelectionChanged_Ignore">
                     <ListView.ContextMenu>
                         <ContextMenu>
+                            <MenuItem Header="Студенты" Click="GroupStudentsItem_Click"/>
                             <MenuItem Header="Редактировать" Click="EditItem_Click"/>
                             <MenuItem Header="Удалить" Click="RemoveItem_Click"/>
                         </ContextMenu>
@@ -82,9 +83,9 @@
                                     </DataTemplate>
                                 </GridViewColumn.CellTemplate>
                             </GridViewColumn>
-                            <GridViewColumn Header="Код"/>
-                            <GridViewColumn Header="Название"/>
-                            <GridViewColumn Header="Специальность"/>
+                            <GridViewColumn Header="Код" DisplayMemberBinding="{Binding GroupCode}"/>
+                            <GridViewColumn Header="Название" DisplayMemberBinding="{Binding GroupName}"/>
+                            <GridViewColumn Header="Специальность" DisplayMemberBinding="{Binding SpecialtyName}"/>
                         </GridView>
                     </ListView.View>
                 </ListView>
@@ -93,6 +94,7 @@
                 <ListView Name="SubjectsLV" SelectionChanged="Something_SelectionChanged_Ignore">
                     <ListView.ContextMenu>
                         <ContextMenu>
+                            <MenuItem Header="Преподаватели" Click="TeachersItem_Click"/>
                             <MenuItem Header="Редактировать" Click="EditItem_Click"/>
                             <MenuItem Header="Удалить" Click="RemoveItem_Click"/>
                         </ContextMenu>
@@ -108,8 +110,8 @@
                                     </DataTemplate>
                                 </GridViewColumn.CellTemplate>
                             </GridViewColumn>
-                            <GridViewColumn Header="Индекс"/>
-                            <GridViewColumn Header="Название"/>
+                            <GridViewColumn Header="Индекс" DisplayMemberBinding="{Binding SubjectIndex}"/>
+                            <GridViewColumn Header="Название" DisplayMemberBinding="{Binding SubjectName}"/>
                         </GridView>
                     </ListView.View>
                 </ListView>
@@ -150,12 +152,16 @@
                 <StackPanel Orientation="Vertical" MinWidth="400" Margin="5">
                     <TextBox material:HintAssist.Hint="Код" 
                              Name="SpecialtyCodeTB"
+                             Text="{Binding SpecialtyCode}"
                              material:HintAssist.IsFloating="True"/>
                     <TextBox material:HintAssist.Hint="Название" 
                              Name="SpecialtyNameTB"
+                             Text="{Binding SpecialtyName}"
                              material:HintAssist.IsFloating="True"/>
                     <ComboBox material:HintAssist.Hint="Отделение" 
                               Name="DepartmentCB"
+                              SelectedValue="{Binding Department}"
+                              DisplayMemberPath="DepartmentName"
                               material:HintAssist.IsFloating="True"/>
 
                     <Grid>
@@ -175,12 +181,16 @@
                 <StackPanel Orientation="Vertical" MinWidth="400" Margin="5">
                     <TextBox material:HintAssist.Hint="Код" 
                              Name="GroupCodeTB"
+                             Text="{Binding GroupCode}"
                              material:HintAssist.IsFloating="True"/>
                     <TextBox material:HintAssist.Hint="Название" 
                              Name="GroupNameTB"
+                             Text="{Binding GroupName}"
                              material:HintAssist.IsFloating="True"/>
                     <ComboBox material:HintAssist.Hint="Специальность"
                               Name="SpecialtyCB"
+                              SelectedValue="{Binding Specialty}"
+                              DisplayMemberPath="SpecialtyName"
                               material:HintAssist.IsFloating="True"/>
 
                     <Grid>
@@ -199,10 +209,12 @@
             <material:DialogHost.DialogContent>
                 <StackPanel Orientation="Vertical" MinWidth="400" Margin="5">
                     <TextBox material:HintAssist.Hint="Индекс" 
-                             Name="SubjectIndexCB"
+                             Name="SubjectIndexTB"
+                             Text="{Binding SubjectIndex}"
                              material:HintAssist.IsFloating="True"/>
                     <TextBox material:HintAssist.Hint="Название" 
-                             Name="SubjectNameCB"
+                             Name="SubjectNameTB"
+                             Text="{Binding SubjectName}"
                              material:HintAssist.IsFloating="True"/>
 
                     <Grid>

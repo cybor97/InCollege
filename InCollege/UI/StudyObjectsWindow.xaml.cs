@@ -1,6 +1,5 @@
 ﻿using InCollege.Core.Data;
 using InCollege.Core.Data.Base;
-using InCollege.UI.Util;
 using MaterialDesignThemes.Wpf;
 using System.Collections.Generic;
 using System.Linq;
@@ -31,24 +30,38 @@ namespace InCollege.UI
         public async Task UpdateData()
         {
             Title = ((TabItem)StudyObjectsTabs.SelectedItem).Header.ToString();
+            //If not Subjects.
+            if (StudyObjectsTabs.SelectedIndex != StudyObjectsTabs.Items.Count - 1)
+            {
+                var departmentHeads = await NetworkUtils.RequestData<Account>(this, (nameof(Account.AccountType), AccountType.DepartmentHead));
+                DepartmentHeadCB.ItemsSource = departmentHeads;
 
-            var departmentHeads = await NetworkUtils.RequestData<Account>(this, (nameof(Account.AccountType), AccountType.DepartmentHead));
-            DepartmentHeadCB.ItemsSource = departmentHeads;
+                var departmentsData = await NetworkUtils.RequestData<Department>(this);
+                DepartmentCB.ItemsSource = departmentsData;
 
-            var departmentsData = await NetworkUtils.RequestData<Department>(this);
-            foreach (Department current in departmentsData)
-                current.DepartmentHead = departmentHeads.FirstOrDefault(c => c.ID == current.DepartmentHeadID);
-            DepartmentsLV.ItemsSource = departmentsData;
+                foreach (Department current in departmentsData)
+                    current.DepartmentHead = departmentHeads.FirstOrDefault(c => c.ID == current.DepartmentHeadID);
+                DepartmentsLV.ItemsSource = departmentsData;
 
-            SpecialtiesLV.ItemsSource = await NetworkUtils.RequestData<Specialty>(this);
-            foreach (Specialty current in SpecialtiesLV.ItemsSource)
-                current.DepartmentName = (await NetworkUtils.RequestData<Department>(this, (nameof(Department.ID), current.DepartmentID)))?.FirstOrDefault()?.DepartmentName;
+                if (StudyObjectsTabs.SelectedIndex >= 1)
+                {
+                    var specialtiesData = await NetworkUtils.RequestData<Specialty>(this);
+                    SpecialtyCB.ItemsSource = specialtiesData;
 
-            GroupsLV.ItemsSource = await NetworkUtils.RequestData<Group>(this);
-            foreach (Group current in GroupsLV.ItemsSource)
-                current.SpecialtyName = (await NetworkUtils.RequestData<Specialty>(this, (nameof(Specialty.ID), current.SpecialtyID)))?.FirstOrDefault()?.SpecialtyName;
+                    foreach (Specialty current in specialtiesData)
+                        current.Department = departmentsData.FirstOrDefault(c => c.ID == current.DepartmentID);
+                    SpecialtiesLV.ItemsSource = specialtiesData;
 
-            SubjectsLV.ItemsSource = await NetworkUtils.RequestData<Subject>(this);
+                    if (StudyObjectsTabs.SelectedIndex >= 2)
+                    {
+                        var groupsData = await NetworkUtils.RequestData<Group>(this);
+                        foreach (Group current in groupsData)
+                            current.Specialty = specialtiesData.FirstOrDefault(c => c.ID == current.SpecialtyID);
+                        GroupsLV.ItemsSource = groupsData;
+                    }
+                }
+            }
+            else SubjectsLV.ItemsSource = await NetworkUtils.RequestData<Subject>(this);
         }
 
         async void StudyObjectsTabs_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -76,26 +89,10 @@ namespace InCollege.UI
 
         async void SaveButton_Click(object sender, RoutedEventArgs e)
         {
-            Button saveButton = (Button)sender;
+            var saveButton = (Button)sender;
             var dialog = Views[saveButton.Tag].Dialog;
             dialog.IsOpen = false;
-            switch (saveButton.Tag.ToString())
-            {
-                case "Department":
-                    var record = (Department)dialog.DataContext;
-                    record.DepartmentHeadID = ((DBRecord)DepartmentHeadCB?.SelectedItem)?.ID ?? -1;
-                    await NetworkUtils.ExecuteDataAction<Department>(this, record, DataAction.Save);
-                    break;
-                case "Specialty":
-                    await NetworkUtils.ExecuteDataAction<Specialty>(this, (DBRecord)dialog.DataContext, DataAction.Save);
-                    break;
-                case "Group":
-                    await NetworkUtils.ExecuteDataAction<Group>(this, (DBRecord)dialog.DataContext, DataAction.Save);
-                    break;
-                case "Subject":
-                    await NetworkUtils.ExecuteDataAction<Subject>(this, (DBRecord)dialog.DataContext, DataAction.Save);
-                    break;
-            }
+            await NetworkUtils.ExecuteDataAction(saveButton.Tag.ToString(), this, (DBRecord)dialog.DataContext, DataAction.Save);
         }
 
         void CancelButton_Click(object sender, RoutedEventArgs e)
@@ -103,12 +100,12 @@ namespace InCollege.UI
             Views[((Button)sender).Tag].Dialog.IsOpen = false;
         }
 
-        private void Something_SelectionChanged_Ignore(object sender, SelectionChangedEventArgs e)
+        void Something_SelectionChanged_Ignore(object sender, SelectionChangedEventArgs e)
         {
             e.Handled = true;
         }
 
-        private void EditItem_Click(object sender, RoutedEventArgs e)
+        void EditItem_Click(object sender, RoutedEventArgs e)
         {
             var view = Views[((TabItem)StudyObjectsTabs.SelectedItem).Tag];
             var dialog = view.Dialog;
@@ -116,11 +113,30 @@ namespace InCollege.UI
             dialog.IsOpen = true;
         }
 
-        private void RemoveItem_Click(object sender, RoutedEventArgs e)
+        async void RemoveItem_Click(object sender, RoutedEventArgs e)
         {
-            var item = UIUtils.FindAncestorOrSelf<ListView>(sender as MenuItem);
-            MessageBox.Show(item.ToString());
+            var tag = ((TabItem)StudyObjectsTabs.SelectedItem).Tag.ToString();
+            foreach (DBRecord current in Views[tag].ListView.SelectedItems)
+                await NetworkUtils.ExecuteDataAction(tag, null, current, DataAction.Remove);
+            await UpdateData();
+        }
 
+        async void TeachersItem_Click(object sender, RoutedEventArgs e)
+        {
+            if (SubjectsLV.SelectedItem != null)
+            {
+                new SubjectTeachersWindow((Subject)SubjectsLV.SelectedItem).ShowDialog();
+                await UpdateData();
+            }
+        }
+
+        async void GroupStudentsItem_Click(object sender, RoutedEventArgs e)
+        {
+            if (GroupsLV.SelectedItem != null)
+            {
+                new GroupStudentsWindow((Group)GroupsLV.SelectedItem).ShowDialog();
+                await UpdateData();
+            }
         }
     }
 }
