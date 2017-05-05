@@ -12,6 +12,19 @@ namespace InCollege.Core.Data
 
         [Ignore]
         [JsonIgnore]
-        public string DepartmentName { get; set; }
+        public Department Department
+        {
+            get => _department;
+            set
+            {
+                _department = value;
+                DepartmentID = value?.ID ?? -1;
+            }
+        }
+        private Department _department;
+
+        [Ignore]
+        [JsonIgnore]
+        public string DepartmentName { get => Department?.DepartmentName; }
     }
 }

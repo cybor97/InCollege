@@ -13,7 +13,16 @@ namespace InCollege.Core.Data
 
         [Ignore]
         [JsonIgnore]
-        public Account DepartmentHead { get; set; }
+        public Account DepartmentHead
+        {
+            get => _departmentHead;
+            set
+            {
+                _departmentHead = value;
+                DepartmentHeadID = value?.ID ?? -1;
+            }
+        }
+        private Account _departmentHead { get; set; }
 
         [Ignore]
         [JsonIgnore]

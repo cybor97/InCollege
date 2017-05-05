@@ -12,6 +12,19 @@ namespace InCollege.Core.Data
 
         [Ignore]
         [JsonIgnore]
-        public string SpecialtyName { get; set; }
+        public Specialty Specialty
+        {
+            get => _specialty;
+            set
+            {
+                _specialty = value;
+                SpecialtyID = value?.ID ?? -1;
+            }
+        }
+        private Specialty _specialty;
+
+        [Ignore]
+        [JsonIgnore]
+        public string SpecialtyName { get => Specialty?.SpecialtyName; }
     }
 }
