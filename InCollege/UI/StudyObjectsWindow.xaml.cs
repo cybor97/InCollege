@@ -117,7 +117,20 @@ namespace InCollege.UI
         {
             var tag = ((TabItem)StudyObjectsTabs.SelectedItem).Tag.ToString();
             foreach (DBRecord current in Views[tag].ListView.SelectedItems)
+            {
                 await NetworkUtils.ExecuteDataAction(tag, null, current, DataAction.Remove);
+                if (tag == "Group")
+                    foreach (var currentStudent in (await NetworkUtils.RequestData<Account>(this, (nameof(Account.AccountType), AccountType.Student),
+                                                                                                  (nameof(Account.GroupID), current.ID))))
+                    {
+                        currentStudent.GroupID = -1;
+                        await NetworkUtils.ExecuteDataAction<Account>(null, currentStudent, DataAction.Save);
+                    }
+                else if (tag == "Subject")
+                    foreach (var currentTeacher in (await NetworkUtils.RequestData<Teacher>(this, (nameof(Teacher.SubjectID), current.ID))))
+                        await NetworkUtils.ExecuteDataAction<Teacher>(this, currentTeacher, DataAction.Remove);
+            }
+
             await UpdateData();
         }
 

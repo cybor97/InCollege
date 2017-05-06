@@ -10,7 +10,7 @@
         <ListView Name="SubjectTeachersLV">
             <ListView.ContextMenu>
                 <ContextMenu>
-                    <MenuItem Header="Редактировать" Click="EditItem_Click"/>
+                    <MenuItem Header="Заменить" Click="EditItem_Click"/>
                     <MenuItem Header="Удалить" Click="RemoveItem_Click"/>
                 </ContextMenu>
             </ListView.ContextMenu>
