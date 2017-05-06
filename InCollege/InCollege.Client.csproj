@@ -73,7 +73,7 @@
     </ApplicationDefinition>
     <Compile Include="ClientConfiguration.cs" />
     <Compile Include="CommonVariables.cs" />
-    <Compile Include="UI\AuthorizationUI\AccountEditDialog.xaml.cs">
+    <Compile Include="UI\AccountsUI\AccountEditDialog.xaml.cs">
       <DependentUpon>AccountEditDialog.xaml</DependentUpon>
     </Compile>
     <Compile Include="UI\Base\StyleableWindow\ControlDoubleClickBehavior.cs" />
@@ -99,8 +99,8 @@
     <Compile Include="UI\StatementsUI\MiddleStatementFrame.xaml.cs">
       <DependentUpon>MiddleStatementFrame.xaml</DependentUpon>
     </Compile>
-    <Compile Include="UI\ParticipantsWindow.xaml.cs">
-      <DependentUpon>ParticipantsWindow.xaml</DependentUpon>
+    <Compile Include="UI\AccountsUI\AccountsWindow.xaml.cs">
+      <DependentUpon>AccountsWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="UI\StatementsUI\QualificationStatementFrame.xaml.cs">
       <DependentUpon>QualificationStatementFrame.xaml</DependentUpon>
@@ -118,7 +118,7 @@
     <Compile Include="UI\Util\ImageToSourceConverter.cs" />
     <Compile Include="NetworkUtils.cs" />
     <Compile Include="UI\Util\UIUtils.cs" />
-    <Page Include="UI\AuthorizationUI\AccountEditDialog.xaml">
+    <Page Include="UI\AccountsUI\AccountEditDialog.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -130,7 +130,7 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="UI\AuthorizationUI\AuthorizationWindow.xaml">
+    <Page Include="UI\AccountsUI\AuthorizationWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -157,7 +157,7 @@
     <Compile Include="UI\DictionariesUI\DictionariesWindow.xaml.cs">
       <DependentUpon>DictionariesWindow.xaml</DependentUpon>
     </Compile>
-    <Compile Include="UI\AuthorizationUI\AuthorizationWindow.xaml.cs">
+    <Compile Include="UI\AccountsUI\AuthorizationWindow.xaml.cs">
       <DependentUpon>AuthorizationWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="UI\MainUI\MainWindow.xaml.cs">
@@ -168,7 +168,7 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="UI\ParticipantsWindow.xaml">
+    <Page Include="UI\AccountsUI\AccountsWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

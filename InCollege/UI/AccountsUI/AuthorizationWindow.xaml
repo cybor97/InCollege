@@ -1,4 +1,4 @@
-﻿<Window x:Class="InCollege.Client.UI.AuthorizationUI.AuthorizationWindow"
+﻿<Window x:Class="InCollege.Client.UI.AccountsUI.AuthorizationWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:material="http://materialdesigninxaml.net/winfx/xaml/themes"

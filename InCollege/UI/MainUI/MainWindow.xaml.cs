@@ -1,4 +1,5 @@
-﻿using InCollege.Client.UI.DictionariesUI;
+﻿using InCollege.Client.UI.AccountsUI;
+using InCollege.Client.UI.DictionariesUI;
 using InCollege.Core.Data;
 using InCollege.Core.Data.Base;
 using InCollege.UI;
@@ -65,7 +66,7 @@ namespace InCollege.Client.UI.MainUI
 
         async void ParticipantsItem_Click(object sender, RoutedEventArgs e)
         {
-            new ParticipantsWindow((AccountType)((MenuItem)(((MenuItem)sender).Parent)).Items.IndexOf(sender)).ShowDialog();
+            new AccountsWindow((AccountType)((MenuItem)(((MenuItem)sender).Parent)).Items.IndexOf(sender)).ShowDialog();
             await UpdateData();
         }
 

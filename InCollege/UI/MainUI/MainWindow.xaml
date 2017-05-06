@@ -3,7 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:sw="clr-namespace:WpfStyleableWindow.StyleableWindow"
         xmlns:statements="clr-namespace:InCollege.UI.StatementsUI"
-        xmlns:authorizationui="clr-namespace:InCollege.UI.AuthorizationUI"
+        xmlns:accountsui="clr-namespace:InCollege.Client.UI.AccountsUI"
         MouseDoubleClick="Window_MouseDoubleClick"
         Style="{StaticResource BaseWindow}"
         Loaded="MainWindow_Loaded"
@@ -87,14 +87,14 @@
                 </GridView>
             </ListView.View>
         </ListView>
-        
+
         <Button Grid.Row="1" 
                 Foreground="WhiteSmoke" FontSize="30" FontStretch="Medium" 
                 Style="{StaticResource MaterialDesignFloatingActionMiniAccentButton}" Content="+" 
                 Click="AddButton_Click"
                 HorizontalAlignment="Right" VerticalAlignment="Bottom"/>
 
-        <authorizationui:AccountEditDialog x:Name="ProfileDialog"
+        <accountsui:AccountEditDialog x:Name="ProfileDialog"
                                            KeyDown="ProfileDialog_KeyDown"
                                            OnSave="ProfileDialog_OnSave"
                                            OnCancel="ProfileDialog_OnCancel"

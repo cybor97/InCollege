@@ -1,9 +1,9 @@
-﻿<Window x:Class="InCollege.Client.UI.ParticipantsWindow"
+﻿<Window x:Class="InCollege.Client.UI.AccountsUI.AccountsWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         Style="{StaticResource BaseWindow}"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:dragablz="http://dragablz.net/winfx/xaml/dragablz"
-        xmlns:authorizationui="clr-namespace:InCollege.UI.AuthorizationUI"
+        xmlns:accountsui="clr-namespace:InCollege.Client.UI.AccountsUI"
         Title="Учетные записи" Height="500" Width="650"
         Loaded="ParticipantsWindow_Loaded">
     <Grid>
@@ -63,7 +63,7 @@
                 Click="AddButton_Click"
                 HorizontalAlignment="Right" VerticalAlignment="Bottom"/>
 
-        <authorizationui:AccountEditDialog x:Name="ProfileDialog"
+        <accountsui:AccountEditDialog x:Name="ProfileDialog"
                                            OnSave="ProfileDialog_OnSave"
                                            OnCancel="ProfileDialog_OnCancel"/>
     </Grid>

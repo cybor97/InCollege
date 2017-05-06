@@ -4,7 +4,7 @@ using MaterialDesignThemes.Wpf;
 using System.Windows;
 using System.Windows.Controls;
 
-namespace InCollege.UI.AuthorizationUI
+namespace InCollege.Client.UI.AccountsUI
 {
     public partial class AccountEditDialog : DialogHost
     {

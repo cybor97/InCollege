@@ -9,13 +9,13 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 
-namespace InCollege.Client.UI
+namespace InCollege.Client.UI.AccountsUI
 {
-    public partial class ParticipantsWindow : Window, IUpdatable
+    public partial class AccountsWindow : Window, IUpdatable
     {
         bool AddMode { get; set; }
 
-        public ParticipantsWindow(AccountType accountType)
+        public AccountsWindow(AccountType accountType)
         {
             InitializeComponent();
             AccountTypesTabs.SelectedIndex = (int)accountType;
