@@ -1,6 +1,6 @@
 ﻿using System.Threading.Tasks;
 
-namespace InCollege.UI
+namespace InCollege.Client.UI
 {
     public interface IUpdatable
     {

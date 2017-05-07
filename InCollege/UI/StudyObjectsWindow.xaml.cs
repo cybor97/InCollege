@@ -1,4 +1,6 @@
-﻿using InCollege.Core.Data;
+﻿using InCollege.Client.UI;
+using InCollege.Client.UI.DictionariesUI;
+using InCollege.Core.Data;
 using InCollege.Core.Data.Base;
 using MaterialDesignThemes.Wpf;
 using System.Collections.Generic;

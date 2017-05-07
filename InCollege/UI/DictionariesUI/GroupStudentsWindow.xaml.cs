@@ -4,7 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
 
-namespace InCollege.UI
+namespace InCollege.Client.UI.DictionariesUI
 {
     //TODO:Implement!
     public partial class GroupStudentsWindow : Window, IUpdatable

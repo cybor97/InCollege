@@ -1,4 +1,4 @@
-﻿<Window x:Class="InCollege.UI.GroupStudentsWindow"
+﻿<Window x:Class="InCollege.Client.UI.DictionariesUI.GroupStudentsWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:material="http://materialdesigninxaml.net/winfx/xaml/themes"

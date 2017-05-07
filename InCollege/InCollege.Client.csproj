@@ -86,7 +86,7 @@
     <Compile Include="UI\Base\StyleableWindow\WindowMinimizeCommand.cs" />
     <Compile Include="UI\Base\StyleableWindow\WindowResizeBehavior.cs" />
     <Compile Include="UI\Base\Styles\WindowButton.cs" />
-    <Compile Include="UI\GroupStudentsWindow.xaml.cs">
+    <Compile Include="UI\DictionariesUI\GroupStudentsWindow.xaml.cs">
       <DependentUpon>GroupStudentsWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="UI\IUpdatable.cs" />
@@ -134,7 +134,7 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="UI\GroupStudentsWindow.xaml">
+    <Page Include="UI\DictionariesUI\GroupStudentsWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
