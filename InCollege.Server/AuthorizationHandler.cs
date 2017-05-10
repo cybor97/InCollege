@@ -55,7 +55,7 @@ namespace InCollege.Server
             if (query.TryGetByName("UserName", out string userName) &&
                 query.TryGetByName("Password", out string password))
             {
-                var rows = DBHolderSQL.GetRange("Account", null, 0, 1, true,
+                var rows = DBHolderSQL.GetRange("Account", null, 0, 1, true, false, false,
                     ("UserName", userName),
                     ("Password", password)).Rows;
 
@@ -75,7 +75,7 @@ namespace InCollege.Server
                 query.TryGetByName("Password", out string password) &&
                 query.TryGetByName("AccountType", out byte accountType) &&
                 query.TryGetByName("BirthDate", out string birthDateString) &&
-                DateTime.TryParseExact(birthDateString, "yyyy-MM-dd", CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime birthDate) &&
+                DateTime.TryParseExact(birthDateString, Core.CommonVariables.DateFormatString, CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime birthDate) &&
 
                 query.TryGetByName("FullName", out string fullName))
             {
@@ -83,7 +83,7 @@ namespace InCollege.Server
                 var validationResult = Account.Validate(userName, password, birthDate, fullName);
                 if (validationResult == AccountValidationResult.OK)
                 {
-                    var rows = DBHolderSQL.GetRange("Account", null, 0, 1, true, ("UserName", userName)).Rows;
+                    var rows = DBHolderSQL.GetRange("Account", null, 0, 1, true, false, false, ("UserName", userName)).Rows;
                     if (rows.Count == 0)
                     {
                         query.TryGetByName("ProfileImage", out byte[] profileImage);
@@ -168,7 +168,7 @@ namespace InCollege.Server
             if (data.id == -1 || string.IsNullOrWhiteSpace(data.userName) || string.IsNullOrWhiteSpace(data.password))
                 return (false, null);
 
-            DataTable table = DBHolderSQL.GetRange("Account", null, 0, 1, true,
+            DataTable table = DBHolderSQL.GetRange("Account", null, 0, 1, true, false, false,
                 ("ID", data.id),
                 ("UserName", data.userName),
                 ("Password", data.password));
