@@ -50,7 +50,7 @@ namespace InCollege.Core.Data.Base
                                  return $"field{c.Name}=" + WebUtility.UrlEncode(((value is byte[]) ? Convert.ToBase64String((byte[])value) :
                                                         (value is bool) ? ((bool)value ? 1 : 0) :
                                                         (value is Enum) ? (byte)value :
-                                                        (value is DateTime) ? ((DateTime)value).ToString("yyyy-MM-dd") :
+                                                        (value is DateTime) ? ((DateTime)value).ToString(Core.CommonVariables.DateFormatString) :
                                                         value).ToString());
                              }));
             }
