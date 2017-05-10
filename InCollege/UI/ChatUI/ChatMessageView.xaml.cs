@@ -4,7 +4,6 @@ using System.Windows.Controls;
 using System.Windows.Data;
 using System;
 using System.Globalization;
-using System.Drawing;
 using System.Windows.Media;
 
 namespace InCollege.Client.UI.ChatUI
@@ -17,32 +16,20 @@ namespace InCollege.Client.UI.ChatUI
         public static readonly RoutedEvent SenderClickEvent = EventManager.RegisterRoutedEvent("OnSave", RoutingStrategy.Direct, typeof(RoutedEventHandler), typeof(ChatMessageView));
         public event RoutedEventHandler SenderClick
         {
-            add { AddHandler(SenderClickEvent, value); }
-            remove { RemoveHandler(SenderClickEvent, value); }
+            add => AddHandler(SenderClickEvent, value);
+            remove => RemoveHandler(SenderClickEvent, value);
         }
 
         public string MessageText
         {
-            get
-            {
-                return (string)GetValue(MessageTextProperty);
-            }
-            set
-            {
-                SetValue(MessageTextProperty, value);
-            }
+            get => (string)GetValue(MessageTextProperty);
+            set => SetValue(MessageTextProperty, value);
         }
 
         public Account Sender
         {
-            get
-            {
-                return (Account)GetValue(SenderProperty);
-            }
-            set
-            {
-                SetValue(SenderProperty, value);
-            }
+            get => (Account)GetValue(SenderProperty);
+            set => SetValue(SenderProperty, value);
         }
 
         public string SenderName => Sender?.FullName;
@@ -50,11 +37,6 @@ namespace InCollege.Client.UI.ChatUI
         public ChatMessageView()
         {
             InitializeComponent();
-        }
-
-        void ChatMessageView_Loaded(object sender, RoutedEventArgs e)
-        {
-            //    DataContext = this;
         }
 
         private void SenderButton_Click(object sender, RoutedEventArgs e)
@@ -80,7 +62,7 @@ namespace InCollege.Client.UI.ChatUI
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            return ((Account)value).ID == App.Account.ID ? new SolidColorBrush(Colors.LightGreen) :new SolidColorBrush(Colors.White);
+            return ((Account)value).ID == App.Account.ID ? new SolidColorBrush(Colors.LightGreen) : new SolidColorBrush(Colors.White);
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
