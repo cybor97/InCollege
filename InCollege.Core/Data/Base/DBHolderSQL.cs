@@ -27,7 +27,7 @@ namespace InCollege.Core.Data.Base
                 Adapters.Add(current[2].ToString(), new SQLiteDataAdapter("SELECT * FROM {0} LIMIT {1}, {2}", DataConnection));
         }
 
-        public static DataTable GetRange(string table, string column, int skip, int count, bool fixedString, params (string name, object value)[] whereParams)
+        public static DataTable GetRange(string table, string column, int skip, int count, bool fixedString, bool justCount, bool reverse, params (string name, object value)[] whereParams)
         {
             if (count == -1)
                 count = DBHolderORM.DEFAULT_LIMIT;
@@ -40,19 +40,23 @@ namespace InCollege.Core.Data.Base
             string whereString = "";
             if (whereParams != null)
                 for (int i = 0; i < whereParams.Length; i++)
-                {
-                    object name = whereParams[i].name,
-                        value = whereParams[i].value;
-                    whereString += value is string ? fixedString ?
-                        $"{name} LIKE '{value}'" :
-                        $"instr({name}, '{value}') > 0" :
-                        $"{name} LIKE {value}";
-                    if (i < whereParams.Length - 1)
-                        whereString += " AND ";
-                }
+                    if (!string.IsNullOrWhiteSpace(whereParams[i].value?.ToString()))
+                    {
+                        object name = whereParams[i].name,
+                            value = whereParams[i].value;
+                        whereString += value is string ? fixedString ?
+                            $"{name} LIKE '{value}'" :
+                            $"instr({name}, '{value}') > 0" :
+                            $"{name} LIKE {value}";
+                        if (i < whereParams.Length - 1 && !string.IsNullOrWhiteSpace(whereParams[i + 1].value?.ToString()))
+                            whereString += " AND ";
+                    }
             Adapters[table].SelectCommand =
-                new SQLiteCommand($"SELECT {column} FROM [{table}] " +
+                new SQLiteCommand($"SELECT " +
+                                  (justCount ? "count()" : $"{column} ") +
+                                  $"FROM [{table}] " +
                                   (string.IsNullOrWhiteSpace(whereString) ? $"" : $"WHERE {whereString} ") +
+                                  (reverse ? column == "*" ? "ORDER BY ID DESC " : $"ORDER BY {column} DESC " : "") +
                                   $"LIMIT {skip}, {count} ",
                     DataConnection);
             Adapters[table].Fill(result);

@@ -47,19 +47,26 @@ namespace InCollege.Server
                     int skip = query.TryGetByName("skipRecords", out int skipResult) ? skipResult : 0;
                     int count = query.TryGetByName("countRecords", out int countResult) ? countResult : -1;
                     string column = query.TryGetByName("column", out string columnResult) ? columnResult : null;
-                    bool fixedString = query.TryGetByName("fixedString", out bool fixedStringResult) && fixedStringResult;
+                    bool fixedString = query.TryGetByName("fixedString", out int fixedStringResult) && fixedStringResult == 1;
+                    bool justCount = query.TryGetByName("justCount", out int justCountResult) && justCountResult == 1;
+                    bool reverse = query.TryGetByName("reverse", out int reverseResult) && reverseResult == 1;
                     var whereParams = new List<(string, object)>();
+
                     foreach (var current in query)
                         if (current.Key.StartsWith("where"))
                             whereParams.Add((current.Key.Split(new[] { "where" }, StringSplitOptions.RemoveEmptyEntries)[0], current.Value));
 
-                    //We never should send passwords.
-                    var range = DBHolderSQL.GetRange(table, column, skip, count, fixedString, whereParams.ToArray());
-                    if (table == nameof(Account))
+                    var range = DBHolderSQL.GetRange(table, column, skip, count, fixedString, justCount, reverse, whereParams.ToArray());
+
+                    //We never should send passwords...
+                    //...but if it's just count requested - why not?
+                    if (table == nameof(Account) && !justCount)
                         foreach (DataRow current in range.Rows)
                             current[nameof(Account.Password)] = null;
 
-                    return new HttpResponse(HttpResponseCode.Ok, JsonConvert.SerializeObject(range, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore }), false);
+                    if (!justCount)
+                        return new HttpResponse(HttpResponseCode.Ok, JsonConvert.SerializeObject(range, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore }), false);
+                    else return new HttpResponse(HttpResponseCode.Ok, range.Rows[0][0].ToString(), false);
                 }
                 else return new HttpResponse(HttpResponseCode.BadRequest, "Ошибка! Таблица не найдена!", false);
             else return new HttpResponse(HttpResponseCode.Forbidden, "У вас нет прав на получение данных!", false);
