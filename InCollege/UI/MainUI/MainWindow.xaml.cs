@@ -1,4 +1,5 @@
 ﻿using InCollege.Client.UI.AccountsUI;
+using InCollege.Client.UI.ChatUI;
 using InCollege.Client.UI.DictionariesUI;
 using InCollege.Core.Data;
 using InCollege.Core.Data.Base;
@@ -29,7 +30,7 @@ namespace InCollege.Client.UI.MainUI
 
         public async Task UpdateData()
         {
-            CurrentAccountItem.Header = (ProfileDialog.Account = App.Account = await NetworkUtils.WhoAmI())?.FullName;
+            CurrentAccountItemHeaderTB.Text = (ProfileDialog.Account = App.Account = await NetworkUtils.WhoAmI())?.FullName;
 
             if (App.Account == null || !App.Account.Approved)
             {
@@ -137,6 +138,11 @@ namespace InCollege.Client.UI.MainUI
         private void ProfileDialog_OnCancel(object sender, RoutedEventArgs e)
         {
             ProfileDialog.IsOpen = false;
+        }
+
+        private void MessagesButton_Click(object sender, RoutedEventArgs e)
+        {
+            new ChatWindow().ShowDialog();
         }
     }
 }

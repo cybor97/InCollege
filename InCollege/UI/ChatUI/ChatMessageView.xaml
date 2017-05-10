@@ -1,0 +1,59 @@
+﻿<Grid x:Class="InCollege.Client.UI.ChatUI.ChatMessageView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:local="clr-namespace:InCollege.Client.UI.ChatUI"
+      Loaded="ChatMessageView_Loaded"
+      ToolTip="{Binding MessageDate}">
+    <Grid.Resources>
+        <local:MessageSenderToAlignConverter x:Key="MessageSenderToAlignConverter"/>
+        <local:MessageSenderToColorConverter x:Key="MessageSenderToColorConverter"/>
+    </Grid.Resources>
+    <Border BorderBrush="White"
+            Background="{Binding Sender, Converter={StaticResource MessageSenderToColorConverter}}"
+            HorizontalAlignment="{Binding Sender, Converter={StaticResource MessageSenderToAlignConverter}}"
+            MinHeight="30" MinWidth="200" MaxWidth="400"
+            CornerRadius="5">
+        <Border.Effect>
+            <DropShadowEffect Color="LightGray" Direction="270" ShadowDepth="2"/>
+        </Border.Effect>
+        <StackPanel Orientation="Vertical" Margin="7">
+            <Button Content="{Binding SenderName}" 
+                    Click="SenderButton_Click"
+                    Height="Auto">
+                <Button.Template>
+                    <ControlTemplate TargetType="Button">
+                        <TextBlock 
+                            TextTrimming="CharacterEllipsis"
+                            
+                            Text="{TemplateBinding Content}"
+                            Name="SenderNameContent"
+                            FontSize="12"
+                           FontWeight="Light">
+                            <TextBlock.Triggers>
+                                <EventTrigger RoutedEvent="MouseEnter">
+                                    <BeginStoryboard>
+                                        <Storyboard TargetName="SenderNameContent" TargetProperty="(TextBlock.Foreground).(SolidColorBrush.Color)">
+                                            <ColorAnimation To="Black" Duration="0:0:0.2"/>
+                                        </Storyboard>
+                                    </BeginStoryboard>
+                                </EventTrigger>
+                                <EventTrigger RoutedEvent="MouseLeave">
+                                    <BeginStoryboard>
+                                        <Storyboard TargetName="SenderNameContent" TargetProperty="(TextBlock.Foreground).(SolidColorBrush.Color)">
+                                            <ColorAnimation From="Black" Duration="0:0:0.2"/>
+                                        </Storyboard>
+                                    </BeginStoryboard>
+                                </EventTrigger>
+                            </TextBlock.Triggers>
+                        </TextBlock>
+                    </ControlTemplate>
+                </Button.Template>
+            </Button>
+            <TextBlock Text="{Binding MessageText}" 
+                       Margin="0 3 0 0"
+                       Grid.Row="1"
+                       TextWrapping="Wrap"
+                       FontSize="14"/>
+        </StackPanel>
+    </Border>
+</Grid>
