@@ -30,7 +30,7 @@ namespace SG.Algoritma
             // Hash the password with SHA256
             passwordBytes = SHA256.Create().ComputeHash(passwordBytes);
 
-            var bytesEncrypted = Cipher.Encrypt(bytesToBeEncrypted, passwordBytes);
+            var bytesEncrypted = Encrypt(bytesToBeEncrypted, passwordBytes);
 
             return Convert.ToBase64String(bytesEncrypted);
         }
