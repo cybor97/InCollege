@@ -12,6 +12,7 @@ namespace WpfStyleableWindow.StyleableWindow
             return true;
         }
 
+        #pragma warning disable CS0067
         public event EventHandler CanExecuteChanged;
 
         public void Execute(object parameter)

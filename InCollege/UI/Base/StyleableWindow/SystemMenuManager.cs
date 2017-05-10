@@ -48,6 +48,7 @@ namespace WpfStyleableWindow.StyleableWindow
         [DllImport("user32.dll")]
         internal static extern int TrackPopupMenuEx(IntPtr hmenu, uint fuFlags, int x, int y, IntPtr hwnd, IntPtr lptpm);
 
+        #pragma warning disable CA1901
         [DllImport("user32.dll")]
         internal static extern IntPtr PostMessage(IntPtr hWnd, uint Msg, IntPtr wParam, IntPtr lParam);
 

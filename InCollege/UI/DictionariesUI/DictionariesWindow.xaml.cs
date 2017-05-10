@@ -3,7 +3,6 @@ using System.Threading.Tasks;
 using System.Windows;
 using InCollege.Core.Data.Base;
 using System.Windows.Input;
-using InCollege.UI;
 
 namespace InCollege.Client.UI.DictionariesUI
 {

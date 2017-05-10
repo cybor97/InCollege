@@ -48,6 +48,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CommonVariables.cs" />
     <Compile Include="Data\Account.cs" />
     <Compile Include="Data\AttestationType.cs" />
     <Compile Include="Data\Base\DBHolderORM.cs" />
