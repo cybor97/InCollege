@@ -4,6 +4,7 @@ using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Linq;
 using System.Threading.Tasks;
 using uhttpsharp;
 using uhttpsharp.Headers;
@@ -20,9 +21,13 @@ namespace InCollege.Server
                 {
                     var validationResult = AuthorizationHandler.VerifyToken(tokenString, false);
                     if (validationResult.valid)
+                    {
+                        validationResult.account.LastAction = DateTime.Now;
+                        DBHolderSQL.Save(nameof(Account), validationResult.account.Columns.ToArray());
                         if (request.Post.Parsed.TryGetByName("action", out string action))
                             context.Response = Actions[action]?.Invoke(request.Post.Parsed, validationResult.account);
                         else context.Response = new HttpResponse(HttpResponseCode.MethodNotAllowed, "Эм.. что от меня требуется???", false);
+                    }
                 }
                 else context.Response = new HttpResponse(HttpResponseCode.Forbidden, "Доступ запрещен! Нужен токен!", false);
             else context.Response = new HttpResponse(HttpResponseCode.MethodNotAllowed, "Метод недоступен!", false);
