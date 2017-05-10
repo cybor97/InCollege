@@ -1,6 +1,4 @@
-﻿using InCollege.Client.UI;
-using InCollege.Client.UI.DictionariesUI;
-using InCollege.Core.Data;
+﻿using InCollege.Core.Data;
 using InCollege.Core.Data.Base;
 using MaterialDesignThemes.Wpf;
 using System.Collections.Generic;
@@ -9,7 +7,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 
-namespace InCollege.UI
+namespace InCollege.Client.UI.DictionariesUI
 {
     public partial class StudyObjectsWindow : Window, IUpdatable
     {

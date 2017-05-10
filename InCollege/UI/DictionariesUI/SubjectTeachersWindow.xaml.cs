@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
 
-namespace InCollege.UI
+namespace InCollege.Client.UI.DictionariesUI
 {
     public partial class SubjectTeachersWindow : Window, IUpdatable
     {
