@@ -15,15 +15,15 @@ namespace InCollege.Client.UI.AccountsUI
         public static readonly RoutedEvent OnSaveEvent = EventManager.RegisterRoutedEvent("OnSave", RoutingStrategy.Direct, typeof(RoutedEventHandler), typeof(AccountEditDialog));
         public event RoutedEventHandler OnSave
         {
-            add { AddHandler(OnSaveEvent, value); }
-            remove { RemoveHandler(OnSaveEvent, value); }
+            add => AddHandler(OnSaveEvent, value);
+            remove => RemoveHandler(OnSaveEvent, value);
         }
 
         public static readonly RoutedEvent OnCancelEvent = EventManager.RegisterRoutedEvent("OnCancel", RoutingStrategy.Direct, typeof(RoutedEventHandler), typeof(AccountEditDialog));
         public event RoutedEventHandler OnCancel
         {
-            add { AddHandler(OnCancelEvent, value); }
-            remove { RemoveHandler(OnCancelEvent, value); }
+            add => AddHandler(OnCancelEvent, value);
+            remove => RemoveHandler(OnCancelEvent, value);
         }
 
         Account AccountDataContext => DataContext as Account;

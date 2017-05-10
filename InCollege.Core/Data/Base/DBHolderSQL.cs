@@ -38,6 +38,7 @@ namespace InCollege.Core.Data.Base
 
             DataTable result = new DataTable(table);
             string whereString = "";
+            //TODO:Use LINQ Select and String.Join
             if (whereParams != null)
                 for (int i = 0; i < whereParams.Length; i++)
                     if (!string.IsNullOrWhiteSpace(whereParams[i].value?.ToString()))
@@ -51,6 +52,7 @@ namespace InCollege.Core.Data.Base
                         if (i < whereParams.Length - 1 && !string.IsNullOrWhiteSpace(whereParams[i + 1].value?.ToString()))
                             whereString += " AND ";
                     }
+            //TODO:Consider using parametrized query as SelectCommand.Parameters.AddWithValue()
             Adapters[table].SelectCommand =
                 new SQLiteCommand($"SELECT " +
                                   (justCount ? "count()" : $"{column} ") +

@@ -20,6 +20,7 @@ namespace InCollege.Core.Data
         /// </summary>
         public string MessageAttachment { get; set; }
         public DateTime MessageDate { get; set; }
+        public bool IsRead { get; set; }
 
         [Ignore]
         [JsonIgnore]

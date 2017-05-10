@@ -1,4 +1,5 @@
-﻿using MaterialDesignThemes.Wpf;
+﻿using InCollege.Core.Data;
+using MaterialDesignThemes.Wpf;
 using System.Windows;
 
 namespace InCollege.UI.StatementsUI
@@ -7,6 +8,13 @@ namespace InCollege.UI.StatementsUI
     {
         public event RoutedEventHandler OnSave;
         public event RoutedEventHandler OnCancel;
+
+        public static DependencyProperty StatementProperty = DependencyProperty.Register("Statement", typeof(Statement), typeof(EditStatementDialog));
+        public Statement Statement
+        {
+            get => (Statement)GetValue(StatementProperty);
+            set => SetValue(StatementProperty, value);
+        }
 
         public EditStatementDialog()
         {
