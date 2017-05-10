@@ -38,6 +38,11 @@ namespace InCollege
 
         public static async Task<List<T>> RequestData<T>(Window context, params (string name, object value)[] whereParams) where T : DBRecord
         {
+            return await RequestData<T>(context, true, whereParams);
+        }
+
+        public static async Task<List<T>> RequestData<T>(Window context, bool strict, params (string name, object value)[] whereParams) where T : DBRecord
+        {
             try
             {
                 HttpResponseMessage response;
@@ -45,7 +50,7 @@ namespace InCollege
                 var whereString = string.Join("&", whereParams.Select(c => $"where{c.name}=" + WebUtility.UrlEncode(((c.value is byte[]) ? Convert.ToBase64String((byte[])c.value) :
                                                         (c.value is bool) ? ((bool)c.value ? 1 : 0) :
                                                         (c.value is Enum) ? (byte)c.value :
-                                                        (c.value is DateTime) ? ((DateTime)c.value).ToString("yyyy-MM-dd") :
+                                                        (c.value is DateTime) ? ((DateTime)c.value).ToString(Core.CommonVariables.DateFormatString) :
                                                         c.value).ToString())));
 
                 if ((response = (await new HttpClient()
@@ -53,7 +58,8 @@ namespace InCollege
                       new StringContent(
                       $"Action=GetRange&" +
                       $"table={typeof(T).Name}&" +
-                      $"token={App.Token}" +
+                      $"token={App.Token}&" +
+                      $"fixedString={(strict ? 1 : 0)}" +
                       //Not an error! Little more attension, & is  ' here
                       (!string.IsNullOrWhiteSpace(whereString) ? $"&{whereString}" : ""))))).StatusCode == HttpStatusCode.OK)
                     return JsonConvert
