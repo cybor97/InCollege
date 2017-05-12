@@ -1,9 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Data;
 using System.Data.SQLite;
 using System.Linq;
-
+//TODO:Fix concurency
 namespace InCollege.Core.Data.Base
 {
     /// <summary>
@@ -12,7 +11,6 @@ namespace InCollege.Core.Data.Base
     public static class DBHolderSQL
     {
         static SQLiteConnection DataConnection;
-        static Dictionary<string, SQLiteDataAdapter> Adapters;
         public static void Init(string filename)
         {
             //Create required tables and... at all, prepare db.
@@ -21,87 +19,74 @@ namespace InCollege.Core.Data.Base
 
             DataConnection = new SQLiteConnection($"Data Source={filename}; Version=3;");
             DataConnection.Open();
-            Adapters = new Dictionary<string, SQLiteDataAdapter>();
-
-            foreach (DataRow current in DataConnection.GetSchema("Tables").Rows)
-                Adapters.Add(current[2].ToString(), new SQLiteDataAdapter("SELECT * FROM {0} LIMIT {1}, {2}", DataConnection));
         }
 
         public static DataTable GetRange(string table, string column, int skip, int count, bool fixedString, bool justCount, bool reverse, params (string name, object value)[] whereParams)
         {
-            if (count == -1)
-                count = DBHolderORM.DEFAULT_LIMIT;
-            if (table == null)
-                table = "master_table";
-
             column = string.IsNullOrWhiteSpace(column) ? "*" : $"[{column}]";
 
-            DataTable result = new DataTable(table);
-            string whereString = "";
-            //TODO:Use LINQ Select and String.Join
-            if (whereParams != null)
-                for (int i = 0; i < whereParams.Length; i++)
-                    if (!string.IsNullOrWhiteSpace(whereParams[i].value?.ToString()))
-                    {
-                        object name = whereParams[i].name,
-                            value = whereParams[i].value;
-                        whereString += value is string ? fixedString ?
-                            $"{name} LIKE '{value}'" :
-                            $"instr({name}, '{value}') > 0" :
-                            $"{name} LIKE {value}";
-                        if (i < whereParams.Length - 1 && !string.IsNullOrWhiteSpace(whereParams[i + 1].value?.ToString()))
-                            whereString += " AND ";
-                    }
-            //TODO:Consider using parametrized query as SelectCommand.Parameters.AddWithValue()
-            Adapters[table].SelectCommand =
-                new SQLiteCommand($"SELECT " +
+            string whereString = string.Join(" AND ", whereParams
+                .Where(c => !string.IsNullOrWhiteSpace(c.name) && !string.IsNullOrWhiteSpace(c.value.ToString()))
+                .Select(c => !(c.value is string) || fixedString ?
+                        $"{c.name} LIKE @{c.name}" :
+                        $"instr({c.name}, @{c.name}) > 0"));
+
+            var adapter = new SQLiteDataAdapter($"SELECT " +
                                   (justCount ? "count()" : $"{column} ") +
                                   $"FROM [{table}] " +
-                                  (string.IsNullOrWhiteSpace(whereString) ? $"" : $"WHERE {whereString} ") +
+                                  (string.IsNullOrWhiteSpace(whereString) ? "" : $"WHERE {whereString} ") +
                                   (reverse ? column == "*" ? "ORDER BY ID DESC " : $"ORDER BY {column} DESC " : "") +
-                                  $"LIMIT {skip}, {count} ",
+                                  $"LIMIT {skip}, {(count == -1 ? DBHolderORM.DEFAULT_LIMIT : count)} ",
                     DataConnection);
-            Adapters[table].Fill(result);
+            foreach (var current in whereParams)
+                adapter.SelectCommand.Parameters.AddWithValue($"@{current.name}", current.value);
+
+            var result = new DataTable(table);
+            adapter.Fill(result);
             return result;
         }
 
         public static DataRow GetByID(string table, int id)
         {
             DataTable result = new DataTable();
-            Adapters[table].SelectCommand = new SQLiteCommand($"SELECT * FROM [{table}] WHERE ID={id}", DataConnection);
-            Adapters[table].Fill(result);
+            var adapter = new SQLiteDataAdapter($"SELECT * FROM [{table}] WHERE ID={id}", DataConnection);
+            adapter.Fill(result);
             return result.Rows.Count > 0 ? result.Rows[0] : null;
         }
 
-        public static int Save(string table, params (string key, object value)[] columns)
+        public static long Save(string table, params (string key, object value)[] columns)
         {
+            bool isLocal = false;
+            long id = -1;
+
             for (int i = 0; i < columns.Length; i++)
             {
                 var c = columns[i];
-                if ((c.key == "IsLocal" || c.key == "Modified" || c.key == "Removed") && !(c.value is bool))
+                if (c.key == "Removed" && c.value.ToString() == "1")
+                    return -1;
+                if (c.key == "ID")
+                    id = long.Parse(c.value.ToString());
+                else if ((c.key == "IsLocal" || c.key == "Modified" || c.key == "Removed") && !(c.value is bool))
+                {
                     columns[i] = (c.key, (int.Parse(c.value.ToString()) == 1));
+                    if (c.key == "IsLocal") isLocal = (bool)columns[i].value;
+                }
             }
 
-            if (columns.Any(c => c.key.Equals("Removed") && (bool)c.value))
-                return -1;
-
-            var adapter = Adapters[table];
-            adapter.SelectCommand = new SQLiteCommand($"SELECT * FROM [{table}]", DataConnection);
+            var adapter = new SQLiteDataAdapter($"SELECT * FROM [{table}] LIMIT 0, 1", DataConnection);
             var data = new DataTable(table);
             adapter.Fill(data);
-            data.PrimaryKey = new[] { data.Columns["ID"]
-            };
+            data.PrimaryKey = new[] { data.Columns["ID"] };
 
 
             DataRow row;
-            int id;
-            bool isLocal = true, addMode = true;
-            if (columns.Any(c => c.key.Equals("IsLocal")) &&
-                !(isLocal = bool.Parse(columns.First(c => c.key.Equals("IsLocal")).value.ToString())) &&
-                (id = int.Parse(columns.First(c => c.key.Equals("ID")).value.ToString())) > 0 &&
-                data.Rows.Contains(id))
+            bool addMode = true;
+            if (!isLocal && (long)new SQLiteCommand($"SELECT Count() FROM {table} WHERE ID LIKE '{id}'", DataConnection).ExecuteScalar() > 0)
             {
-                row = data.Rows.Find(id);
+                adapter = new SQLiteDataAdapter($"SELECT * FROM [{table}] WHERE ID LIKE '{id}'", DataConnection);
+                data.Clear();
+                adapter.Fill(data);
+                row = data.Rows[0];
                 addMode = false;
             }
             else
@@ -119,7 +104,7 @@ namespace InCollege.Core.Data.Base
                         row[current.key] = current.value;
                     else row[current.key] = Convert.FromBase64String(current.value.ToString().Split(new[] { "raw_data" }, StringSplitOptions.RemoveEmptyEntries)[0]);
 
-            Adapters[table].SelectCommand = new SQLiteCommand($"SELECT * FROM [{table}] WHERE ID={id}", DataConnection);
+            adapter.SelectCommand = new SQLiteCommand($"SELECT * FROM [{table}] WHERE ID={id}", DataConnection);
 
             if (addMode)
                 data.Rows.Add(row);
@@ -127,7 +112,8 @@ namespace InCollege.Core.Data.Base
             adapter.InsertCommand = new SQLiteCommandBuilder(adapter).GetInsertCommand(true);
             adapter.UpdateCommand = new SQLiteCommandBuilder(adapter).GetUpdateCommand(true);
 
-            adapter.Update(data);
+            lock (DataConnection)
+                adapter.Update(data);
 
             return id;
         }
@@ -140,9 +126,7 @@ namespace InCollege.Core.Data.Base
         static int GetFreeID(string table)
         {
             var data = new DataTable();
-            var adapter = Adapters["sqlite_sequence"];
-            adapter.SelectCommand = new SQLiteCommand($"SELECT * FROM sqlite_sequence WHERE name LIKE '{table}';", DataConnection);
-            adapter.Fill(data);
+            new SQLiteDataAdapter($"SELECT * FROM sqlite_sequence WHERE name LIKE '{table}';", DataConnection).Fill(data);
             return data.Rows.Count == 0 ? 0 : Convert.ToInt32(data.Rows[0]["seq"]) + 1;
         }
     }
