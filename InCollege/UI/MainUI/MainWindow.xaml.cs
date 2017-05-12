@@ -3,7 +3,6 @@ using InCollege.Client.UI.ChatUI;
 using InCollege.Client.UI.DictionariesUI;
 using InCollege.Core.Data;
 using InCollege.Core.Data.Base;
-using InCollege.UI;
 using System.Diagnostics;
 using System.Reflection;
 using System.Threading.Tasks;
