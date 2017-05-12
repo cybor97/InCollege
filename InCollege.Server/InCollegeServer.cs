@@ -11,7 +11,7 @@ namespace InCollege.Server
     internal static class InCollegeServer
     {
         private static HttpServer Server;
-        public static bool Working { get => Server != null; }
+        public static bool Working => Server != null;
 
         public static void Start()
         {
@@ -22,7 +22,6 @@ namespace InCollege.Server
                 Server.Use(new TcpListenerAdapter(new TcpListener(IPAddress.Any, 80)));
                 //  Server.Use(new ListenerSslDecorator(new TcpListenerAdapter(new TcpListener(IPAddress.Any, 443)),
                 //    X509Certificate.CreateFromCertFile("")));
-
                 Server.Use(new HttpRouter()
                 .With(String.Empty, new HomeHandler())
                 .With("Auth", new AuthorizationHandler())
