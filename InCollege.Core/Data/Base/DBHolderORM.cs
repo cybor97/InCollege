@@ -9,31 +9,38 @@ namespace InCollege.Core.Data.Base
     {
         static SQLiteConnection DataConnection;
         public const int DEFAULT_LIMIT = 100;
+        static bool InitCompleted;
+
         public static void Init(string filename)
         {
-            DirectoryInfo parentDirectory;
-            if (!Directory.Exists((parentDirectory = Directory.GetParent(filename)).FullName))
-                Directory.CreateDirectory(parentDirectory.FullName);
+            if (!InitCompleted)
+            {
+                DirectoryInfo parentDirectory;
+                if (!Directory.Exists((parentDirectory = Directory.GetParent(filename)).FullName))
+                    Directory.CreateDirectory(parentDirectory.FullName);
 
-            DataConnection = new SQLiteConnection(filename);
+                DataConnection = new SQLiteConnection(filename);
 
-            CreateTables(
-                typeof(Account),
-                typeof(AttestationType),
-                typeof(ConfigurationParameter),
-                typeof(Department),
-                typeof(ExamStatementResult),
-                typeof(Group),
-                typeof(Log),
-                typeof(Mark),
-                typeof(Message),
-                typeof(MiddleStatementResult),
-                typeof(CommissionMember),
-                typeof(Specialty),
-                typeof(Statement),
-                typeof(StatementAttestationType),
-                typeof(Subject),
-                typeof(Teacher));
+                CreateTables(
+                    typeof(Account),
+                    typeof(AttestationType),
+                    typeof(ConfigurationParameter),
+                    typeof(Department),
+                    typeof(ExamStatementResult),
+                    typeof(Group),
+                    typeof(Log),
+                    typeof(Mark),
+                    typeof(Message),
+                    typeof(MiddleStatementResult),
+                    typeof(CommissionMember),
+                    typeof(Specialty),
+                    typeof(Statement),
+                    typeof(StatementAttestationType),
+                    typeof(Subject),
+                    typeof(Teacher));
+                InitCompleted = true;
+                DataConnection.Close();
+            }
         }
 
         public static List<T> GetAll<T>() where T : DBRecord, new()
