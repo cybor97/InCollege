@@ -1,12 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace InCollege.Installer
 {
-    class CommonVariables
+    public class CommonVariables
     {
+        public static string DesktopPath = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
+        public static string StartMenuPath = Environment.GetFolderPath(Environment.SpecialFolder.StartMenu);
+        public static string StartUpPath = Environment.GetFolderPath(Environment.SpecialFolder.Startup);
     }
 }
