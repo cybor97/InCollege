@@ -22,7 +22,8 @@ namespace InCollege.Server
                     var validationResult = AuthorizationHandler.VerifyToken(tokenString, false);
                     if (validationResult.valid)
                     {
-                        validationResult.account.LastAction = DateTime.Now;
+                        if ((DateTime.Now.Subtract(validationResult.account.LastAction ?? new DateTime()).TotalSeconds) > Account.OnlineTimeoutSeconds / 2)
+                            validationResult.account.LastAction = DateTime.Now;
                         DBHolderSQL.Save(nameof(Account), validationResult.account.Columns.ToArray());
                         if (request.Post.Parsed.TryGetByName("action", out string action))
                             context.Response = Actions[action]?.Invoke(request.Post.Parsed, validationResult.account);
@@ -63,15 +64,30 @@ namespace InCollege.Server
 
                     var range = DBHolderSQL.GetRange(table, column, skip, count, fixedString, justCount, reverse, whereParams.ToArray());
 
+                    #region Special rules for accounts
                     //We never should send passwords...
                     //...but if it's just count requested - why not?
                     if (table == nameof(Account) && !justCount)
                         foreach (DataRow current in range.Rows)
                             current[nameof(Account.Password)] = null;
+                    #endregion
+
+                    #region Special rules for messages
+                    //All messages, sent us from other person have to be set "IsRead"
+                    //It doesn't touches justCount queries
+                    //Need to be replaced with different Processor
+                    if (table == nameof(Message) && !justCount)
+                        foreach (DataRow current in range.Rows)
+                            if ((current[nameof(Message.IsRead)] == DBNull.Value || (long)current[nameof(Message.IsRead)] == 0) && (long)current[nameof(Message.FromID)] != account.ID)
+                            {
+                                current[nameof(Message.IsRead)] = 1;
+                                DBHolderSQL.Save(table, current.ItemArray.Select((c, i) => (range.Columns[i].ColumnName, c)).ToArray());
+                            }
+                    #endregion
 
                     if (!justCount)
-                        return new HttpResponse(HttpResponseCode.Ok, JsonConvert.SerializeObject(range, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore }), false);
-                    else return new HttpResponse(HttpResponseCode.Ok, range.Rows[0][0].ToString(), false);
+                        return new HttpResponse(HttpResponseCode.Ok, JsonConvert.SerializeObject(range, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore }), true);
+                    else return new HttpResponse(HttpResponseCode.Ok, range.Rows[0][0].ToString(), true);
                 }
                 else return new HttpResponse(HttpResponseCode.BadRequest, "Ошибка! Таблица не найдена!", false);
             else return new HttpResponse(HttpResponseCode.Forbidden, "У вас нет прав на получение данных!", false);
@@ -87,7 +103,7 @@ namespace InCollege.Server
                         if (current.Key.StartsWith("field"))
                             fields.Add((current.Key.Split(new[] { "field" }, StringSplitOptions.RemoveEmptyEntries)[0], current.Value));
 
-                    //Special rules for accounts. Need to be optimized.
+                    #region Special rules for accounts. Need to be optimized.
                     if (table.Equals(nameof(Account)))
                     {
                         //Empty password field means that user don't want to change password.
@@ -112,8 +128,8 @@ namespace InCollege.Server
                                     if (fields[i].name.Equals("Approved")) fields[i] = ("Approved", false);
                         }
                     }
-
-                    return new HttpResponse(HttpResponseCode.Ok, DBHolderSQL.Save(table, fields.ToArray()).ToString(), false);
+                    #endregion
+                    return new HttpResponse(HttpResponseCode.Ok, DBHolderSQL.Save(table, fields.ToArray()).ToString(), true);
                 }
                 else return new HttpResponse(HttpResponseCode.BadRequest, "Куда сохранять???", false);
             else return new HttpResponse(HttpResponseCode.Forbidden, "У вас нет прав на изменение данных!", false);
@@ -124,7 +140,7 @@ namespace InCollege.Server
             if (CheckAccess(query, account, true))
                 if (query.TryGetByName("table", out string table))
                     if (query.TryGetByName("id", out int id))
-                        return new HttpResponse(HttpResponseCode.Ok, DBHolderSQL.Remove(table, id).ToString(), false);
+                        return new HttpResponse(HttpResponseCode.Ok, DBHolderSQL.Remove(table, id).ToString(), true);
                     else return new HttpResponse(HttpResponseCode.BadRequest, "Откуда удалять???", false);
                 else return new HttpResponse(HttpResponseCode.BadRequest, "Что удалять???", false);
             else return new HttpResponse(HttpResponseCode.Forbidden, "У вас нет прав на удаление данных!", false);
