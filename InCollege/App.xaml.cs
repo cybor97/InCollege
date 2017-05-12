@@ -50,7 +50,7 @@ namespace InCollege.Client
         {
             try
             {
-                var task = new HttpClient().PostAsync(ClientConfiguration.AuthHandlerPath, new StringContent($"Action=ValidateToken&token={Token}"));
+                var task = new HttpClient().PostAsync(ClientConfiguration.Instance.AuthHandlerPath, new StringContent($"Action=ValidateToken&token={Token}"));
                 task.Wait();
                 return task.Result.StatusCode == HttpStatusCode.OK;
             }
