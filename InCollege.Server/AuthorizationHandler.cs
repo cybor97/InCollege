@@ -44,7 +44,7 @@ namespace InCollege.Server
                 //Nope! I won't send password with account info!
                 var token = VerifyTokenString(tokenString, true);
                 if (token.valid)
-                    return new HttpResponse(HttpResponseCode.Ok, token.accountJSON, false);
+                    return new HttpResponse(HttpResponseCode.Ok, token.accountJSON, true);
                 else return new HttpResponse(HttpResponseCode.Forbidden, "Токен невалидный. Проверьте правильность или запросите новый.", false);
             }
             else return new HttpResponse(HttpResponseCode.Forbidden, "Не удалось получить данные об аккаунте. Нужен токен!", false);
@@ -60,7 +60,7 @@ namespace InCollege.Server
                     ("Password", password)).Rows;
 
                 if (rows.Count == 1)
-                    return new HttpResponse(HttpResponseCode.Ok, CreateToken(int.Parse(rows[0]["ID"].ToString()), userName, password), false);
+                    return new HttpResponse(HttpResponseCode.Ok, CreateToken(int.Parse(rows[0]["ID"].ToString()), userName, password), true);
                 else if (rows.Count > 1)
                     return new HttpResponse(HttpResponseCode.InternalServerError, "Ошибка! Найдено более 1 аккаунта. Обратитесь к администратору.", false);
                 else
@@ -97,7 +97,7 @@ namespace InCollege.Server
                             ("Approved", false),
                             ("IsLocal", true),
                             ("ID", -1)),
-                            userName, password), false);
+                            userName, password), true);
                     }
                     else return new HttpResponse(HttpResponseCode.BadRequest, "Ошибка! Регистрация невозможна, т.к. пользователь с этим именем пользователя уже зарегистирован в системе!", false);
                 }
@@ -128,7 +128,7 @@ namespace InCollege.Server
 
 
         //TODO:Implement device-specific "secret" to ensure token isn't stolen
-        static string CreateToken(int id, string userName, string password)
+        static string CreateToken(long id, string userName, string password)
         {
             var handler = new JwtSecurityTokenHandler();
 
