@@ -22,11 +22,20 @@ namespace InCollege
 
     public class NetworkUtils
     {
+        static HttpClient Client;
+        static NetworkUtils()
+        {
+            Client = new HttpClient();
+            Client.DefaultRequestHeaders.Accept.Clear();
+            Client.DefaultRequestHeaders.Add("Connection", "Keep-Alive");
+            Client.DefaultRequestHeaders.Add("Keep-Alive", "timeout=600");
+        }
+
         public static async Task<Account> WhoAmI()
         {
             HttpResponseMessage response;
-            if ((response = (await new HttpClient()
-            .PostAsync(ClientConfiguration.AuthHandlerPath,
+            if ((response = (await Client
+            .PostAsync(ClientConfiguration.Instance.AuthHandlerPath,
             new StringContent(
             $"Action=WhoAmI&" +
             $"token={App.Token}")))).StatusCode == HttpStatusCode.OK)
@@ -34,6 +43,38 @@ namespace InCollege
             else
                 MessageBox.Show(await response.Content.ReadAsStringAsync());
             return null;
+        }
+
+        public static async Task<int> GetCount<T>(Window context, params (string name, object value)[] whereParams) where T : DBRecord
+        {
+            try
+            {
+                HttpResponseMessage response;
+
+                var whereString = string.Join("&", whereParams.Select(c => $"where{c.name}=" + WebUtility.UrlEncode(((c.value is byte[]) ? Convert.ToBase64String((byte[])c.value) :
+                                                        (c.value is bool) ? ((bool)c.value ? 1 : 0) :
+                                                        (c.value is Enum) ? (byte)c.value :
+                                                        (c.value is DateTime) ? ((DateTime)c.value).ToString(Core.CommonVariables.DateFormatString) :
+                                                        c.value).ToString())));
+
+                if ((response = (await Client
+                      .PostAsync(ClientConfiguration.Instance.DataHandlerPath,
+                      new StringContent(
+                      $"Action=GetRange&" +
+                      $"table={typeof(T).Name}&" +
+                      $"justCount=1&" +
+                      $"token={App.Token}&" +
+                      $"fixedString=1" +
+                      //Not an error! Little more attension, & is  ' here
+                      (!string.IsNullOrWhiteSpace(whereString) ? $"&{whereString}" : ""))))).StatusCode == HttpStatusCode.OK)
+                    return int.TryParse(await response.Content.ReadAsStringAsync(), out int result) ? result : -1;
+                else if (response.StatusCode == HttpStatusCode.Forbidden) context?.Close();
+            }
+            catch (HttpRequestException exc)
+            {
+                MessageBox.Show($"Ошибка подключения к серверу. Проверьте:\n-запущен ли сервер\n-настройки брандмауэра\n-правильно ли указан адрес\nТехническая информация:\n\n{exc.Message}");
+            }
+            return -1;
         }
 
         public static async Task<List<T>> RequestData<T>(Window context, params (string name, object value)[] whereParams) where T : DBRecord
@@ -53,8 +94,8 @@ namespace InCollege
                                                         (c.value is DateTime) ? ((DateTime)c.value).ToString(Core.CommonVariables.DateFormatString) :
                                                         c.value).ToString())));
 
-                if ((response = (await new HttpClient()
-                      .PostAsync(ClientConfiguration.DataHandlerPath,
+                if ((response = (await Client
+                      .PostAsync(ClientConfiguration.Instance.DataHandlerPath,
                       new StringContent(
                       $"Action=GetRange&" +
                       $"table={typeof(T).Name}&" +
@@ -87,8 +128,8 @@ namespace InCollege
             try
             {
                 HttpResponseMessage response;
-                if ((response = (await new HttpClient()
-                      .PostAsync(ClientConfiguration.DataHandlerPath,
+                if ((response = (await Client
+                      .PostAsync(ClientConfiguration.Instance.DataHandlerPath,
                       new StringContent(
                       $"Action={Enum.GetName(typeof(DataAction), action)}&" +
                       $"table={tableName}&" +
