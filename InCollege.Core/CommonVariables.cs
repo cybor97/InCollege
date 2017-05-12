@@ -2,6 +2,6 @@
 {
     public class CommonVariables
     {
-        public static string DateFormatString = "yyyy-MM-dd hh:mm:ss";
+        public static string DateFormatString = "yyyy-MM-dd HH:mm:ss";
     }
 }
