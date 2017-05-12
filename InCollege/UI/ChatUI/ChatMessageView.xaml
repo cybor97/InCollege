@@ -6,6 +6,7 @@
     <Grid.Resources>
         <local:MessageSenderToAlignConverter x:Key="MessageSenderToAlignConverter"/>
         <local:MessageSenderToColorConverter x:Key="MessageSenderToColorConverter"/>
+        <local:MessageUnseenVisibilityConverter x:Key="MessageUnseenVisibilityConverter"/>
     </Grid.Resources>
     <Border BorderBrush="White"
             Background="{Binding Sender, Converter={StaticResource MessageSenderToColorConverter}}"
@@ -16,38 +17,43 @@
             <DropShadowEffect Color="LightGray" Direction="270" ShadowDepth="2"/>
         </Border.Effect>
         <StackPanel Orientation="Vertical" Margin="7">
-            <Button Content="{Binding SenderName}" 
+            <StackPanel Orientation="Horizontal">
+                <Button Content="{Binding SenderName}" 
                     Click="SenderButton_Click"
                     Height="Auto">
-                <Button.Template>
-                    <ControlTemplate TargetType="Button">
-                        <TextBlock 
+                    <Button.Template>
+                        <ControlTemplate TargetType="Button">
+                            <TextBlock 
                             TextTrimming="CharacterEllipsis"
                             
                             Text="{TemplateBinding Content}"
                             Name="SenderNameContent"
                             FontSize="12"
                            FontWeight="Light">
-                            <TextBlock.Triggers>
-                                <EventTrigger RoutedEvent="MouseEnter">
-                                    <BeginStoryboard>
-                                        <Storyboard TargetName="SenderNameContent" TargetProperty="(TextBlock.Foreground).(SolidColorBrush.Color)">
-                                            <ColorAnimation To="Black" Duration="0:0:0.2"/>
-                                        </Storyboard>
-                                    </BeginStoryboard>
-                                </EventTrigger>
-                                <EventTrigger RoutedEvent="MouseLeave">
-                                    <BeginStoryboard>
-                                        <Storyboard TargetName="SenderNameContent" TargetProperty="(TextBlock.Foreground).(SolidColorBrush.Color)">
-                                            <ColorAnimation From="Black" Duration="0:0:0.2"/>
-                                        </Storyboard>
-                                    </BeginStoryboard>
-                                </EventTrigger>
-                            </TextBlock.Triggers>
-                        </TextBlock>
-                    </ControlTemplate>
-                </Button.Template>
-            </Button>
+                                <TextBlock.Triggers>
+                                    <EventTrigger RoutedEvent="MouseEnter">
+                                        <BeginStoryboard>
+                                            <Storyboard TargetName="SenderNameContent" TargetProperty="(TextBlock.Foreground).(SolidColorBrush.Color)">
+                                                <ColorAnimation To="Black" Duration="0:0:0.2"/>
+                                            </Storyboard>
+                                        </BeginStoryboard>
+                                    </EventTrigger>
+                                    <EventTrigger RoutedEvent="MouseLeave">
+                                        <BeginStoryboard>
+                                            <Storyboard TargetName="SenderNameContent" TargetProperty="(TextBlock.Foreground).(SolidColorBrush.Color)">
+                                                <ColorAnimation From="Black" Duration="0:0:0.2"/>
+                                            </Storyboard>
+                                        </BeginStoryboard>
+                                    </EventTrigger>
+                                </TextBlock.Triggers>
+                            </TextBlock>
+                        </ControlTemplate>
+                    </Button.Template>
+                </Button>
+                
+                <Image Source="/Resources/Unseen.png" Margin="5 0 0 0" Visibility="{Binding Converter={StaticResource MessageUnseenVisibilityConverter}}"/>
+
+            </StackPanel>
             <TextBlock Text="{Binding MessageText}" 
                        Margin="0 3 0 0"
                        Grid.Row="1"
