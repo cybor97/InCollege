@@ -1,6 +1,8 @@
 ﻿using InCollege.Core.Data;
 using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -14,6 +16,38 @@ namespace InCollege.Client.UI.ChatUI
         public ChatWindow()
         {
             InitializeComponent();
+
+            var cancelToken = new CancellationTokenSource();
+
+            Task.Run(async () =>
+            {
+                while (!cancelToken.IsCancellationRequested)
+                {
+                    Message lastMessage;
+                    int partnerID = Dispatcher.Invoke(() => Partner?.ID ?? -1);
+                    try
+                    {
+                        if (await NetworkUtils.GetCount<Message>(null, (nameof(Message.ToID), App.Account.ID), (nameof(Message.IsRead), false)) > 0 ||
+
+                        ((lastMessage = ((IList<Message>)MessagesLV?.ItemsSource)?.LastOrDefault()) != null && lastMessage.Sender.ID == App.Account.ID && !lastMessage.IsRead &&
+                        ((await NetworkUtils.RequestData<Message>(null, (nameof(Message.FromID), App.Account.ID), (nameof(Message.ToID), partnerID)))?.LastOrDefault()?.IsRead ?? false)))
+                            await Dispatcher.Invoke(async () => await UpdateData());
+                    }
+                    catch (Exception e)
+                    {
+                        MessageBox.Show(e.ToString());
+                    }
+                    Thread.Sleep(100);
+
+
+                    Thread.Sleep(100);
+                }
+            }, cancelToken.Token);
+
+            Closing += (s, e) =>
+            {
+                cancelToken.Cancel();
+            };
         }
 
         public async Task UpdateAccounts()
@@ -76,6 +110,7 @@ namespace InCollege.Client.UI.ChatUI
                 MessageDate = DateTime.Now,
                 MessageText = MessageTB.Text
             }, DataAction.Save);
+            MessageTB.Text = string.Empty;
         }
 
         async void PeopleLV_SelectionChanged(object sender, SelectionChangedEventArgs e)

@@ -26,7 +26,7 @@
                 <ListView.ItemTemplate>
                     <DataTemplate>
                         <StackPanel Orientation="Horizontal" >
-                            <TextBlock Text="{Binding UserName}"/>
+                            <TextBlock Text="{Binding FullName}"/>
                         </StackPanel>
 
                     </DataTemplate>
@@ -77,7 +77,7 @@
                 </ListView.ItemContainerStyle>
                 <ListView.ItemTemplate>
                     <DataTemplate>
-                        <local:ChatMessageView MessageText="{Binding MessageText}" Sender="{Binding Sender}"/>
+                        <local:ChatMessageView Message="{Binding}"/>
                     </DataTemplate>
                 </ListView.ItemTemplate>
             </ListView>
