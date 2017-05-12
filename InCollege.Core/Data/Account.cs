@@ -1,4 +1,5 @@
 ﻿using InCollege.Core.Data.Base;
+using Newtonsoft.Json;
 using SQLite;
 using System;
 using System.Collections.Generic;
@@ -25,6 +26,7 @@ namespace InCollege.Core.Data
     {
         private const decimal DaysInAYear = 365.242M;
         private const int MaxAge = 150;
+        public const int OnlineTimeoutSeconds = 10;
 
         public int GroupID { get; set; } = -1;
         public string UserName { get; set; }
@@ -37,6 +39,11 @@ namespace InCollege.Core.Data
         public bool Approved { get; set; }
 
         [Ignore]
+        [JsonIgnore]
+        public bool IsOnline => LastAction != null && DateTime.Now.Subtract(LastAction.Value).Seconds < OnlineTimeoutSeconds;
+
+        [Ignore]
+        [JsonIgnore]
         public string AccountTypeString
         {
             get
