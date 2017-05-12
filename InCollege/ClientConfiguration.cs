@@ -1,14 +1,29 @@
-﻿using System.IO;
+﻿using Newtonsoft.Json;
+using System.IO;
 
 namespace InCollege
 {
-    public static class ClientConfiguration
+    public class ClientConfiguration
     {
-        //TODO:Implement correctly - through local configuration.
-        public static string HostName { get; set; } = File.ReadAllText("host.txt");// "192.168.1.2";
-        public static int Port { get; set; } = 80;
+        public static ClientConfiguration Instance
+        {
+            get
+            {
+                if (_instance != null)
+                    return _instance;
+                if (File.Exists(CommonVariables.ConfigFileName))
+                    return _instance = JsonConvert.DeserializeObject<ClientConfiguration>(File.ReadAllText(CommonVariables.ConfigFileName));
 
-        public static readonly string AuthHandlerPath = $"http://{HostName}:{Port}/Auth";
-        public static readonly string DataHandlerPath = $"http://{HostName}:{Port}/Data";
+                File.WriteAllText(CommonVariables.ConfigFileName, JsonConvert.SerializeObject(_instance = new ClientConfiguration()));
+                return _instance;
+            }
+        }
+        private static ClientConfiguration _instance;
+
+        public string HostName { get; set; } = File.Exists("host.txt") ? File.ReadAllText("host.txt") : "127.0.0.1";
+        public int Port { get; set; } = 80;
+
+        public string AuthHandlerPath => $"http://{HostName}:{Port}/Auth";
+        public string DataHandlerPath => $"http://{HostName}:{Port}/Data";
     }
 }

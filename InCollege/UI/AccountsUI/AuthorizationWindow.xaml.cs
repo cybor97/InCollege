@@ -57,7 +57,7 @@ namespace InCollege.Client.UI.AccountsUI
                 try
                 {
                     if ((response = (await new HttpClient()
-                          .PostAsync(ClientConfiguration.AuthHandlerPath,
+                          .PostAsync(ClientConfiguration.Instance.AuthHandlerPath,
                           new StringContent(
                           $"Action={(SignUpMode ? "SignUp" : "SignIn")}&" +
                           (SignUpMode ? $"FullName={FullNameTB.Text}&" : string.Empty) +
