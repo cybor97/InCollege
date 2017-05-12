@@ -14,7 +14,7 @@ namespace InCollege.Server
                 "<center><a href=\"/Auth\">Авторизация</a></center>" +
                 "<center><a href=\"/Data?action=GetRange&table=AttestationType\">Данные</a></center>" +
                 "<a style=\"position:fixed; bottom: 0; height: auto; margin - top:40px; width: 100 %; text - align:center\">Made by [CYBOR]</a>",
-                false);
+                true);
 
             return Task.Factory.GetCompleted();
         }
