@@ -1,6 +1,4 @@
 ﻿using InCollege.Core.Data.Base;
-using System;
-using System.IO;
 
 namespace InCollege.Server
 {
@@ -8,7 +6,7 @@ namespace InCollege.Server
     {
         public static void Main()
         {
-            DBHolderSQL.Init(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Desktop), "test.db"));
+            DBHolderSQL.Init(CommonVariables.DBLocation);
             InCollegeServer.Start();
             while (true) System.Threading.Thread.Sleep(100);
         }
