@@ -73,48 +73,53 @@ namespace InCollege.Core.Data.Base
                 }
             }
 
-            var adapter = new SQLiteDataAdapter($"SELECT * FROM [{table}] LIMIT 0, 1", DataConnection);
-            var data = new DataTable(table);
-            adapter.Fill(data);
-            data.PrimaryKey = new[] { data.Columns["ID"] };
-
-
-            DataRow row;
-            bool addMode = true;
-            if (!isLocal && (long)new SQLiteCommand($"SELECT Count() FROM {table} WHERE ID LIKE '{id}'", DataConnection).ExecuteScalar() > 0)
-            {
-                adapter = new SQLiteDataAdapter($"SELECT * FROM [{table}] WHERE ID LIKE '{id}'", DataConnection);
-                data.Clear();
-                adapter.Fill(data);
-                row = data.Rows[0];
-                addMode = false;
-            }
-            else
-            {
-                row = data.NewRow();
-                row["ID"] = id = GetFreeID(table);
-            }
-
-            row["IsLocal"] = false;
-            row["Modified"] = false;
-
-            foreach (var current in columns)
-                if ((current.key != "ID" || isLocal) && current.key != "IsLocal" && current.key != "Modified")
-                    if (current.value == null || !current.value.ToString().StartsWith("raw_data"))
-                        row[current.key] = current.value;
-                    else row[current.key] = Convert.FromBase64String(current.value.ToString().Split(new[] { "raw_data" }, StringSplitOptions.RemoveEmptyEntries)[0]);
-
-            adapter.SelectCommand = new SQLiteCommand($"SELECT * FROM [{table}] WHERE ID={id}", DataConnection);
-
-            if (addMode)
-                data.Rows.Add(row);
-
-            adapter.InsertCommand = new SQLiteCommandBuilder(adapter).GetInsertCommand(true);
-            adapter.UpdateCommand = new SQLiteCommandBuilder(adapter).GetUpdateCommand(true);
-
             lock (DataConnection)
-                adapter.Update(data);
+                using (var transaction = DataConnection.BeginTransaction(IsolationLevel.Serializable))
+                using (var adapter = new SQLiteDataAdapter($"SELECT * FROM [{table}] LIMIT 0, 1", DataConnection))
+                {
+                    var data = new DataTable(table);
+                    adapter.Fill(data);
+                    data.PrimaryKey = new[] { data.Columns["ID"] };
 
+
+                    DataRow row;
+                    bool addMode = true;
+                    if (!isLocal && (long)new SQLiteCommand($"SELECT Count() FROM {table} WHERE ID LIKE '{id}'", DataConnection).ExecuteScalar() > 0)
+                    {
+                        adapter.SelectCommand = new SQLiteCommand($"SELECT * FROM [{table}] WHERE ID LIKE '{id}'", DataConnection) { Transaction = transaction };
+                        data.Clear();
+                        adapter.Fill(data);
+                        row = data.Rows[0];
+                        addMode = false;
+                    }
+                    else
+                    {
+                        row = data.NewRow();
+                        row["ID"] = id = GetFreeID(table);
+                    }
+
+                    row["IsLocal"] = false;
+                    row["Modified"] = false;
+
+                    foreach (var current in columns)
+                        if ((current.key != "ID" || isLocal) && current.key != "IsLocal" && current.key != "Modified")
+                            if (current.value == null || !current.value.ToString().StartsWith("raw_data"))
+                                row[current.key] = current.value;
+                            else row[current.key] = Convert.FromBase64String(current.value.ToString().Split(new[] { "raw_data" }, StringSplitOptions.RemoveEmptyEntries)[0]);
+
+                    adapter.SelectCommand = new SQLiteCommand($"SELECT * FROM [{table}] WHERE ID={id}", DataConnection) { Transaction = transaction };
+
+                    if (addMode)
+                        data.Rows.Add(row);
+
+                    adapter.InsertCommand = new SQLiteCommandBuilder(adapter).GetInsertCommand(true);
+                    adapter.InsertCommand.Transaction = transaction;
+                    adapter.UpdateCommand = new SQLiteCommandBuilder(adapter).GetUpdateCommand(true);
+                    adapter.UpdateCommand.Transaction = transaction;
+
+                    adapter.Update(data);
+                    transaction.Commit();
+                }
             return id;
         }
 
