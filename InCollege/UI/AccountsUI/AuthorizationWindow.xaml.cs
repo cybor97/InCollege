@@ -1,4 +1,5 @@
-﻿using System;
+﻿using InCollege.UI;
+using System;
 using System.Net;
 using System.Net.Http;
 using System.Windows;
@@ -20,7 +21,7 @@ namespace InCollege.Client.UI.AccountsUI
             {
                 SignUpElementsVisibility = value ? Visibility.Visible : Visibility.Collapsed;
                 var storyboard = (Storyboard)Resources["SwitchModeStoryboard"];
-                ((DoubleAnimation)storyboard.Children[0]).To = value ? 350 : 200;
+                ((DoubleAnimation)storyboard.Children[0]).To = value ? 350 : 220;
                 storyboard.Begin();
                 LoginButton.Content = value ? "Зарегистрироваться" : "Войти";
                 ChangeModeButton.Content = value ? "Войти" : "Зарегистироваться";
@@ -103,6 +104,11 @@ namespace InCollege.Client.UI.AccountsUI
         private void SysadminModeItem_Click(object sender, RoutedEventArgs e)
         {
             MessageBox.Show("Не верю!");
+        }
+
+        private void SettingsButton_Click(object sender, RoutedEventArgs e)
+        {
+            new SettingsWindow().ShowDialog();
         }
     }
 }
