@@ -25,14 +25,16 @@ namespace InCollege
         public string HostName { get; set; } = File.Exists("host.txt") ? File.ReadAllText("host.txt") : "127.0.0.1";
         public int Port { get; set; } = 80;
 
+        [JsonIgnore]
         public string AuthHandlerPath => $"http://{HostName}:{Port}/Auth";
+        [JsonIgnore]
         public string DataHandlerPath => $"http://{HostName}:{Port}/Data";
 
         public bool Save()
         {
             try
             {
-                File.WriteAllText(CommonVariables.ConfigFileName, JsonConvert.SerializeObject(this));
+                File.WriteAllText(CommonVariables.ConfigFileName, JsonConvert.SerializeObject(this, Formatting.Indented));
                 return true;
             }
             catch
