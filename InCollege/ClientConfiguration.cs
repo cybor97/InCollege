@@ -14,7 +14,9 @@ namespace InCollege
                 if (File.Exists(CommonVariables.ConfigFileName))
                     return _instance = JsonConvert.DeserializeObject<ClientConfiguration>(File.ReadAllText(CommonVariables.ConfigFileName));
 
-                File.WriteAllText(CommonVariables.ConfigFileName, JsonConvert.SerializeObject(_instance = new ClientConfiguration()));
+                _instance = new ClientConfiguration();
+                _instance.Save();
+
                 return _instance;
             }
         }
@@ -25,5 +27,18 @@ namespace InCollege
 
         public string AuthHandlerPath => $"http://{HostName}:{Port}/Auth";
         public string DataHandlerPath => $"http://{HostName}:{Port}/Data";
+
+        public bool Save()
+        {
+            try
+            {
+                File.WriteAllText(CommonVariables.ConfigFileName, JsonConvert.SerializeObject(this));
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
+        }
     }
 }
