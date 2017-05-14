@@ -6,12 +6,15 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 
 namespace InCollege.Client.UI.ChatUI
 {
     public partial class ChatWindow : Window, IUpdatable
     {
         Account Partner { get => (Account)DataContext; set => DataContext = value; }
+
+        List<int> PoolOnline = new List<int>();
 
         public ChatWindow()
         {
@@ -25,34 +28,48 @@ namespace InCollege.Client.UI.ChatUI
                 {
                     Message lastMessage;
                     int partnerID = Dispatcher.Invoke(() => Partner?.ID ?? -1);
-                    try
-                    {
-                        if (await NetworkUtils.GetCount<Message>(null, (nameof(Message.ToID), App.Account.ID), (nameof(Message.IsRead), false)) > 0 ||
 
-                        ((lastMessage = ((IList<Message>)MessagesLV?.ItemsSource)?.LastOrDefault()) != null && lastMessage.Sender.ID == App.Account.ID && !lastMessage.IsRead &&
-                        ((await NetworkUtils.RequestData<Message>(null, (nameof(Message.FromID), App.Account.ID), (nameof(Message.ToID), partnerID)))?.LastOrDefault()?.IsRead ?? false)))
-                            await Dispatcher.Invoke(async () => await UpdateData());
-                    }
-                    catch (Exception e)
-                    {
-                        MessageBox.Show(e.ToString());
-                    }
-                    Thread.Sleep(100);
+                    if (await NetworkUtils.GetCount<Message>(this, (nameof(Message.ToID), App.Account.ID), (nameof(Message.IsRead), false)) > 0 ||
 
+                    ((lastMessage = ((IList<Message>)MessagesLV?.ItemsSource)?.LastOrDefault()) != null && lastMessage.Sender.ID == App.Account.ID && !lastMessage.IsRead &&
+                    ((await NetworkUtils.RequestData<Message>(this, (nameof(Message.FromID), App.Account.ID), (nameof(Message.ToID), partnerID)))?.LastOrDefault()?.IsRead ?? false)))
+                        await Dispatcher.Invoke(UpdateData);
 
-                    Thread.Sleep(100);
+                    bool onlineNeedsUpdate = false;
+                    foreach (Account current in PeopleLV.Items)
+                        if (current != null)
+                        {
+                            var onlineState = (await NetworkUtils.RequestData<Account>(this, nameof(Account.LastAction), (nameof(Account.ID), current?.ID ?? -1)))?.FirstOrDefault();
+                            if (onlineState != null)
+                            {
+                                current.LastAction = onlineState?.LastAction;
+
+                                if (current.IsOnline && !PoolOnline.Contains(current.ID))
+                                {
+                                    onlineNeedsUpdate = true;
+                                    PoolOnline.Add(current.ID);
+                                }
+                                else if (!current.IsOnline && PoolOnline.Contains(current.ID))
+                                {
+                                    onlineNeedsUpdate = true;
+                                    PoolOnline.Remove(current.ID);
+                                }
+                            }
+                        }
+                    if (onlineNeedsUpdate)
+                        Dispatcher.Invoke(PeopleLV.Items.Refresh);
+
+                    Thread.Sleep(200);
                 }
             }, cancelToken.Token);
 
-            Closing += (s, e) =>
-            {
-                cancelToken.Cancel();
-            };
+            Closing += (s, e) => cancelToken.Cancel();
         }
 
         public async Task UpdateAccounts()
         {
             PeopleLV.ItemsSource = (await NetworkUtils.RequestData<Account>(this)).Where(c => c.ID != App.Account.ID);
+            PoolOnline.Clear();
         }
 
         public async Task UpdateData()
@@ -65,9 +82,9 @@ namespace InCollege.Client.UI.ChatUI
 
                     var messagesData = await NetworkUtils.RequestData<Message>(this, (nameof(Message.FromID), App.Account.ID),
                                                                              (nameof(Message.ToID), Partner.ID));
-                    messagesData.AddRange(await NetworkUtils.RequestData<Message>(this, (nameof(Message.ToID), App.Account.ID),
+                    messagesData?.AddRange(await NetworkUtils.RequestData<Message>(this, (nameof(Message.ToID), App.Account.ID),
                                                                                 (nameof(Message.FromID), Partner.ID)));
-                    if (messagesData.Count == 0)
+                    if ((messagesData?.Count ?? 0) == 0)
                     {
                         MessagesLV.Visibility = Visibility.Collapsed;
                         NoMessagesTB.Visibility = Visibility.Visible;
@@ -122,6 +139,14 @@ namespace InCollege.Client.UI.ChatUI
         void SearchTB_TextChanged(object sender, TextChangedEventArgs e)
         {
             PeopleLV.Items.Filter = c => ((Account)c).FullName.ToLower().Contains(SearchTB.Text.ToLower());
+        }
+
+        async void SearchTB_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Enter)
+                if (!string.IsNullOrWhiteSpace(SearchTB.Text))
+                    PeopleLV.ItemsSource = (await NetworkUtils.RequestData<Account>(this, false, false, null, (nameof(Account.FullName), SearchTB.Text.Trim())))?.Where(c => c.ID != App.Account.ID);
+                else await UpdateAccounts();
         }
     }
 }

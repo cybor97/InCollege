@@ -6,6 +6,9 @@
         Loaded="ChatWindow_Loaded"
         Style="{StaticResource BaseWindow}"
         Width="800" Height="500">
+    <Window.Resources>
+        <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
+    </Window.Resources>
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="1*"/>
@@ -19,16 +22,26 @@
             </Grid.RowDefinitions>
             <TextBox Name="SearchTB"
                      TextChanged="SearchTB_TextChanged"
-                material:HintAssist.Hint="Поиск..."/>
+                material:HintAssist.Hint="Поиск..."
+                     KeyDown="SearchTB_KeyDown"/>
             <ListView Name="PeopleLV"
                       SelectionChanged="PeopleLV_SelectionChanged"
+                      ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                      HorizontalContentAlignment="Stretch"
                       Grid.Row="1">
                 <ListView.ItemTemplate>
                     <DataTemplate>
-                        <StackPanel Orientation="Horizontal" >
-                            <TextBlock Text="{Binding FullName}"/>
-                        </StackPanel>
-
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Text="{Binding FullName}" TextTrimming="WordEllipsis" Grid.Column="0"/>
+                            <Ellipse Width="5" Height="5" Grid.Column="1" VerticalAlignment="Center"  
+                                     Fill="Lime" 
+                                     Margin="5 0 0 0"
+                                     Visibility="{Binding IsOnline, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+                        </Grid>
                     </DataTemplate>
                 </ListView.ItemTemplate>
             </ListView>

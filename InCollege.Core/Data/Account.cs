@@ -40,7 +40,7 @@ namespace InCollege.Core.Data
 
         [Ignore]
         [JsonIgnore]
-        public bool IsOnline => LastAction != null && DateTime.Now.Subtract(LastAction.Value).Seconds < OnlineTimeoutSeconds;
+        public bool IsOnline => LastAction != null && DateTime.Now.Subtract(LastAction.Value).TotalSeconds < OnlineTimeoutSeconds;
 
         [Ignore]
         [JsonIgnore]
