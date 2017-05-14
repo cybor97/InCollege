@@ -58,7 +58,6 @@
     <Compile Include="Data\Base\Enums.cs" />
     <Compile Include="Data\CommissionMember.cs" />
     <Compile Include="Data\Configuration.cs" />
-    <Compile Include="Data\Mark.cs" />
     <Compile Include="Data\Department.cs" />
     <Compile Include="Data\ExamStatementResult.cs" />
     <Compile Include="Data\Group.cs" />

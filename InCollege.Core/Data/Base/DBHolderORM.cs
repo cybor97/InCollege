@@ -29,7 +29,6 @@ namespace InCollege.Core.Data.Base
                     typeof(ExamStatementResult),
                     typeof(Group),
                     typeof(Log),
-                    typeof(Mark),
                     typeof(Message),
                     typeof(MiddleStatementResult),
                     typeof(CommissionMember),
