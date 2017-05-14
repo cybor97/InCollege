@@ -1,7 +1,7 @@
 ﻿<Grid x:Class="InCollege.Client.UI.ChatUI.ChatMessageView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-      xmlns:local="clr-namespace:InCollege.Client.UI.ChatUI"
+      xmlns:local="clr-namespace:InCollege.Client.UI.ChatUI" 
       ToolTip="{Binding MessageDate}">
     <Grid.Resources>
         <local:MessageSenderToAlignConverter x:Key="MessageSenderToAlignConverter"/>

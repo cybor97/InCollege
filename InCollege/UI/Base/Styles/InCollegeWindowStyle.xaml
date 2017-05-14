@@ -227,7 +227,7 @@
         <Setter Property="TextElement.FontSize" Value="13"/>
         <Setter Property="FontFamily" Value="{DynamicResource MaterialDesignFont}"/>
         <Setter Property="AllowsTransparency" Value="True"/>
-
+                
         <Setter Property="Template" Value="{StaticResource BaseWindowTemplate}"/>
 
         <Setter Property="WindowStyle" Value="None"/>
