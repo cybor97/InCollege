@@ -67,7 +67,7 @@ namespace InCollege.Server
                     #region Special rules for accounts
                     //We never should send passwords...
                     //...but if it's just count requested - why not?
-                    if (table == nameof(Account) && !justCount)
+                    if (table == nameof(Account) && !justCount && range.Columns.Contains(nameof(Account.Password)))
                         foreach (DataRow current in range.Rows)
                             current[nameof(Account.Password)] = null;
                     #endregion
