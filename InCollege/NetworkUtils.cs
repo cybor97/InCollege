@@ -33,19 +33,32 @@ namespace InCollege
 
         public static async Task<Account> WhoAmI()
         {
-            HttpResponseMessage response;
-            if ((response = (await Client
-            .PostAsync(ClientConfiguration.Instance.AuthHandlerPath,
-            new StringContent(
-            $"Action=WhoAmI&" +
-            $"token={App.Token}")))).StatusCode == HttpStatusCode.OK)
-                return JsonConvert.DeserializeObject<IList<Account>>(await response.Content.ReadAsStringAsync())[0];
-            else
-                MessageBox.Show(await response.Content.ReadAsStringAsync());
+            try
+            {
+                HttpResponseMessage response;
+                if ((response = (await Client
+                .PostAsync(ClientConfiguration.Instance.AuthHandlerPath,
+                new StringContent(
+                $"Action=WhoAmI&" +
+                $"token={App.Token}")))).StatusCode == HttpStatusCode.OK)
+                    return JsonConvert.DeserializeObject<IList<Account>>(await response.Content.ReadAsStringAsync())[0];
+                else
+                    MessageBox.Show(await response.Content.ReadAsStringAsync());
+            }
+            catch (HttpRequestException exc)
+            {
+                MessageBox.Show($"Ошибка подключения к серверу. Проверьте:\n-запущен ли сервер\n-настройки брандмауэра\n-правильно ли указан адрес\nТехническая информация:\n\n{exc.Message}");
+            }
             return null;
+
         }
 
         public static async Task<int> GetCount<T>(Window context, params (string name, object value)[] whereParams) where T : DBRecord
+        {
+            return await GetCount<T>(context, false, whereParams);
+        }
+
+        public static async Task<int> GetCount<T>(Window context, bool preserveContext = false, params (string name, object value)[] whereParams) where T : DBRecord
         {
             try
             {
@@ -73,16 +86,28 @@ namespace InCollege
             catch (HttpRequestException exc)
             {
                 MessageBox.Show($"Ошибка подключения к серверу. Проверьте:\n-запущен ли сервер\n-настройки брандмауэра\n-правильно ли указан адрес\nТехническая информация:\n\n{exc.Message}");
+                if (!preserveContext)
+                    context?.Close();
             }
             return -1;
         }
 
         public static async Task<List<T>> RequestData<T>(Window context, params (string name, object value)[] whereParams) where T : DBRecord
         {
-            return await RequestData<T>(context, true, whereParams);
+            return await RequestData<T>(context, true, false, null, whereParams);
         }
 
-        public static async Task<List<T>> RequestData<T>(Window context, bool strict, params (string name, object value)[] whereParams) where T : DBRecord
+        public static async Task<List<T>> RequestData<T>(Window context, string column, params (string name, object value)[] whereParams) where T : DBRecord
+        {
+            return await RequestData<T>(context, true, false, column, whereParams);
+        }
+
+        public static async Task<List<T>> RequestData<T>(Window context, bool preserveContext, string column, params (string name, object value)[] whereParams) where T : DBRecord
+        {
+            return await RequestData<T>(context, true, preserveContext, column, whereParams);
+        }
+
+        public static async Task<List<T>> RequestData<T>(Window context, bool strict, bool preserveContext, string column, params (string name, object value)[] whereParams) where T : DBRecord
         {
             try
             {
@@ -100,9 +125,11 @@ namespace InCollege
                       $"Action=GetRange&" +
                       $"table={typeof(T).Name}&" +
                       $"token={App.Token}&" +
+                      (!string.IsNullOrWhiteSpace(column) ? $"column={column}&" : "") +
                       $"fixedString={(strict ? 1 : 0)}" +
                       //Not an error! Little more attension, & is  ' here
-                      (!string.IsNullOrWhiteSpace(whereString) ? $"&{whereString}" : ""))))).StatusCode == HttpStatusCode.OK)
+                      (!string.IsNullOrWhiteSpace(whereString) ? $"&{whereString}" : "")
+                      )))).StatusCode == HttpStatusCode.OK)
                     return JsonConvert
                         .DeserializeObject<List<T>>(await response.Content.ReadAsStringAsync());
                 else
@@ -114,6 +141,8 @@ namespace InCollege
             catch (HttpRequestException exc)
             {
                 MessageBox.Show($"Ошибка подключения к серверу. Проверьте:\n-запущен ли сервер\n-настройки брандмауэра\n-правильно ли указан адрес\nТехническая информация:\n\n{exc.Message}");
+                if (!preserveContext)
+                    context?.Close();
             }
             return null;
         }
