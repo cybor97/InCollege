@@ -59,11 +59,6 @@ namespace InCollege.Client.UI.MainUI
             await UpdateData();
         }
 
-        void Window_MouseDoubleClick(object sender, MouseButtonEventArgs e)
-        {
-            WindowState = WindowState == WindowState.Normal ? WindowState.Maximized : WindowState.Normal;
-        }
-
         async void ParticipantsItem_Click(object sender, RoutedEventArgs e)
         {
             new AccountsWindow((AccountType)((MenuItem)(((MenuItem)sender).Parent)).Items.IndexOf(sender)).ShowDialog();
