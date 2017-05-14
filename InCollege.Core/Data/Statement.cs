@@ -1,4 +1,5 @@
 ﻿using InCollege.Core.Data.Base;
+using Newtonsoft.Json;
 using SQLite;
 using System;
 using System.Collections.Generic;
@@ -11,37 +12,47 @@ namespace InCollege.Core.Data
         public int GroupID { get; set; }
         public StatementType StatementType { get; set; }
         public int StatementNumber { get; set; }
+        public int Course { get; set; }
         public int Semester { get; set; }
         public virtual DateTime StatementDate { get; set; }
         public virtual string Note { get; set; }
 
         #region Display data
         [Ignore]
-        public string StatementTypeString
-        {
-            get
-            {
-                return StatementTypeStrings[StatementType];
-            }
-        }
+        [JsonIgnore]
+        public string StatementTypeString => StatementTypeStrings[StatementType];
         #endregion
 
         #region Local data
         [Ignore]
-        public List<AttestationType> AttestationTypes { get; set; }
+        [JsonIgnore]
+        public Specialty Specialty => Group?.Specialty;
 
         [Ignore]
-        public List<CommissionMember> CommissionMembers { get; set; }
+        [JsonIgnore]
+        public Group Group
+        {
+            get => _group;
+            set
+            {
+                _group = value;
+                GroupID = value?.ID ?? -1;
+            }
+        }
+        private Group _group;
 
-        //Either ExamStatementResult either MiddleStatementResult. Depends of StatementType.
         [Ignore]
-        public List<DBRecord> StatementResults { get; set; }
-
-        [Ignore]
-        public Group Group { get; set; }
-
-        [Ignore]
-        public Subject Subject { get; set; }
+        [JsonIgnore]
+        public Subject Subject
+        {
+            get => _subject;
+            set
+            {
+                _subject = value;
+                SubjectID = value?.ID ?? -1;
+            }
+        }
+        private Subject _subject;
         #endregion
 
         #region Service data
