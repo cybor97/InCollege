@@ -1,10 +1,11 @@
 ﻿using InCollege.Core.Data;
 using MaterialDesignThemes.Wpf;
 using System.Windows;
+using System.Threading.Tasks;
 
-namespace InCollege.UI.StatementsUI
+namespace InCollege.Client.UI.StatementsUI
 {
-    public partial class EditStatementDialog : DialogHost
+    public partial class EditStatementDialog : DialogHost, IUpdatable
     {
         public event RoutedEventHandler OnSave;
         public event RoutedEventHandler OnCancel;
@@ -26,6 +27,25 @@ namespace InCollege.UI.StatementsUI
                 CourseCB.Items.Add(i);
         }
 
+        public async Task UpdateData()
+        {
+            SubjectCB.ItemsSource = await NetworkUtils.RequestData<Subject>(null);
+            SpecialtyCB.ItemsSource = await NetworkUtils.RequestData<Specialty>(null);
+            UpdateGroupList();
+        }
+
+        async void UpdateGroupList()
+        {
+            GroupCB.ItemsSource = SpecialtyCB.SelectedItem != null ?
+                await NetworkUtils.RequestData<Group>(null, (nameof(Group.SpecialtyID), ((Specialty)SpecialtyCB.SelectedItem).ID)) :
+                null;
+        }
+
+        async void EditStatementDialog_Loaded(object sender, RoutedEventArgs e)
+        {
+            await UpdateData();
+        }
+
         private void SaveButton_Click(object sender, RoutedEventArgs e)
         {
             OnSave?.Invoke(sender, e);
@@ -34,6 +54,21 @@ namespace InCollege.UI.StatementsUI
         private void CancelButton_Click(object sender, RoutedEventArgs e)
         {
             OnCancel?.Invoke(sender, e);
+        }
+
+        void CommissionMembersButton_Click(object sender, RoutedEventArgs e)
+        {
+            new StatementCommissionMembersWindow((Statement)DataContext).ShowDialog();
+        }
+
+        void AttestationTypesButton_Click(object sender, RoutedEventArgs e)
+        {
+            new StatementAttestationTypesWindow((Statement)DataContext).ShowDialog();
+        }
+
+        void SpecialtyCB_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
+        {
+            UpdateGroupList();
         }
     }
 }

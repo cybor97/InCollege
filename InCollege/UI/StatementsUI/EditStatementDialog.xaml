@@ -1,7 +1,8 @@
-﻿<material:DialogHost x:Class="InCollege.UI.StatementsUI.EditStatementDialog"
+﻿<material:DialogHost x:Class="InCollege.Client.UI.StatementsUI.EditStatementDialog"
                      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" IsOpen="False"
-                     xmlns:material="http://materialdesigninxaml.net/winfx/xaml/themes">
+                     xmlns:material="http://materialdesigninxaml.net/winfx/xaml/themes"
+                     Loaded="EditStatementDialog_Loaded">
     <material:DialogHost.DialogContent>
         <Grid Margin="5"
               Width="500" Height="600" Background="White">
@@ -50,6 +51,8 @@
 
             <ComboBox Grid.Row="1"
               IsEditable="True"
+                      Name="SubjectCB"
+                      DisplayMemberPath="SubjectName"
               material:HintAssist.Hint="Дисциплина/Профессиональный модуль"
               material:HintAssist.IsFloating="True"
               Margin="0 0 5 0"/>
@@ -57,13 +60,19 @@
             <Button Content="Виды аттестации" 
                     Style="{StaticResource MaterialDesignFlatButton}"
                     Grid.Row="2"
+                    Click="AttestationTypesButton_Click"
                     Margin="0 5 0 0"/>
             <ComboBox Grid.Row="3"
               IsEditable="True" 
+                      Name="SpecialtyCB"
+                      DisplayMemberPath="SpecialtyName"
+                      SelectionChanged="SpecialtyCB_SelectionChanged"
               material:HintAssist.Hint="Специальность"
               material:HintAssist.IsFloating="True"/>
             <ComboBox Grid.Row="4"
               IsEditable="True"
+                      Name="GroupCB"
+                      DisplayMemberPath="GroupInfo"
               material:HintAssist.Hint="Группа"
               material:HintAssist.IsFloating="True"/>
             <Grid Grid.Row="5">
@@ -84,11 +93,12 @@
                           material:HintAssist.IsFloating="True"/>
             </Grid>
 
-            <Button Content="Участники коммиссии" 
-                        Style="{StaticResource MaterialDesignFlatButton}"
-                           Grid.Row="6"
-                   Foreground="Gray"
-                   Margin="0 5 0 0"/>
+            <Button Content="Состав коммиссии" 
+                    Style="{StaticResource MaterialDesignFlatButton}"
+                    Click="CommissionMembersButton_Click"
+                    Grid.Row="6"
+                    Foreground="Gray"
+                    Margin="0 5 0 0"/>
 
             <ListView Grid.Row="7" Margin="0 5 0 0">
                 <ListView.View>

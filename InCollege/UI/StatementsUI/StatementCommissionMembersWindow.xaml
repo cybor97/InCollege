@@ -1,0 +1,14 @@
+﻿<Window x:Class="InCollege.Client.UI.StatementsUI.StatementCommissionMembersWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Style="{StaticResource BaseWindow}"
+        Title="Состав комиссии"
+        Height="300" Width="300">
+    <Grid>
+        <Button Grid.Row="1" 
+                Foreground="WhiteSmoke" FontSize="30" FontStretch="Medium" 
+                Style="{StaticResource MaterialDesignFloatingActionMiniAccentButton}" Content="+" 
+                Click="AddButton_Click"
+                HorizontalAlignment="Right" VerticalAlignment="Bottom"/>
+    </Grid>
+</Window>

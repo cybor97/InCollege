@@ -117,6 +117,12 @@
     <Compile Include="UI\DictionariesUI\StudyObjectsWindow.xaml.cs">
       <DependentUpon>StudyObjectsWindow.xaml</DependentUpon>
     </Compile>
+    <Compile Include="UI\StatementsUI\StatementAttestationTypesWindow.xaml.cs">
+      <DependentUpon>StatementAttestationTypesWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\StatementsUI\StatementCommissionMembersWindow.xaml.cs">
+      <DependentUpon>StatementCommissionMembersWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="UI\StatementsUI\TotalStatementFrame.xaml.cs">
       <DependentUpon>TotalStatementFrame.xaml</DependentUpon>
     </Compile>
@@ -198,6 +204,14 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="UI\DictionariesUI\StudyObjectsWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\StatementsUI\StatementAttestationTypesWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\StatementsUI\StatementCommissionMembersWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
