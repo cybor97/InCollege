@@ -25,13 +25,17 @@ namespace InCollege.Client.UI.StatementsUI
                 current.AttestationType = attestationTypesData.FirstOrDefault(c => c.ID == current.AttestationTypeID);
             StatementAttestationTypesLV.ItemsSource = statementAttestationTypesData;
 
-            AttestationTypeCB.ItemsSource = attestationTypesData;
+            AttestationTypeCB.ItemsSource = attestationTypesData.Where(currentAttestationType => !(statementAttestationTypesData
+                                                                .Any(c => c.AttestationTypeID == currentAttestationType.ID)));
         }
 
         void AddButton_Click(object sender, RoutedEventArgs e)
         {
-            StatementAttestationTypeDialog.DataContext = new StatementAttestationType { StatementID = Statement?.ID ?? -1 };
-            StatementAttestationTypeDialog.IsOpen = true;
+            if (!AttestationTypeCB.Items.IsEmpty)
+            {
+                StatementAttestationTypeDialog.DataContext = new StatementAttestationType { StatementID = Statement?.ID ?? -1 };
+                StatementAttestationTypeDialog.IsOpen = true;
+            }
         }
 
         async void StatementAttestationTypeDialog_KeyDown(object sender, KeyEventArgs e)
@@ -55,16 +59,17 @@ namespace InCollege.Client.UI.StatementsUI
 
         async void SaveButton_Click(object sender, RoutedEventArgs e)
         {
-            await NetworkUtils.ExecuteDataAction<StatementAttestationType>(this, (DBRecord)StatementAttestationTypeDialog.DataContext, DataAction.Save);
+            if (AttestationTypeCB.SelectedItem != null)
+                await NetworkUtils.ExecuteDataAction<StatementAttestationType>(this, (DBRecord)StatementAttestationTypeDialog.DataContext, DataAction.Save);
             StatementAttestationTypeDialog.IsOpen = false;
         }
 
-        private void CancelButton_Click(object sender, RoutedEventArgs e)
+        void CancelButton_Click(object sender, RoutedEventArgs e)
         {
             StatementAttestationTypeDialog.IsOpen = false;
         }
 
-        private void EditItem_Click(object sender, RoutedEventArgs e)
+        void EditItem_Click(object sender, RoutedEventArgs e)
         {
             if (StatementAttestationTypesLV.SelectedItem != null)
             {

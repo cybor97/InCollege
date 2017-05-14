@@ -1,5 +1,4 @@
-﻿using InCollege.Client.UI;
-using InCollege.Core.Data;
+﻿using InCollege.Core.Data;
 using InCollege.Core.Data.Base;
 using System.Collections.Generic;
 using System.Linq;
@@ -48,8 +47,11 @@ namespace InCollege.Client.UI.DictionariesUI
 
         void AddButton_Click(object sender, RoutedEventArgs e)
         {
-            TeacherDialog.DataContext = new Teacher { SubjectID = Subject?.ID ?? -1 };
-            TeacherDialog.IsOpen = true;
+            if (!ProfessorCB.Items.IsEmpty)
+            {
+                TeacherDialog.DataContext = new Teacher { SubjectID = Subject?.ID ?? -1 };
+                TeacherDialog.IsOpen = true;
+            }
         }
 
         void EditItem_Click(object sender, RoutedEventArgs e)
@@ -70,7 +72,8 @@ namespace InCollege.Client.UI.DictionariesUI
 
         async void SaveButton_Click(object sender, RoutedEventArgs e)
         {
-            await NetworkUtils.ExecuteDataAction<Teacher>(this, (DBRecord)TeacherDialog.DataContext, DataAction.Save);
+            if (ProfessorCB.SelectedItem != null)
+                await NetworkUtils.ExecuteDataAction<Teacher>(this, (DBRecord)TeacherDialog.DataContext, DataAction.Save);
             TeacherDialog.IsOpen = false;
         }
 
