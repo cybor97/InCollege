@@ -12,6 +12,10 @@ namespace InCollege.Core.Data
 
         [Ignore]
         [JsonIgnore]
+        public string GroupInfo => $"{GroupName} {GroupCode}";
+
+        [Ignore]
+        [JsonIgnore]
         public Specialty Specialty
         {
             get => _specialty;
