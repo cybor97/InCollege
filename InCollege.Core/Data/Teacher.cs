@@ -24,6 +24,6 @@ namespace InCollege.Core.Data
 
         [Ignore]
         [JsonIgnore]
-        public string FullName { get => Professor?.FullName; }
+        public string FullName => Professor?.FullName;
     }
 }
