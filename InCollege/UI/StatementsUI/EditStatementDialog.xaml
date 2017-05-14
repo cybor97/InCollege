@@ -33,7 +33,7 @@
             <StackPanel HorizontalAlignment="Center" Orientation="Horizontal">
                 <ComboBox material:HintAssist.Hint="Тип ведомости"
                           material:HintAssist.IsFloating="True" 
-                          SelectedIndex="0"
+                          SelectedIndex="{Binding StatementType}"
                           Foreground="Gray"
                           Margin="0 0 5 0">
                     <ComboBoxItem Content="Промежуточная"/>
@@ -46,13 +46,15 @@
                     <ComboBoxItem Content="Прочее"/>
                 </ComboBox>
                 <TextBox material:HintAssist.Hint="Номер ведомости"
-                  material:HintAssist.IsFloating="True"/>
+                  material:HintAssist.IsFloating="True"
+                  Text="{Binding StatementNumber}"/>
             </StackPanel>
 
             <ComboBox Grid.Row="1"
               IsEditable="True"
-                      Name="SubjectCB"
-                      DisplayMemberPath="SubjectName"
+              Name="SubjectCB"
+              DisplayMemberPath="SubjectName"
+              SelectedValue="{Binding Subject}"
               material:HintAssist.Hint="Дисциплина/Профессиональный модуль"
               material:HintAssist.IsFloating="True"
               Margin="0 0 5 0"/>
@@ -62,17 +64,20 @@
                     Grid.Row="2"
                     Click="AttestationTypesButton_Click"
                     Margin="0 5 0 0"/>
+
             <ComboBox Grid.Row="3"
               IsEditable="True" 
-                      Name="SpecialtyCB"
-                      DisplayMemberPath="SpecialtyName"
-                      SelectionChanged="SpecialtyCB_SelectionChanged"
+              Name="SpecialtyCB"
+              DisplayMemberPath="SpecialtyName"
+              SelectedValue="{Binding Specialty}"
+              SelectionChanged="SpecialtyCB_SelectionChanged"
               material:HintAssist.Hint="Специальность"
               material:HintAssist.IsFloating="True"/>
             <ComboBox Grid.Row="4"
               IsEditable="True"
-                      Name="GroupCB"
-                      DisplayMemberPath="GroupInfo"
+              Name="GroupCB"
+              DisplayMemberPath="GroupInfo"
+              SelectedValue="{Binding Group}"
               material:HintAssist.Hint="Группа"
               material:HintAssist.IsFloating="True"/>
             <Grid Grid.Row="5">
@@ -84,11 +89,13 @@
               IsEditable="True"
               material:HintAssist.Hint="Курс"
               material:HintAssist.IsFloating="True"
-                          Name="CourseCB"
+              SelectedValue="{Binding Cource}"
+              Name="CourseCB"
               Margin="0 0 5 0"/>
                 <ComboBox Grid.Column="1"
                           IsEditable="True"
                           Name="SemesterCB"
+                          SelectedValue="{Binding Semester}"
                           material:HintAssist.Hint="Семестр"
                           material:HintAssist.IsFloating="True"/>
             </Grid>
@@ -109,11 +116,13 @@
             <TextBox Grid.Row="8"
              material:HintAssist.Hint="Примечание"
              AcceptsReturn="True"
+             Text="{Binding Note}"
              AcceptsTab="True"
              TextWrapping="Wrap"
              material:HintAssist.IsFloating="True"/>
 
             <DatePicker Grid.Row="9"
+                SelectedDate="{Binding StatementDate}"
                 material:HintAssist.Hint="Дата проведения"
                 material:HintAssist.IsFloating="True"
                 Margin="0 10 0 0"/>
