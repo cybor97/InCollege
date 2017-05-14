@@ -1,13 +1,11 @@
 ﻿using InCollege.Core.Data;
 using InCollege.Core.Data.Base;
-using InCollege.UI;
-using InCollege.UI.Util;
+using InCollege.Client.UI.Util;
 using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Media;
 
 namespace InCollege.Client.UI.AccountsUI
 {

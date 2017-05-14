@@ -3,7 +3,7 @@ using System.Globalization;
 using System.Windows.Data;
 using System.Windows.Media.Imaging;
 
-namespace InCollege.UI.Util
+namespace InCollege.Client.UI.Util
 {
     class ImageToSourceConverter : IValueConverter
     {

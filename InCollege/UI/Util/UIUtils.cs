@@ -1,7 +1,7 @@
 ﻿using System.Windows;
 using System.Windows.Media;
 
-namespace InCollege.UI.Util
+namespace InCollege.Client.UI.Util
 {
     class UIUtils
     {
