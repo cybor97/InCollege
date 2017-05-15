@@ -58,11 +58,18 @@
                 <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
 
-            <TextBlock Text="{Binding FullName}"
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                <TextBlock Text="{Binding FullName}"
+                       Name="CurrentPartnerTB"
                        FontSize="16"
                        FontWeight="SemiBold"
                        Background="{StaticResource MaterialDesignPaper}"
                        TextAlignment="Center"/>
+                <Ellipse Width="5" Height="5" Grid.Column="1" VerticalAlignment="Center"  
+                         Fill="Lime" 
+                         Margin="5 0 0 0"
+                         Visibility="{Binding IsOnline, FallbackValue='False', Converter={StaticResource BooleanToVisibilityConverter}}"/>
+            </StackPanel>
 
             <TextBlock HorizontalAlignment="Center" 
                    VerticalAlignment="Center"
@@ -103,7 +110,7 @@
                     <TextBox Name="MessageTB" material:HintAssist.Hint="Сообщение"/>
                     <Button Name="SendButton" 
                             Style="{StaticResource MaterialDesignFlatAccentButton}"
-                            Content="Отправить" Margin="5 0 0 0" Grid.Column="1" Click="SendButton_Click"/>
+                            Content="Отправить" Margin="5 0 0 0" Grid.Column="1" Click="SendButton_Click" KeyDown="SendButton_KeyDown"/>
                 </Grid>
             </Grid>
         </Grid>

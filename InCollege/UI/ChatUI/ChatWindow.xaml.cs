@@ -59,7 +59,7 @@ namespace InCollege.Client.UI.ChatUI
                     if (onlineNeedsUpdate)
                         Dispatcher.Invoke(PeopleLV.Items.Refresh);
 
-                    Thread.Sleep(200);
+                    Thread.Sleep(250);
                 }
             }, cancelToken.Token);
 
@@ -147,6 +147,12 @@ namespace InCollege.Client.UI.ChatUI
                 if (!string.IsNullOrWhiteSpace(SearchTB.Text))
                     PeopleLV.ItemsSource = (await NetworkUtils.RequestData<Account>(this, false, false, null, (nameof(Account.FullName), SearchTB.Text.Trim())))?.Where(c => c.ID != App.Account.ID);
                 else await UpdateAccounts();
+        }
+
+        private void SendButton_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Enter)
+                SendButton_Click(null, null);
         }
     }
 }
