@@ -2,7 +2,7 @@
 using System.Data;
 using System.Data.SQLite;
 using System.Linq;
-//TODO:Fix concurency
+
 namespace InCollege.Core.Data.Base
 {
     /// <summary>
