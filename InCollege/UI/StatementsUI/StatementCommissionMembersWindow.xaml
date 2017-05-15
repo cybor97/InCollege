@@ -46,7 +46,7 @@
                              KeyDown="CommissionMemberDialog_KeyDown">
             <material:DialogHost.DialogContent>
                 <StackPanel Orientation="Vertical" MinWidth="300">
-                    <ComboBox material:HintAssist.Hint="Вид аттестации"
+                    <ComboBox material:HintAssist.Hint="Преподаватель"
                               Name="ProfessorCB"
                               material:HintAssist.IsFloating="True" 
                               HorizontalContentAlignment="Center"
