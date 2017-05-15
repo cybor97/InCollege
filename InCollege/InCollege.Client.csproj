@@ -102,29 +102,23 @@
     <Compile Include="UI\StatementsUI\EditStatementDialog.xaml.cs">
       <DependentUpon>EditStatementDialog.xaml</DependentUpon>
     </Compile>
-    <Compile Include="UI\StatementsUI\ExamStatementFrame.xaml.cs">
-      <DependentUpon>ExamStatementFrame.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="UI\StatementsUI\MiddleStatementFrame.xaml.cs">
-      <DependentUpon>MiddleStatementFrame.xaml</DependentUpon>
-    </Compile>
     <Compile Include="UI\AccountsUI\AccountsWindow.xaml.cs">
       <DependentUpon>AccountsWindow.xaml</DependentUpon>
     </Compile>
-    <Compile Include="UI\StatementsUI\QualificationStatementFrame.xaml.cs">
-      <DependentUpon>QualificationStatementFrame.xaml</DependentUpon>
-    </Compile>
     <Compile Include="UI\DictionariesUI\StudyObjectsWindow.xaml.cs">
       <DependentUpon>StudyObjectsWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\StatementsUI\ExamStatementResult.xaml.cs">
+      <DependentUpon>ExamStatementResult.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\StatementsUI\MiddleStatementResult.xaml.cs">
+      <DependentUpon>MiddleStatementResult.xaml</DependentUpon>
     </Compile>
     <Compile Include="UI\StatementsUI\StatementAttestationTypesWindow.xaml.cs">
       <DependentUpon>StatementAttestationTypesWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="UI\StatementsUI\StatementCommissionMembersWindow.xaml.cs">
       <DependentUpon>StatementCommissionMembersWindow.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="UI\StatementsUI\TotalStatementFrame.xaml.cs">
-      <DependentUpon>TotalStatementFrame.xaml</DependentUpon>
     </Compile>
     <Compile Include="UI\DictionariesUI\SubjectTeachersWindow.xaml.cs">
       <DependentUpon>SubjectTeachersWindow.xaml</DependentUpon>
@@ -169,10 +163,6 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="UI\StatementsUI\ExamStatementFrame.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
     <Page Include="UI\MainUI\MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -191,19 +181,19 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Page Include="UI\StatementsUI\MiddleStatementFrame.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
     <Page Include="UI\AccountsUI\AccountsWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="UI\StatementsUI\QualificationStatementFrame.xaml">
+    <Page Include="UI\DictionariesUI\StudyObjectsWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="UI\DictionariesUI\StudyObjectsWindow.xaml">
+    <Page Include="UI\StatementsUI\ExamStatementResult.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\StatementsUI\MiddleStatementResult.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -212,10 +202,6 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="UI\StatementsUI\StatementCommissionMembersWindow.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="UI\StatementsUI\TotalStatementFrame.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
