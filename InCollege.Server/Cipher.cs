@@ -71,12 +71,10 @@ namespace SG.Algoritma
             byte[] encryptedBytes = null;
 
             using (MemoryStream ms = new MemoryStream())
+            using (var cs = new CryptoStream(ms, GetAES(passwordBytes, SaltBytes).CreateEncryptor(), CryptoStreamMode.Write))
             {
-                using (var cs = new CryptoStream(ms, GetAES(passwordBytes, SaltBytes).CreateEncryptor(), CryptoStreamMode.Write))
-                {
-                    cs.Write(bytesToBeEncrypted, 0, bytesToBeEncrypted.Length);
-                    cs.Close();
-                }
+                cs.Write(bytesToBeEncrypted, 0, bytesToBeEncrypted.Length);
+                cs.Close();
                 encryptedBytes = ms.ToArray();
             }
 
@@ -88,12 +86,10 @@ namespace SG.Algoritma
             byte[] decryptedBytes = null;
 
             using (MemoryStream ms = new MemoryStream())
+            using (var cs = new CryptoStream(ms, GetAES(passwordBytes, SaltBytes).CreateDecryptor(), CryptoStreamMode.Write))
             {
-                using (var cs = new CryptoStream(ms, GetAES(passwordBytes, SaltBytes).CreateDecryptor(), CryptoStreamMode.Write))
-                {
-                    cs.Write(bytesToBeDecrypted, 0, bytesToBeDecrypted.Length);
-                    cs.Close();
-                }
+                cs.Write(bytesToBeDecrypted, 0, bytesToBeDecrypted.Length);
+                cs.Close();
                 decryptedBytes = ms.ToArray();
             }
 
