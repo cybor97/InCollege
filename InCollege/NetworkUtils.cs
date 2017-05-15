@@ -2,7 +2,6 @@
 using InCollege.Client.UI;
 using InCollege.Core.Data;
 using InCollege.Core.Data.Base;
-using InCollege.UI;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
