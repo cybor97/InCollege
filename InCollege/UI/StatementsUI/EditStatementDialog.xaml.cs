@@ -1,11 +1,15 @@
 ﻿using InCollege.Core.Data;
 using MaterialDesignThemes.Wpf;
 using System.Windows;
-using System.Threading.Tasks;
+using System.Windows.Data;
+using System;
+using System.Globalization;
+using InCollege.Core.Data.Base;
+using System.Windows.Controls;
 
 namespace InCollege.Client.UI.StatementsUI
 {
-    public partial class EditStatementDialog : DialogHost, IUpdatable
+    public partial class EditStatementDialog : DialogHost
     {
         public event RoutedEventHandler OnSave;
         public event RoutedEventHandler OnCancel;
@@ -14,8 +18,10 @@ namespace InCollege.Client.UI.StatementsUI
         public Statement Statement
         {
             get => (Statement)GetValue(StatementProperty);
-            set => SetValue(StatementProperty, value);
+            set => SetValue(StatementProperty, DataContext = value);
         }
+
+        public bool AddMode { get; set; }
 
         public EditStatementDialog()
         {
@@ -27,23 +33,16 @@ namespace InCollege.Client.UI.StatementsUI
                 CourseCB.Items.Add(i);
         }
 
-        public async Task UpdateData()
+        public void UpdateGroupList()
         {
-            SubjectCB.ItemsSource = await NetworkUtils.RequestData<Subject>(null);
-            SpecialtyCB.ItemsSource = await NetworkUtils.RequestData<Specialty>(null);
-            UpdateGroupList();
-        }
-
-        async void UpdateGroupList()
-        {
-            GroupCB.ItemsSource = SpecialtyCB.SelectedItem != null ?
-                await NetworkUtils.RequestData<Group>(null, (nameof(Group.SpecialtyID), ((Specialty)SpecialtyCB.SelectedItem).ID)) :
-                null;
-        }
-
-        async void EditStatementDialog_Loaded(object sender, RoutedEventArgs e)
-        {
-            await UpdateData();
+            if (SpecialtyCB.SelectedItem == null)
+                GroupCB.Visibility = Visibility.Collapsed;
+            else
+            {
+                if (GroupCB.Items != null && (GroupCB.SelectedItem == null || ((Group)GroupCB.SelectedItem).SpecialtyID != ((Specialty)SpecialtyCB.SelectedItem).ID))
+                    GroupCB.Items.Filter = c => (((Group)c)?.SpecialtyID ?? -1) == (((Specialty)SpecialtyCB.SelectedItem)?.ID ?? -1);
+                GroupCB.Visibility = Visibility.Visible;
+            }
         }
 
         private void SaveButton_Click(object sender, RoutedEventArgs e)
@@ -58,17 +57,44 @@ namespace InCollege.Client.UI.StatementsUI
 
         void CommissionMembersButton_Click(object sender, RoutedEventArgs e)
         {
-            new StatementCommissionMembersWindow((Statement)DataContext).ShowDialog();
+            new StatementCommissionMembersWindow(Statement).ShowDialog();
         }
 
         void AttestationTypesButton_Click(object sender, RoutedEventArgs e)
         {
-            new StatementAttestationTypesWindow((Statement)DataContext).ShowDialog();
+            new StatementAttestationTypesWindow(Statement).ShowDialog();
         }
 
-        void SpecialtyCB_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
+        void SpecialtyCB_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             UpdateGroupList();
+        }
+    }
+
+    public class IndexConverter : IValueConverter
+    {
+        public object Convert(object value, Type TargetType, object parameter, CultureInfo culture)
+        {
+            var item = (ListViewItem)value;
+            return ItemsControl.ItemsControlFromItemContainer(item).ItemContainerGenerator.IndexFromContainer(item);
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
+    public class StatementTypeToIntConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            return (int)(StatementType)value;
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            return (StatementType)(int)value;
         }
     }
 }

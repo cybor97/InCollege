@@ -9,6 +9,8 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using System;
+using System.Linq;
 
 namespace InCollege.Client.UI.MainUI
 {
@@ -38,12 +40,30 @@ namespace InCollege.Client.UI.MainUI
                 AccountExit();
             }
 
-
             //TODO:
             //if(teacher) request<statement>(teacher.subjects);
             //else if (departmentHead) request<statement>(departmentHead.groups);
             //else if (admin) request<statement>(all);
-            StatementsLV.ItemsSource = await NetworkUtils.RequestData<Statement>(this);
+
+            var statementsData = await NetworkUtils.RequestData<Statement>(this);
+
+            var specialtiesData = await NetworkUtils.RequestData<Specialty>(this);
+            var groupsData = await NetworkUtils.RequestData<Group>(this);
+            var subjectsData = await NetworkUtils.RequestData<Subject>(this);
+
+            foreach (var current in statementsData)
+            {
+                current.Group = groupsData.FirstOrDefault(c => c.ID == current.GroupID);
+                if (current.Group != null)
+                    current.Specialty = specialtiesData.FirstOrDefault(c => c.ID == current.Group.SpecialtyID);
+
+                current.Subject = subjectsData.FirstOrDefault(c => c.ID == current.SubjectID);
+            }
+            EditStatementDialog.SpecialtyCB.ItemsSource = specialtiesData;
+            EditStatementDialog.GroupCB.ItemsSource = groupsData;
+            EditStatementDialog.SubjectCB.ItemsSource = subjectsData;
+
+            StatementsLV.ItemsSource = statementsData;
         }
 
         void ExitItem_Click(object sender, RoutedEventArgs e)
@@ -78,12 +98,19 @@ namespace InCollege.Client.UI.MainUI
 
         void EditItem_Click(object sender, RoutedEventArgs e)
         {
-            MessageBox.Show("Sorry, still unimplemented :(");
+            if (StatementsLV.SelectedItem != null)
+            {
+                EditStatementDialog.AddMode = false;
+                EditStatementDialog.Statement = (Statement)StatementsLV.SelectedItem;
+                EditStatementDialog.IsOpen = true;
+            }
         }
 
-        void RemoveItem_Click(object sender, RoutedEventArgs e)
+        async void RemoveItem_Click(object sender, RoutedEventArgs e)
         {
-            MessageBox.Show("Sorry, still unimplemented :(");
+            foreach (Statement current in StatementsLV.SelectedItems)
+                await RemoveStatement(current);
+            await UpdateData();
         }
 
         void ProfileDialog_KeyDown(object sender, KeyEventArgs e)
@@ -105,20 +132,29 @@ namespace InCollege.Client.UI.MainUI
         }
 
 
-        void AddButton_Click(object sender, RoutedEventArgs e)
+        async void AddButton_Click(object sender, RoutedEventArgs e)
         {
+            var statement = new Statement();
+            //Attention                    'HERE. It cannot be optimized that way, you thought about.
+            statement.ID = int.Parse(await NetworkUtils.ExecuteDataAction<Statement>(this, statement, DataAction.Save));
+            statement.IsLocal = false;
+            EditStatementDialog.Statement = statement;
+            EditStatementDialog.AddMode = true;
             EditStatementDialog.IsOpen = true;
         }
 
-        void EditStatementDialog_OnSave(object sender, RoutedEventArgs e)
+        async void EditStatementDialog_OnSave(object sender, RoutedEventArgs e)
         {
-            MessageBox.Show("Sorry, still unimplemented :(");
+            await NetworkUtils.ExecuteDataAction<Statement>(this, EditStatementDialog.Statement, DataAction.Save);
             EditStatementDialog.IsOpen = false;
         }
 
-        void EditStatementDialog_OnCancel(object sender, RoutedEventArgs e)
+        async void EditStatementDialog_OnCancel(object sender, RoutedEventArgs e)
         {
             EditStatementDialog.IsOpen = false;
+            if (EditStatementDialog.AddMode)
+                await RemoveStatement(EditStatementDialog.Statement);
+            await UpdateData();
         }
 
         private async void ProfileDialog_OnSave(object sender, RoutedEventArgs e)
@@ -137,6 +173,18 @@ namespace InCollege.Client.UI.MainUI
         private void MessagesButton_Click(object sender, RoutedEventArgs e)
         {
             new ChatWindow().ShowDialog();
+        }
+
+        async Task RemoveStatement(Statement statement)
+        {
+            await NetworkUtils.ExecuteDataAction<Statement>(null, statement, DataAction.Remove);
+            await NetworkUtils.RemoveWhere<StatementAttestationType>(null, (nameof(StatementAttestationType.StatementID), statement.ID));
+            await NetworkUtils.RemoveWhere<CommissionMember>(null, (nameof(CommissionMember.StatementID), statement.ID));
+
+            await NetworkUtils.RemoveWhere<MiddleStatementResult>(null, (nameof(MiddleStatementResult.MiddleStatementID), statement.ID));
+            await NetworkUtils.RemoveWhere<MiddleStatementResult>(null, (nameof(MiddleStatementResult.QualificationStatementID), statement.ID));
+
+            await NetworkUtils.RemoveWhere<ExamStatementResult>(null, (nameof(ExamStatementResult.ExamStatementID), statement.ID));
         }
     }
 }

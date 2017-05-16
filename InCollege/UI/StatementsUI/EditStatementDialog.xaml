@@ -2,7 +2,11 @@
                      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" IsOpen="False"
                      xmlns:material="http://materialdesigninxaml.net/winfx/xaml/themes"
-                     Loaded="EditStatementDialog_Loaded">
+                     xmlns:local="clr-namespace:InCollege.Client.UI.StatementsUI">
+    <material:DialogHost.Resources>
+        <local:StatementTypeToIntConverter x:Key="StatementTypeToIntConverter"/>
+        <local:IndexConverter x:Key="IndexConverter"/>
+    </material:DialogHost.Resources>
     <material:DialogHost.DialogContent>
         <Grid Margin="5"
               Width="500" Height="600" Background="White">
@@ -33,17 +37,17 @@
             <StackPanel HorizontalAlignment="Center" Orientation="Horizontal">
                 <ComboBox material:HintAssist.Hint="Тип ведомости"
                           material:HintAssist.IsFloating="True" 
-                          SelectedIndex="{Binding StatementType}"
+                          SelectedIndex="{Binding StatementType, Converter={StaticResource StatementTypeToIntConverter}}"
                           Foreground="Gray"
                           Margin="0 0 5 0">
                     <ComboBoxItem Content="Промежуточная"/>
-                    <ComboBoxItem Content="Экзаменационная"/>
-                    <ComboBoxItem Content="Квалификационный экзамен"/>
-                    <ComboBoxItem Content="Учебная практика"/>
-                    <ComboBoxItem Content="Производственная практика"/>
-                    <ComboBoxItem Content="Курсовой проект"/>
+                    <ComboBoxItem Content="Экзаменационная" IsEnabled="False"/>
+                    <ComboBoxItem Content="Квалификационный экзамен" IsEnabled="False"/>
+                    <ComboBoxItem Content="Учебная практика" IsEnabled="False"/>
+                    <ComboBoxItem Content="Производственная практика" IsEnabled="False"/>
+                    <ComboBoxItem Content="Курсовой проект" IsEnabled="False"/>
                     <ComboBoxItem Content="Сводная" IsEnabled="False"/>
-                    <ComboBoxItem Content="Прочее"/>
+                    <ComboBoxItem Content="Прочее" IsEnabled="False"/>
                 </ComboBox>
                 <TextBox material:HintAssist.Hint="Номер ведомости"
                   material:HintAssist.IsFloating="True"
@@ -89,7 +93,7 @@
               IsEditable="True"
               material:HintAssist.Hint="Курс"
               material:HintAssist.IsFloating="True"
-              SelectedValue="{Binding Cource}"
+              SelectedValue="{Binding Course}"
               Name="CourseCB"
               Margin="0 0 5 0"/>
                 <ComboBox Grid.Column="1"
@@ -107,9 +111,14 @@
                     Foreground="Gray"
                     Margin="0 5 0 0"/>
 
-            <ListView Grid.Row="7" Margin="0 5 0 0">
+            <ListView Grid.Row="7" Margin="0 5 0 0" Name="StatementResultsLV">
                 <ListView.View>
-                    <GridView/>
+                    <GridView>
+                        <GridViewColumn Header="№ п/п"
+                                        DisplayMemberBinding="{Binding RelativeSource={RelativeSource FindAncestor, 
+                                                                       AncestorType={x:Type ListViewItem}}, 
+                                                                       Converter={StaticResource IndexConverter}}" />
+                    </GridView>
                 </ListView.View>
             </ListView>
 
