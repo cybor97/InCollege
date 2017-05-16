@@ -177,8 +177,16 @@ namespace InCollege.Server
             {
                 if (wipePassword)
                     table.Rows[0]["Password"] = null;
-                var accountString = JsonConvert.SerializeObject(table, new JsonSerializerSettings() { NullValueHandling = NullValueHandling.Ignore });
-                return (true, deSerializeAccount ? (object)JsonConvert.DeserializeObject<IList<Account>>(accountString)[0] : accountString);
+                return (true, deSerializeAccount ?
+                    (object)new Account
+                    {
+                        ID = (int)(long)table.Rows[0]["ID"],
+                        AccountType = (AccountType)(int)(long)table.Rows[0]["AccountType"],
+                        Approved = ((long)table.Rows[0]["Approved"] == 1),
+                        LastAction = (DateTime)table.Rows[0]["LastAction"],
+                        Password = (string)table.Rows[0]["Password"],
+                    } :
+                    JsonConvert.SerializeObject(table, new JsonSerializerSettings() { NullValueHandling = NullValueHandling.Ignore }));
             }
             else if (table.Rows.Count > 1)
                 return (false, null);
@@ -186,12 +194,33 @@ namespace InCollege.Server
                 return (false, null);
         }
 
+        static JwtSecurityTokenHandler TokenHandler = new JwtSecurityTokenHandler();
+        static Dictionary<string, JwtSecurityToken> TokensCache = new Dictionary<string, JwtSecurityToken>();
+        const int TOKENS_CACHE_SIZE_LIMIT = 100;
+
         //TODO:Implement "expires" checking.
         public static (int id, string userName, string password) GetToken(string tokenString)
         {
             try
             {
-                JwtSecurityToken token = new JwtSecurityTokenHandler().ReadJwtToken(Cipher.Decrypt(tokenString.Replace(' ', '+'), EncryptionKey));
+                JwtSecurityToken token;
+                if (TokensCache.ContainsKey(tokenString))
+                    token = TokensCache[tokenString];
+                else
+                {
+                    token = TokenHandler.ReadJwtToken(Cipher.Decrypt(tokenString.Replace(' ', '+'), EncryptionKey));
+                    if (TokensCache.Count >= TOKENS_CACHE_SIZE_LIMIT)
+                    {
+                        string key = "";
+                        foreach (var current in TokensCache.Keys)
+                        {
+                            key = current;
+                            break;
+                        }
+                        TokensCache.Remove(key);
+                    }
+                    TokensCache.Add(tokenString, token);
+                }
 
                 int id = -1;
                 string userName = null, password = null;
