@@ -14,8 +14,8 @@ namespace InCollege.Core.Data
         public int StatementNumber { get; set; }
         public int Course { get; set; }
         public int Semester { get; set; }
-        public virtual DateTime StatementDate { get; set; }
-        public virtual string Note { get; set; }
+        public DateTime StatementDate { get; set; }
+        public string Note { get; set; }
 
         #region Display data
         [Ignore]
@@ -26,7 +26,7 @@ namespace InCollege.Core.Data
         #region Local data
         [Ignore]
         [JsonIgnore]
-        public Specialty Specialty => Group?.Specialty;
+        public Specialty Specialty{ get; set; }
 
         [Ignore]
         [JsonIgnore]
