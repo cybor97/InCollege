@@ -58,9 +58,8 @@
                 <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
 
-            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Name="CurrentPartnerContainer">
                 <TextBlock Text="{Binding FullName}"
-                       Name="CurrentPartnerTB"
                        FontSize="16"
                        FontWeight="SemiBold"
                        Background="{StaticResource MaterialDesignPaper}"
@@ -107,10 +106,10 @@
                         <ColumnDefinition/>
                         <ColumnDefinition Width="Auto"/>
                     </Grid.ColumnDefinitions>
-                    <TextBox Name="MessageTB" material:HintAssist.Hint="Сообщение"/>
+                    <TextBox Name="MessageTB" material:HintAssist.Hint="Сообщение" KeyDown="MessageTB_KeyDown"/>
                     <Button Name="SendButton" 
                             Style="{StaticResource MaterialDesignFlatAccentButton}"
-                            Content="Отправить" Margin="5 0 0 0" Grid.Column="1" Click="SendButton_Click" KeyDown="SendButton_KeyDown"/>
+                            Content="Отправить" Margin="5 0 0 0" Grid.Column="1" Click="SendButton_Click"/>
                 </Grid>
             </Grid>
         </Grid>
