@@ -82,6 +82,7 @@
               Name="GroupCB"
               DisplayMemberPath="GroupInfo"
               SelectedValue="{Binding Group}"
+              SelectionChanged="GroupCB_SelectionChanged"
               material:HintAssist.Hint="Группа"
               material:HintAssist.IsFloating="True"/>
             <Grid Grid.Row="5">
@@ -111,16 +112,75 @@
                     Foreground="Gray"
                     Margin="0 5 0 0"/>
 
-            <ListView Grid.Row="7" Margin="0 5 0 0" Name="StatementResultsLV">
-                <ListView.View>
-                    <GridView>
-                        <GridViewColumn Header="№ п/п"
+            <Grid Grid.Row="7" Background="WhiteSmoke" Name="ComplexStatementPanel" Margin="0 5 0 0" Visibility="Collapsed">
+                <StackPanel Orientation="Vertical" HorizontalAlignment="Center" VerticalAlignment="Center">
+                    <TextBlock Text="Редактирование результатов возможно только в новом окне" TextAlignment="Center"/>
+                    <Button Content="Открыть в новом окне" 
+                        Grid.Column="2"
+                        Style="{StaticResource MaterialDesignFlatAccentButton}" 
+                        VerticalAlignment="Bottom" 
+                        Click="SeparateWindowButton_Click"/>
+                </StackPanel>
+            </Grid>
+
+            <Grid Name="MiddleStatementResultsContainer" Grid.Row="7" Margin="0 5 0 0">
+                <ListView  Name="StatementResultsLV">
+                    <ListView.View>
+                        <GridView>
+                            <GridViewColumn Header="№ п/п"
                                         DisplayMemberBinding="{Binding RelativeSource={RelativeSource FindAncestor, 
                                                                        AncestorType={x:Type ListViewItem}}, 
                                                                        Converter={StaticResource IndexConverter}}" />
-                    </GridView>
-                </ListView.View>
-            </ListView>
+
+                            <GridViewColumn Header="ФИО обучающегося"
+                                        DisplayMemberBinding="{Binding StudentFullName}" />
+
+                            <GridViewColumn Header="Итоговая оценка"
+                                        DisplayMemberBinding="{Binding MarkValue}" />
+                        </GridView>
+                    </ListView.View>
+                </ListView>
+
+                <Button Grid.Row="1" 
+                Foreground="WhiteSmoke" FontSize="30" FontStretch="Medium" 
+                Style="{StaticResource MaterialDesignFloatingActionMiniAccentButton}" Content="+" 
+                HorizontalAlignment="Right" VerticalAlignment="Bottom"
+                Click="AddButton_Click"/>
+
+                <material:DialogHost Name="MiddleStatementResultDialog">
+                    <material:DialogHost.DialogContent>
+                        <StackPanel>
+                            <StackPanel Orientation="Vertical" MinWidth="300">
+                                <ComboBox material:HintAssist.Hint="Студент"
+                             Name="StudentCB"
+                             DisplayMemberPath="FullName"
+                             Text="{Binding TypeName}"
+                             material:HintAssist.IsFloating="True" 
+                             HorizontalContentAlignment="Center"
+                             Grid.Column="0"/>
+                                <TextBox material:HintAssist.Hint="Оценка"
+                             Name="MarkTB"
+                                       PreviewTextInput="MarkTB_PreviewTextInput"
+                             Text="{Binding TypeName}"
+                             material:HintAssist.IsFloating="True" 
+                             HorizontalContentAlignment="Center"
+                             Grid.Column="0"/>
+                                <Button Grid.Column="1"
+                            Click="SaveMiddleStatementButton_Click"
+                            Style="{StaticResource MaterialDesignFlatAccentButton}"
+                            Margin="0 15 0 0"
+                            Content="Сохранить"/>
+                                <Button Grid.Column="2"
+                            Foreground="Red"
+                            Click="CancelMiddleStatementButton_Click"
+                            Style="{StaticResource MaterialDesignFlatAccentButton}"
+                            Content="Отмена"/>
+                            </StackPanel>
+
+                        </StackPanel>
+                    </material:DialogHost.DialogContent>
+                </material:DialogHost>
+            </Grid>
 
             <TextBox Grid.Row="8"
              material:HintAssist.Hint="Примечание"
@@ -140,13 +200,22 @@
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition/>
                     <ColumnDefinition/>
+                    <ColumnDefinition/>
                 </Grid.ColumnDefinitions>
                 <Button Content="Отмена" 
                         Style="{StaticResource MaterialDesignFlatButton}" 
                         VerticalAlignment="Bottom" 
                         Click="CancelButton_Click"/>
-                <Button Content="Сохранить" 
+
+                <Button Content="Печать" 
                         Grid.Column="1"
+                        Style="{StaticResource MaterialDesignFlatButton}" 
+                        VerticalAlignment="Bottom" 
+                        IsEnabled="False"
+                        Click="PrintButton_Click"/>
+
+                <Button Content="Сохранить" 
+                        Grid.Column="2"
                         Style="{StaticResource MaterialDesignFlatAccentButton}" 
                         VerticalAlignment="Bottom" 
                         Click="SaveButton_Click"/>

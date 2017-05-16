@@ -6,6 +6,7 @@ using System;
 using System.Globalization;
 using InCollege.Core.Data.Base;
 using System.Windows.Controls;
+using System.Threading.Tasks;
 
 namespace InCollege.Client.UI.StatementsUI
 {
@@ -45,6 +46,17 @@ namespace InCollege.Client.UI.StatementsUI
             }
         }
 
+        public async Task UpdateStudentList()
+        {
+            if (GroupCB.SelectedItem != null)
+                StudentCB.ItemsSource = await NetworkUtils.RequestData<Account>(null, (nameof(Account.AccountType), AccountType.Student), (nameof(Account.GroupID), ((Group)GroupCB.SelectedItem).ID));
+        }
+
+        async void GroupCB_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            await UpdateStudentList();
+        }
+
         private void SaveButton_Click(object sender, RoutedEventArgs e)
         {
             OnSave?.Invoke(sender, e);
@@ -69,6 +81,46 @@ namespace InCollege.Client.UI.StatementsUI
         {
             UpdateGroupList();
         }
+
+        private void PrintButton_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void SeparateWindowButton_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void AddButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (SubjectCB.SelectedItem != null)
+            {
+                MiddleStatementResultDialog.DataContext = new MiddleStatementResult
+                {
+                    MiddleStatementID = Statement.ID,
+                    SubjectID = ((Subject)SubjectCB.SelectedItem).ID
+                };
+                MiddleStatementResultDialog.IsOpen = true;
+            }
+            else MessageBox.Show("Выберите дисциплину!");
+        }
+
+        void SaveMiddleStatementButton_Click(object sender, RoutedEventArgs e)
+        {
+            MessageBox.Show("Sorry, still unimplemented :(");
+        }
+
+        void CancelMiddleStatementButton_Click(object sender, RoutedEventArgs e)
+        {
+            MiddleStatementResultDialog.IsOpen = false;
+        }
+
+        private void MarkTB_PreviewTextInput(object sender, System.Windows.Input.TextCompositionEventArgs e)
+        {
+            e.Handled = !System.Text.RegularExpressions.Regex.IsMatch(MarkTB.Text + e.Text, "^[1-5]$");
+        }
+
     }
 
     public class IndexConverter : IValueConverter
