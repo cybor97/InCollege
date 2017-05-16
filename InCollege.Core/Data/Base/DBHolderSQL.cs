@@ -11,13 +11,16 @@ namespace InCollege.Core.Data.Base
     public static class DBHolderSQL
     {
         static SQLiteConnection DataConnection;
+
+        static string ConnectionString { get; set; }
+
         public static void Init(string filename)
         {
             //Create required tables and... at all, prepare db.
             //I hope this isn't shit-code-design.
             DBHolderORM.Init(filename);
 
-            DataConnection = new SQLiteConnection($"Data Source={filename}; Version=3;");
+            DataConnection = new SQLiteConnection(ConnectionString = $"Data Source={filename}; Version=3; PRAGMA threads = 2;");
             DataConnection.Open();
         }
 
@@ -84,9 +87,9 @@ namespace InCollege.Core.Data.Base
 
                     DataRow row;
                     bool addMode = true;
-                    if (!isLocal && (long)new SQLiteCommand($"SELECT Count() FROM {table} WHERE ID LIKE '{id}'", DataConnection).ExecuteScalar() > 0)
+                    if (!isLocal && (long)new SQLiteCommand($"SELECT Count() FROM {table} WHERE ID LIKE '{id}'") { Transaction = transaction }.ExecuteScalar() > 0)
                     {
-                        adapter.SelectCommand = new SQLiteCommand($"SELECT * FROM [{table}] WHERE ID LIKE '{id}'", DataConnection) { Transaction = transaction };
+                        adapter.SelectCommand = new SQLiteCommand($"SELECT * FROM [{table}] WHERE ID LIKE '{id}'") { Transaction = transaction };
                         data.Clear();
                         adapter.Fill(data);
                         row = data.Rows[0];
@@ -102,22 +105,39 @@ namespace InCollege.Core.Data.Base
                     row["Modified"] = false;
 
                     foreach (var current in columns)
-                        if ((current.key != "ID" || isLocal) && current.key != "IsLocal" && current.key != "Modified")
+                        if ((current.key != "ID") && current.key != "IsLocal" && current.key != "Modified")
                             if (current.value == null || !current.value.ToString().StartsWith("raw_data"))
                                 row[current.key] = current.value;
                             else row[current.key] = Convert.FromBase64String(current.value.ToString().Split(new[] { "raw_data" }, StringSplitOptions.RemoveEmptyEntries)[0]);
 
-                    adapter.SelectCommand = new SQLiteCommand($"SELECT * FROM [{table}] WHERE ID={id}", DataConnection) { Transaction = transaction };
+                    adapter.SelectCommand = new SQLiteCommand($"SELECT * FROM [{table}] WHERE ID={id}") { Transaction = transaction };
 
                     if (addMode)
                         data.Rows.Add(row);
 
-                    adapter.InsertCommand = new SQLiteCommandBuilder(adapter).GetInsertCommand(true);
-                    adapter.InsertCommand.Transaction = transaction;
-                    adapter.UpdateCommand = new SQLiteCommandBuilder(adapter).GetUpdateCommand(true);
-                    adapter.UpdateCommand.Transaction = transaction;
+                    if (addMode)
+                    {
+                        var command = new SQLiteCommand($"INSERT INTO [{table}] " +
+                            $"({string.Join(", ", columns.Select(c => c.key))}) " +
+                            $"VALUES ({string.Join(", ", columns.Select(c => $"@{c.key}"))});")
+                        {
+                            Transaction = transaction
+                        };
+                        command.Parameters.AddRange(columns.Select(c => new SQLiteParameter(c.key, row[c.key])).ToArray());
 
-                    adapter.Update(data);
+                        command.ExecuteNonQuery();
+                    }
+                    else
+                    {
+                        var command = new SQLiteCommand($"UPDATE [{table}] " +
+                            $"SET {string.Join(", ", columns.Select(c => $"{c.key} = @{c.key} "))}" +
+                            $"WHERE ID = @ID")
+                        { Transaction = transaction };
+                        command.Parameters.AddRange(columns.Select(c => new SQLiteParameter(c.key, row[c.key])).ToArray());
+
+                        command.ExecuteNonQuery();
+                    }
+
                     transaction.Commit();
                 }
             return id;
@@ -125,7 +145,31 @@ namespace InCollege.Core.Data.Base
 
         public static int Remove(string table, int id)
         {
-            return new SQLiteCommand($"DELETE FROM [{table}] WHERE ID={id}", DataConnection).ExecuteNonQuery();
+            int result = -1;
+            using (var connection = new SQLiteConnection(ConnectionString).OpenAndReturn())
+            using (var transaction = connection.BeginTransaction(IsolationLevel.Serializable))
+            {
+                result = new SQLiteCommand($"DELETE FROM [{table}] WHERE ID={id}") { Transaction = transaction }.ExecuteNonQuery();
+                transaction.Commit();
+            }
+            return result;
+        }
+
+        public static int RemoveWhere(string table, params (string name, object value)[] whereParams)
+        {
+            int result = -1;
+            using (var connection = new SQLiteConnection(ConnectionString).OpenAndReturn())
+            using (var transaction = connection.BeginTransaction(IsolationLevel.Serializable))
+            {
+                var command = new SQLiteCommand($"DELETE FROM [{table}] WHERE " +
+                    string.Join(" AND ", whereParams.Where(c => !string.IsNullOrWhiteSpace(c.name) && !string.IsNullOrWhiteSpace(c.value.ToString()))
+                    .Select(c => $"{c.name} LIKE @{c.name}")))
+                { Transaction = transaction };
+                command.Parameters.AddRange(whereParams.Select(c => new SQLiteParameter(c.name, c.value)).ToArray());
+                result = command.ExecuteNonQuery();
+                transaction.Commit();
+            }
+            return result;
         }
 
         static int GetFreeID(string table)
