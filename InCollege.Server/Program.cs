@@ -1,5 +1,6 @@
 ﻿using InCollege.Core.Data.Base;
 using System;
+using System.Threading;
 
 namespace InCollege.Server
 {
@@ -25,7 +26,7 @@ namespace InCollege.Server
             DBHolderSQL.Init(CommonVariables.DBLocation);
             Console.WriteLine($"Initializing uHttpSharp server engine(thanks Elad Zelingher and other 6 team members for uHttpSharp engine).");
             InCollegeServer.Start();
-            while (true) System.Threading.Thread.Sleep(100);
+            while (true) Thread.Sleep(1000);
         }
     }
 }
