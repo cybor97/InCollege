@@ -128,7 +128,7 @@ namespace InCollege.Client.UI.DictionariesUI
                     }
                 else if (tag == "Subject")
                     foreach (var currentTeacher in (await NetworkUtils.RequestData<Teacher>(this, (nameof(Teacher.SubjectID), current.ID))))
-                        await NetworkUtils.ExecuteDataAction<Teacher>(this, currentTeacher, DataAction.Remove);
+                        await NetworkUtils.ExecuteDataAction<Teacher>(null, currentTeacher, DataAction.Remove);
             }
 
             await UpdateData();
