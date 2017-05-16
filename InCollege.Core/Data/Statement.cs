@@ -14,7 +14,7 @@ namespace InCollege.Core.Data
         public int StatementNumber { get; set; }
         public int Course { get; set; }
         public int Semester { get; set; }
-        public DateTime StatementDate { get; set; }
+        public DateTime StatementDate { get; set; } = DateTime.Now;
         public string Note { get; set; }
 
         #region Display data
@@ -26,7 +26,7 @@ namespace InCollege.Core.Data
         #region Local data
         [Ignore]
         [JsonIgnore]
-        public Specialty Specialty{ get; set; }
+        public Specialty Specialty { get; set; }
 
         [Ignore]
         [JsonIgnore]
