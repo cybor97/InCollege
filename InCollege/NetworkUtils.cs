@@ -178,5 +178,38 @@ namespace InCollege
             return "-1";
         }
 
+        public static async Task<string> RemoveWhere<T>(IUpdatable context, params (string name, object value)[] whereParams)
+        {
+            try
+            {
+                var whereString = string.Join("&", whereParams.Select(c => $"where{c.name}=" + WebUtility.UrlEncode(((c.value is byte[]) ? Convert.ToBase64String((byte[])c.value) :
+                                        (c.value is bool) ? ((bool)c.value ? 1 : 0) :
+                                        (c.value is Enum) ? (byte)c.value :
+                                        (c.value is DateTime) ? ((DateTime)c.value).ToString(Core.CommonVariables.DateFormatString) :
+                                        c.value).ToString())));
+
+                HttpResponseMessage response;
+                if ((response = (await Client
+                      .PostAsync(ClientConfiguration.Instance.DataHandlerPath,
+                      new StringContent(
+                      $"Action=RemoveWhere&" +
+                      $"table={typeof(T).Name}&" +
+                      $"token={App.Token}" +
+                      //Not an error! Little more attension, & is  ' here
+                      (!string.IsNullOrWhiteSpace(whereString) ? $"&{whereString}" : ""))))).StatusCode == HttpStatusCode.OK)
+                {
+                    if (context != null)
+                        await context.UpdateData();
+                }
+                else
+                    MessageBox.Show(await response.Content.ReadAsStringAsync());
+                return await response.Content.ReadAsStringAsync();
+            }
+            catch (HttpRequestException exc)
+            {
+                MessageBox.Show($"Ошибка подключения к серверу. Проверьте:\n-запущен ли сервер\n-настройки брандмауэра\n-правильно ли указан адрес\nТехническая информация:\n\n{exc.Message}");
+            }
+            return "-1";
+        }
     }
 }

@@ -22,9 +22,11 @@ namespace InCollege.Server
                     var validationResult = AuthorizationHandler.VerifyToken(tokenString, false);
                     if (validationResult.valid)
                     {
-                        if ((DateTime.Now.Subtract(validationResult.account.LastAction ?? new DateTime()).TotalSeconds) > Account.OnlineTimeoutSeconds / 2)
+                        if ((DateTime.Now.Subtract(validationResult.account.LastAction ?? new DateTime()).TotalSeconds) > Account.OnlineTimeoutSeconds)
+                        {
                             validationResult.account.LastAction = DateTime.Now;
-                        DBHolderSQL.Save(nameof(Account), validationResult.account.Columns.ToArray());
+                            DBHolderSQL.Save(nameof(Account), (nameof(Account.ID), validationResult.account.ID), (nameof(Account.LastAction), validationResult.account.LastAction));
+                        }
                         if (request.Post.Parsed.TryGetByName("action", out string action))
                             context.Response = Actions[action]?.Invoke(request.Post.Parsed, validationResult.account);
                         else context.Response = new HttpResponse(HttpResponseCode.MethodNotAllowed, "Эм.. что от меня требуется???", false);
@@ -40,7 +42,8 @@ namespace InCollege.Server
         {
             { "GetRange", GetRangeProcessor },
             { "Save", SaveProcessor },
-            { "Remove", RemoveProcessor }
+            { "Remove", RemoveProcessor },
+            { "RemoveWhere", RemoveWhereProcessor}
         };
 
         //TODO:Improve data protection
@@ -143,6 +146,27 @@ namespace InCollege.Server
                         return new HttpResponse(HttpResponseCode.Ok, DBHolderSQL.Remove(table, id).ToString(), true);
                     else return new HttpResponse(HttpResponseCode.BadRequest, "Откуда удалять???", false);
                 else return new HttpResponse(HttpResponseCode.BadRequest, "Что удалять???", false);
+            else return new HttpResponse(HttpResponseCode.Forbidden, "У вас нет прав на удаление данных!", false);
+        }
+
+        static HttpResponse RemoveWhereProcessor(IHttpHeaders query, Account account)
+        {
+            if (CheckAccess(query, account, true))
+            {
+                if (query.TryGetByName("table", out string table))
+                {
+                    var whereParams = new List<(string, object)>();
+
+                    foreach (var current in query)
+                        if (current.Key.StartsWith("where"))
+                            if (!string.IsNullOrWhiteSpace(current.Key))
+                                whereParams.Add((current.Key.Split(new[] { "where" }, StringSplitOptions.RemoveEmptyEntries)[0], current.Value));
+
+                    if (whereParams.Count > 0)
+                        return new HttpResponse(HttpResponseCode.Ok, DBHolderSQL.RemoveWhere(table, whereParams.ToArray()).ToString(), true);
+                }
+                return new HttpResponse(HttpResponseCode.BadRequest, "Что удалять???", false);
+            }
             else return new HttpResponse(HttpResponseCode.Forbidden, "У вас нет прав на удаление данных!", false);
         }
 
