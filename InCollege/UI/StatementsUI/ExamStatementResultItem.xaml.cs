@@ -2,9 +2,9 @@
 
 namespace InCollege.Client.UI.StatementsUI
 {
-    public partial class ExamStatementResult : UserControl
+    public partial class ExamStatementResultItem : UserControl
     {
-        public ExamStatementResult()
+        public ExamStatementResultItem()
         {
             InitializeComponent();
         }

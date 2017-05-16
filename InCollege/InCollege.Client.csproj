@@ -124,11 +124,11 @@
     <Compile Include="UI\DictionariesUI\StudyObjectsWindow.xaml.cs">
       <DependentUpon>StudyObjectsWindow.xaml</DependentUpon>
     </Compile>
-    <Compile Include="UI\StatementsUI\ExamStatementResult.xaml.cs">
-      <DependentUpon>ExamStatementResult.xaml</DependentUpon>
+    <Compile Include="UI\StatementsUI\ExamStatementResultItem.xaml.cs">
+      <DependentUpon>ExamStatementResultItem.xaml</DependentUpon>
     </Compile>
-    <Compile Include="UI\StatementsUI\MiddleStatementResult.xaml.cs">
-      <DependentUpon>MiddleStatementResult.xaml</DependentUpon>
+    <Compile Include="UI\StatementsUI\MiddleStatementResultItem.xaml.cs">
+      <DependentUpon>MiddleStatementResultItem.xaml</DependentUpon>
     </Compile>
     <Compile Include="UI\StatementsUI\StatementAttestationTypesWindow.xaml.cs">
       <DependentUpon>StatementAttestationTypesWindow.xaml</DependentUpon>
@@ -205,11 +205,11 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="UI\StatementsUI\ExamStatementResult.xaml">
+    <Page Include="UI\StatementsUI\ExamStatementResultItem.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="UI\StatementsUI\MiddleStatementResult.xaml">
+    <Page Include="UI\StatementsUI\MiddleStatementResultItem.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
