@@ -98,9 +98,15 @@
                     </GridViewColumn>
                     <GridViewColumn Header="Номер" DisplayMemberBinding="{Binding StatementNumber}" Width="100"/>
                     <GridViewColumn Header="Дата" DisplayMemberBinding="{Binding StatementDate, StringFormat=dd\\.MM\\.yyyy}" Width="150"/>
-                    <GridViewColumn Header="Тип" Width="100" DisplayMemberBinding="{Binding StatementTypeString}"/>
+                    <GridViewColumn Header="Тип" Width="150" DisplayMemberBinding="{Binding StatementTypeString}"/>
                     <GridViewColumn Header="Семестр" Width="100" DisplayMemberBinding="{Binding Semester}"/>
-                    <GridViewColumn Header="Примечание" Width="300" DisplayMemberBinding="{Binding Note}"/>
+                    <GridViewColumn Header="Примечание" Width="300" >
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding Note}" TextTrimming="WordEllipsis" Height="16"/>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
                 </GridView>
             </ListView.View>
         </ListView>
