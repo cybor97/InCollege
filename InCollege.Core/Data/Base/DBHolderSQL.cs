@@ -14,14 +14,17 @@ namespace InCollege.Core.Data.Base
 
         static string ConnectionString { get; set; }
 
+        static SQLiteDataAdapter ReadAdapter;
+
         public static void Init(string filename)
         {
             //Create required tables and... at all, prepare db.
             //I hope this isn't shit-code-design.
             DBHolderORM.Init(filename);
 
-            DataConnection = new SQLiteConnection(ConnectionString = $"Data Source={filename}; Version=3; PRAGMA threads = 2;");
+            DataConnection = new SQLiteConnection(ConnectionString = $"Data Source={filename}; Version=3;") { Flags = SQLiteConnectionFlags.GetAllAsText };
             DataConnection.Open();
+            ReadAdapter = new SQLiteDataAdapter { AcceptChangesDuringFill = false };
         }
 
         public static DataTable GetRange(string table, string column, int skip, int count, bool fixedString, bool justCount, bool reverse, params (string name, object value)[] whereParams)
@@ -34,7 +37,7 @@ namespace InCollege.Core.Data.Base
                         $"{c.name} LIKE @{c.name}" :
                         $"instr({c.name}, @{c.name}) > 0"));
 
-            var adapter = new SQLiteDataAdapter($"SELECT " +
+            ReadAdapter.SelectCommand = new SQLiteCommand($"SELECT " +
                                   (justCount ? "count()" : $"{column} ") +
                                   $"FROM [{table}] " +
                                   (string.IsNullOrWhiteSpace(whereString) ? "" : $"WHERE {whereString} ") +
@@ -42,10 +45,12 @@ namespace InCollege.Core.Data.Base
                                   $"LIMIT {skip}, {(count == -1 ? DBHolderORM.DEFAULT_LIMIT : count)} ",
                     DataConnection);
             foreach (var current in whereParams)
-                adapter.SelectCommand.Parameters.AddWithValue($"@{current.name}", current.value);
+                ReadAdapter.SelectCommand.Parameters.AddWithValue($"@{current.name}", current.value);
 
             var result = new DataTable(table);
-            adapter.Fill(result);
+            
+            ReadAdapter.Fill(result);
+
             return result;
         }
 
@@ -76,70 +81,70 @@ namespace InCollege.Core.Data.Base
                 }
             }
 
-            lock (DataConnection)
-                using (var transaction = DataConnection.BeginTransaction(IsolationLevel.Serializable))
-                using (var adapter = new SQLiteDataAdapter($"SELECT * FROM [{table}] LIMIT 0, 1", DataConnection))
+            using (var connection = new SQLiteConnection(ConnectionString).OpenAndReturn())
+            using (var transaction = connection.BeginTransaction(IsolationLevel.Unspecified))
+            using (var adapter = new SQLiteDataAdapter($"SELECT * FROM [{table}] LIMIT 0, 1", connection))
+            {
+                var data = new DataTable(table);
+                adapter.Fill(data);
+                data.PrimaryKey = new[] { data.Columns["ID"] };
+
+
+                DataRow row;
+                bool addMode = true;
+                if (!isLocal && (long)new SQLiteCommand($"SELECT Count() FROM {table} WHERE ID LIKE '{id}'") { Transaction = transaction }.ExecuteScalar() > 0)
                 {
-                    var data = new DataTable(table);
+                    adapter.SelectCommand = new SQLiteCommand($"SELECT * FROM [{table}] WHERE ID LIKE '{id}'") { Transaction = transaction };
+                    data.Clear();
                     adapter.Fill(data);
-                    data.PrimaryKey = new[] { data.Columns["ID"] };
-
-
-                    DataRow row;
-                    bool addMode = true;
-                    if (!isLocal && (long)new SQLiteCommand($"SELECT Count() FROM {table} WHERE ID LIKE '{id}'") { Transaction = transaction }.ExecuteScalar() > 0)
-                    {
-                        adapter.SelectCommand = new SQLiteCommand($"SELECT * FROM [{table}] WHERE ID LIKE '{id}'") { Transaction = transaction };
-                        data.Clear();
-                        adapter.Fill(data);
-                        row = data.Rows[0];
-                        addMode = false;
-                    }
-                    else
-                    {
-                        row = data.NewRow();
-                        row["ID"] = id = GetFreeID(table);
-                    }
-
-                    row["IsLocal"] = false;
-                    row["Modified"] = false;
-
-                    foreach (var current in columns)
-                        if ((current.key != "ID") && current.key != "IsLocal" && current.key != "Modified")
-                            if (current.value == null || !current.value.ToString().StartsWith("raw_data"))
-                                row[current.key] = current.value;
-                            else row[current.key] = Convert.FromBase64String(current.value.ToString().Split(new[] { "raw_data" }, StringSplitOptions.RemoveEmptyEntries)[0]);
-
-                    adapter.SelectCommand = new SQLiteCommand($"SELECT * FROM [{table}] WHERE ID={id}") { Transaction = transaction };
-
-                    if (addMode)
-                        data.Rows.Add(row);
-
-                    if (addMode)
-                    {
-                        var command = new SQLiteCommand($"INSERT INTO [{table}] " +
-                            $"({string.Join(", ", columns.Select(c => c.key))}) " +
-                            $"VALUES ({string.Join(", ", columns.Select(c => $"@{c.key}"))});")
-                        {
-                            Transaction = transaction
-                        };
-                        command.Parameters.AddRange(columns.Select(c => new SQLiteParameter(c.key, row[c.key])).ToArray());
-
-                        command.ExecuteNonQuery();
-                    }
-                    else
-                    {
-                        var command = new SQLiteCommand($"UPDATE [{table}] " +
-                            $"SET {string.Join(", ", columns.Select(c => $"{c.key} = @{c.key} "))}" +
-                            $"WHERE ID = @ID")
-                        { Transaction = transaction };
-                        command.Parameters.AddRange(columns.Select(c => new SQLiteParameter(c.key, row[c.key])).ToArray());
-
-                        command.ExecuteNonQuery();
-                    }
-
-                    transaction.Commit();
+                    row = data.Rows[0];
+                    addMode = false;
                 }
+                else
+                {
+                    row = data.NewRow();
+                    row["ID"] = id = GetFreeID(table);
+                }
+
+                row["IsLocal"] = false;
+                row["Modified"] = false;
+
+                foreach (var current in columns)
+                    if ((current.key != "ID") && current.key != "IsLocal" && current.key != "Modified")
+                        if (current.value == null || !current.value.ToString().StartsWith("raw_data"))
+                            row[current.key] = current.value;
+                        else row[current.key] = Convert.FromBase64String(current.value.ToString().Split(new[] { "raw_data" }, StringSplitOptions.RemoveEmptyEntries)[0]);
+
+                adapter.SelectCommand = new SQLiteCommand($"SELECT * FROM [{table}] WHERE ID={id}") { Transaction = transaction };
+
+                if (addMode)
+                    data.Rows.Add(row);
+
+                if (addMode)
+                {
+                    var command = new SQLiteCommand($"INSERT INTO [{table}] " +
+                        $"({string.Join(", ", columns.Select(c => c.key))}) " +
+                        $"VALUES ({string.Join(", ", columns.Select(c => $"@{c.key}"))});")
+                    {
+                        Transaction = transaction
+                    };
+                    command.Parameters.AddRange(columns.Select(c => new SQLiteParameter(c.key, row[c.key])).ToArray());
+
+                    command.ExecuteNonQuery();
+                }
+                else
+                {
+                    var command = new SQLiteCommand($"UPDATE [{table}] " +
+                        $"SET {string.Join(", ", columns.Select(c => $"{c.key} = @{c.key} "))}" +
+                        $"WHERE ID = @ID")
+                    { Transaction = transaction };
+                    command.Parameters.AddRange(columns.Select(c => new SQLiteParameter(c.key, row[c.key])).ToArray());
+
+                    command.ExecuteNonQuery();
+                }
+
+                transaction.Commit();
+            }
             return id;
         }
 
