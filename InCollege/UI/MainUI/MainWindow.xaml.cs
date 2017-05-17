@@ -9,7 +9,6 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
-using System;
 using System.Linq;
 
 namespace InCollege.Client.UI.MainUI
@@ -96,12 +95,13 @@ namespace InCollege.Client.UI.MainUI
                 await UpdateData();
         }
 
-        void EditItem_Click(object sender, RoutedEventArgs e)
+        async void EditItem_Click(object sender, RoutedEventArgs e)
         {
             if (StatementsLV.SelectedItem != null)
             {
                 EditStatementDialog.AddMode = false;
                 EditStatementDialog.Statement = (Statement)StatementsLV.SelectedItem;
+                await EditStatementDialog.UpdateData();
                 EditStatementDialog.IsOpen = true;
             }
         }

@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace InCollege.Client.UI.StatementsUI
 {
-    public partial class EditStatementDialog : DialogHost
+    public partial class EditStatementDialog : DialogHost, IUpdatable
     {
         public event RoutedEventHandler OnSave;
         public event RoutedEventHandler OnCancel;
@@ -46,15 +46,20 @@ namespace InCollege.Client.UI.StatementsUI
             }
         }
 
-        public async Task UpdateStudentList()
+        public async Task UpdateData()
         {
             if (GroupCB.SelectedItem != null)
                 StudentCB.ItemsSource = await NetworkUtils.RequestData<Account>(null, (nameof(Account.AccountType), AccountType.Student), (nameof(Account.GroupID), ((Group)GroupCB.SelectedItem).ID));
+
+            var statementResultsData = await NetworkUtils.RequestData<MiddleStatementResult>(null, (nameof(MiddleStatementResult.MiddleStatementID), Statement.ID));
+            StatementResultsLV.ItemsSource = statementResultsData;
+            if (statementResultsData.Count > 0)
+                SubjectCB.IsEnabled = false;
         }
 
         async void GroupCB_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            await UpdateStudentList();
+            await UpdateData();
         }
 
         private void SaveButton_Click(object sender, RoutedEventArgs e)
@@ -99,16 +104,17 @@ namespace InCollege.Client.UI.StatementsUI
                 MiddleStatementResultDialog.DataContext = new MiddleStatementResult
                 {
                     MiddleStatementID = Statement.ID,
-                    SubjectID = ((Subject)SubjectCB.SelectedItem).ID
+                    SubjectID = ((Subject)SubjectCB.SelectedItem).ID,
                 };
                 MiddleStatementResultDialog.IsOpen = true;
             }
             else MessageBox.Show("Выберите дисциплину!");
         }
 
-        void SaveMiddleStatementButton_Click(object sender, RoutedEventArgs e)
+        async void SaveMiddleStatementButton_Click(object sender, RoutedEventArgs e)
         {
-            MessageBox.Show("Sorry, still unimplemented :(");
+            await NetworkUtils.ExecuteDataAction<MiddleStatementResult>(this, (DBRecord)MiddleStatementResultDialog.DataContext, DataAction.Save);
+            MiddleStatementResultDialog.IsOpen = false;
         }
 
         void CancelMiddleStatementButton_Click(object sender, RoutedEventArgs e)
