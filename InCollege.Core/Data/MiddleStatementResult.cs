@@ -10,7 +10,7 @@ namespace InCollege.Core.Data
         public int QualificationStatementID { get; set; }
         public int StudentID { get; set; }
         public int SubjectID { get; set; }
-        public int MarkValue { get; set; }
+        public int MarkValue { get; set; } = 2;
 
 
         [Ignore]

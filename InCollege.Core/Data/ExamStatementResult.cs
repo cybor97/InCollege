@@ -6,7 +6,7 @@ namespace InCollege.Core.Data
     {
         public int ExamStatementID { get; set; }
         public int StudentID { get; set; }
-        public int MarkValue { get; set; }
+        public int MarkValue { get; set; } = 2;
         public int TicketNumber { get; set; }
     }
 }
