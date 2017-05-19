@@ -1,6 +1,5 @@
 ﻿using InCollege.Core.Data;
 using InCollege.Core.Data.Base;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
@@ -34,7 +33,7 @@ namespace InCollege.Client.UI.DictionariesUI
                 current.Professor = professorsData.FirstOrDefault(c => c.ID == current.ProfessorID);
             SubjectTeachersLV.ItemsSource = teachersData;
 
-            ProfessorCB.ItemsSource = professorsData.Where(currentProfessor => !((List<Teacher>)SubjectTeachersLV.ItemsSource).Any(c => c.ProfessorID == currentProfessor.ID));
+            ProfessorCB.ItemsSource = professorsData.Where(currentProfessor => !teachersData.Any(c => c.ProfessorID == currentProfessor.ID));
         }
 
         void TeacherDialog_KeyDown(object sender, KeyEventArgs e)
