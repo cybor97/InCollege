@@ -18,7 +18,7 @@ namespace InCollege.Server
             if (!Working)
             {
                 Server = new HttpServer(new HttpRequestProvider());
-                
+
                 Server.Use(new TcpListenerAdapter(new TcpListener(IPAddress.Any, 80)));
                 //  Server.Use(new ListenerSslDecorator(new TcpListenerAdapter(new TcpListener(IPAddress.Any, 443)),
                 //    X509Certificate.CreateFromCertFile("")));
