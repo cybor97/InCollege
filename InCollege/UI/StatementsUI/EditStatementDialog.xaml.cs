@@ -7,6 +7,8 @@ using System.Globalization;
 using InCollege.Core.Data.Base;
 using System.Windows.Controls;
 using System.Threading.Tasks;
+using System.Linq;
+using System.Windows.Input;
 
 namespace InCollege.Client.UI.StatementsUI
 {
@@ -34,6 +36,7 @@ namespace InCollege.Client.UI.StatementsUI
                 CourseCB.Items.Add(i);
         }
 
+        #region Updaters
         public void UpdateGroupList()
         {
             if (SpecialtyCB.SelectedItem == null)
@@ -48,30 +51,53 @@ namespace InCollege.Client.UI.StatementsUI
 
         public async Task UpdateData()
         {
+
             if (GroupCB.SelectedItem != null)
-                StudentCB.ItemsSource = await NetworkUtils.RequestData<Account>(null, (nameof(Account.AccountType), AccountType.Student), (nameof(Account.GroupID), ((Group)GroupCB.SelectedItem).ID));
+            {
+                var studentsData = await NetworkUtils.RequestData<Account>(null, (nameof(Account.AccountType), AccountType.Student), (nameof(Account.GroupID), ((Group)GroupCB.SelectedItem).ID));
 
-            var statementResultsData = await NetworkUtils.RequestData<MiddleStatementResult>(null, (nameof(MiddleStatementResult.MiddleStatementID), Statement.ID));
-            StatementResultsLV.ItemsSource = statementResultsData;
-            if (statementResultsData.Count > 0)
-                SubjectCB.IsEnabled = false;
+                var statementResultsData = await NetworkUtils.RequestData<MiddleStatementResult>(null, (nameof(MiddleStatementResult.MiddleStatementID), Statement.ID));
+                foreach (var current in statementResultsData)
+                    current.Student = studentsData.FirstOrDefault(c => c.ID == current.StudentID);
+
+
+                if (GroupCB.SelectedItem != null)
+                    StudentCB.ItemsSource = studentsData.Where(currentStudent => !statementResultsData.Any(c => c.StudentID == currentStudent.ID)).ToList();
+
+                StatementResultsLV.ItemsSource = statementResultsData;
+            }
+
+            GroupCB.IsEnabled = StatementTypeCB.IsEnabled = SubjectCB.IsEnabled = SpecialtyCB.IsEnabled = StatementResultsLV.Items.Count == 0;
+            StatementResultsContainer.Visibility = SpecialtyCB.SelectedItem != null && GroupCB.SelectedItem != null && SubjectCB.SelectedItem != null ? Visibility.Visible : Visibility.Collapsed;
         }
+        #endregion
 
+        #region Selection callbacks
         async void GroupCB_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             await UpdateData();
         }
 
-        private void SaveButton_Click(object sender, RoutedEventArgs e)
+        void SpecialtyCB_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            OnSave?.Invoke(sender, e);
+            UpdateGroupList();
         }
 
-        private void CancelButton_Click(object sender, RoutedEventArgs e)
+        void StatementTypeCB_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            OnCancel?.Invoke(sender, e);
+            if (StatementTypeCB.SelectedIndex == 0)
+            {
+                MiddleStatementResultsContainer.Visibility = Visibility.Visible;
+                ComplexStatementPanel.Visibility = Visibility.Collapsed;
+            }
+            else
+            {
+                MiddleStatementResultsContainer.Visibility = Visibility.Collapsed;
+                ComplexStatementPanel.Visibility = Visibility.Visible;
+            }
         }
-
+        #endregion
+        #region Separate windows
         void CommissionMembersButton_Click(object sender, RoutedEventArgs e)
         {
             new StatementCommissionMembersWindow(Statement).ShowDialog();
@@ -82,22 +108,13 @@ namespace InCollege.Client.UI.StatementsUI
             new StatementAttestationTypesWindow(Statement).ShowDialog();
         }
 
-        void SpecialtyCB_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        void SeparateWindowButton_Click(object sender, RoutedEventArgs e)
         {
-            UpdateGroupList();
+            new StatementResultsWindow(Statement).ShowDialog();
         }
-
-        private void PrintButton_Click(object sender, RoutedEventArgs e)
-        {
-
-        }
-
-        private void SeparateWindowButton_Click(object sender, RoutedEventArgs e)
-        {
-
-        }
-
-        private void AddButton_Click(object sender, RoutedEventArgs e)
+        #endregion
+        #region Middle statement results list
+        void AddButton_Click(object sender, RoutedEventArgs e)
         {
             if (SubjectCB.SelectedItem != null)
             {
@@ -111,22 +128,75 @@ namespace InCollege.Client.UI.StatementsUI
             else MessageBox.Show("Выберите дисциплину!");
         }
 
+        void EditStatementResultItem_Click(object sender, RoutedEventArgs e)
+        {
+            if (StatementResultsLV.SelectedItem != null)
+            {
+                StudentCB.ItemsSource = new[] { ((MiddleStatementResult)StatementResultsLV.SelectedItem).Student };
+                MiddleStatementResultDialog.DataContext = StatementResultsLV.SelectedItem;
+                MiddleStatementResultDialog.IsOpen = true;
+            }
+        }
+
+        async void RemoveStatementResultItem_Click(object sender, RoutedEventArgs e)
+        {
+            foreach (var current in StatementResultsLV.SelectedItems)
+                await NetworkUtils.ExecuteDataAction<MiddleStatementResult>(null, (DBRecord)current, DataAction.Remove);
+            await UpdateData();
+        }
+
         async void SaveMiddleStatementButton_Click(object sender, RoutedEventArgs e)
         {
-            await NetworkUtils.ExecuteDataAction<MiddleStatementResult>(this, (DBRecord)MiddleStatementResultDialog.DataContext, DataAction.Save);
+            if (StudentCB.SelectedItem != null && !string.IsNullOrEmpty(MarkTB.Text))
+                await NetworkUtils.ExecuteDataAction<MiddleStatementResult>(this, (DBRecord)MiddleStatementResultDialog.DataContext, DataAction.Save);
             MiddleStatementResultDialog.IsOpen = false;
         }
 
-        void CancelMiddleStatementButton_Click(object sender, RoutedEventArgs e)
+        async void CancelMiddleStatementButton_Click(object sender, RoutedEventArgs e)
         {
             MiddleStatementResultDialog.IsOpen = false;
+            await UpdateData();
         }
-
-        private void MarkTB_PreviewTextInput(object sender, System.Windows.Input.TextCompositionEventArgs e)
+        #endregion
+        #region Text filters
+        void MarkTB_PreviewTextInput(object sender, TextCompositionEventArgs e)
         {
-            e.Handled = !System.Text.RegularExpressions.Regex.IsMatch(MarkTB.Text + e.Text, "^[1-5]$");
+            string futureText = MarkTB.Text + e.Text;
+            e.Handled = string.IsNullOrWhiteSpace(futureText) || !System.Text.RegularExpressions.Regex.IsMatch(futureText, "^[1-5]$");
         }
 
+        void StatementNumberTB_PreviewTextInput(object sender, TextCompositionEventArgs e)
+        {
+            string futureText = StatementNumberTB.Text + e.Text;
+            e.Handled = string.IsNullOrWhiteSpace(futureText) || !System.Text.RegularExpressions.Regex.IsMatch(futureText, "^\\d{1,10}$");
+        }
+
+        void StatementNumberTB_PreviewKeyDown(object sender, KeyEventArgs e)
+        {
+            e.Handled = e.Key == Key.Space;
+        }
+
+        void MarkTB_PreviewKeyDown(object sender, KeyEventArgs e)
+        {
+            e.Handled = e.Key == Key.Space;
+        }
+        #endregion
+        #region Dialog buttons
+        void SaveButton_Click(object sender, RoutedEventArgs e)
+        {
+            OnSave?.Invoke(sender, e);
+        }
+
+        private void CancelButton_Click(object sender, RoutedEventArgs e)
+        {
+            OnCancel?.Invoke(sender, e);
+        }
+
+        void PrintButton_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+        #endregion
     }
 
     public class IndexConverter : IValueConverter
@@ -134,7 +204,7 @@ namespace InCollege.Client.UI.StatementsUI
         public object Convert(object value, Type TargetType, object parameter, CultureInfo culture)
         {
             var item = (ListViewItem)value;
-            return ItemsControl.ItemsControlFromItemContainer(item).ItemContainerGenerator.IndexFromContainer(item);
+            return ItemsControl.ItemsControlFromItemContainer(item).ItemContainerGenerator.IndexFromContainer(item) + 1;
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
