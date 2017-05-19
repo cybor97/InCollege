@@ -10,6 +10,8 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Linq;
+using System;
+using System.Reflection.Emit;
 
 namespace InCollege.Client.UI.MainUI
 {
@@ -36,7 +38,7 @@ namespace InCollege.Client.UI.MainUI
             {
                 if (App.Account != null)
                     MessageBox.Show("Извините, ваша должность не подтверждена. Обратитесь к администратору.");
-                AccountExit();
+                await AccountExit();
             }
 
             //TODO:
@@ -84,9 +86,9 @@ namespace InCollege.Client.UI.MainUI
             await UpdateData();
         }
 
-        void AccountExitItem_Click(object sender, RoutedEventArgs e)
+        async void AccountExitItem_Click(object sender, RoutedEventArgs e)
         {
-            AccountExit();
+            await AccountExit();
         }
 
         async void MainWindow_KeyDown(object sender, KeyEventArgs e)
@@ -124,9 +126,10 @@ namespace InCollege.Client.UI.MainUI
             ProfileDialog.IsOpen = true;
         }
 
-        void AccountExit()
+        async Task AccountExit()
         {
             App.Token = null;
+            await NetworkUtils.Disconnect();
             Process.Start(Assembly.GetExecutingAssembly().Location);
             Process.GetCurrentProcess().Kill();
         }
@@ -140,6 +143,8 @@ namespace InCollege.Client.UI.MainUI
             statement.IsLocal = false;
             EditStatementDialog.Statement = statement;
             EditStatementDialog.AddMode = true;
+            EditStatementDialog.StatementResultsLV.ItemsSource = null;
+            await EditStatementDialog.UpdateData();
             EditStatementDialog.IsOpen = true;
         }
 
