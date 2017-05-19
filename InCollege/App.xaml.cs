@@ -44,6 +44,15 @@ namespace InCollege.Client
                 loginWindow.ShowDialog().HasValue && loginWindow.DialogResult.Value)
                 MainWindow.ShowDialog();
             else Shutdown();
+
+            try
+            {
+                NetworkUtils.Disconnect().Wait();
+            }
+            catch (AggregateException e) when (e.InnerException is HttpRequestException)
+            {
+
+            }
         }
 
         static bool ValidateToken()
