@@ -211,5 +211,81 @@ namespace InCollege
             }
             return "-1";
         }
+
+        public static async Task<int> CheckMessages(int partnerID = -1)
+        {
+            try
+            {
+                HttpResponseMessage response;
+                if ((response = (await Client
+                .PostAsync(ClientConfiguration.Instance.DataHandlerPath,
+                new StringContent(
+                $"Action=Chat&" +
+                $"token={App.Token}&" +
+                $"mode={(byte)ChatRequestMode.CheckMessages}" +
+                //Here               '
+                (partnerID != -1 ? $"&partnerID={partnerID}" : ""))))).StatusCode == HttpStatusCode.OK)
+                    return int.Parse(await response.Content.ReadAsStringAsync());
+                else
+                    MessageBox.Show(await response.Content.ReadAsStringAsync());
+            }
+            catch (HttpRequestException exc)
+            {
+                MessageBox.Show($"Ошибка подключения к серверу. Проверьте:\n-запущен ли сервер\n-настройки брандмауэра\n-правильно ли указан адрес\nТехническая информация:\n\n{exc.Message}");
+            }
+            return -1;
+        }
+
+        public static async Task<List<Message>> RequestConversation(int partnerID)
+        {
+            try
+            {
+                HttpResponseMessage response;
+                if ((response = (await Client
+                .PostAsync(ClientConfiguration.Instance.DataHandlerPath,
+                new StringContent(
+                $"Action=Chat&" +
+                $"token={App.Token}&" +
+                $"mode={(byte)ChatRequestMode.Conversation}&" +
+                $"partnerID={partnerID}")))).StatusCode == HttpStatusCode.OK)
+                    return JsonConvert.DeserializeObject<List<Message>>(await response.Content.ReadAsStringAsync(), new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore });
+                else
+                    MessageBox.Show(await response.Content.ReadAsStringAsync());
+            }
+            catch (HttpRequestException exc)
+            {
+                MessageBox.Show($"Ошибка подключения к серверу. Проверьте:\n-запущен ли сервер\n-настройки брандмауэра\n-правильно ли указан адрес\nТехническая информация:\n\n{exc.Message}");
+            }
+            return null;
+        }
+
+        public static async Task<bool> SendMessage(int partnerID, Message message)
+        {
+            try
+            {
+                HttpResponseMessage response;
+                if ((response = (await Client
+                .PostAsync(ClientConfiguration.Instance.DataHandlerPath,
+                new StringContent(
+                $"Action=Chat&" +
+                $"token={App.Token}&" +
+                $"mode={(byte)ChatRequestMode.Send}&" +
+                $"partnerID={partnerID}&" +
+                message.POSTSerializedClear)))).StatusCode == HttpStatusCode.OK)
+                    return true;
+                else
+                    MessageBox.Show(await response.Content.ReadAsStringAsync());
+            }
+            catch (HttpRequestException exc)
+            {
+                MessageBox.Show($"Ошибка подключения к серверу. Проверьте:\n-запущен ли сервер\n-настройки брандмауэра\n-правильно ли указан адрес\nТехническая информация:\n\n{exc.Message}");
+            }
+            return false;
+        }
+
+        public static async Task Disconnect()
+        {
+            await Client.PostAsync(ClientConfiguration.Instance.DataHandlerPath, new StringContent($"Action=Disconnect"));
+        }
     }
 }
