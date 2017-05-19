@@ -35,10 +35,7 @@ namespace InCollege.Client.UI.ChatUI
                 {
                     PeopleLV.IsEnabled = false;
 
-                    var messagesData = await NetworkUtils.RequestData<Message>(this, (nameof(Message.FromID), App.Account.ID),
-                                                                             (nameof(Message.ToID), Partner.ID));
-                    messagesData?.AddRange(await NetworkUtils.RequestData<Message>(this, (nameof(Message.ToID), App.Account.ID),
-                                                                                (nameof(Message.FromID), Partner.ID)));
+                    var messagesData = await NetworkUtils.RequestConversation(Partner.ID);
                     if ((messagesData?.Count ?? 0) == 0)
                     {
                         MessagesLV.Visibility = Visibility.Collapsed;
@@ -87,10 +84,10 @@ namespace InCollege.Client.UI.ChatUI
                     Message lastMessage;
                     int partnerID = Dispatcher.Invoke(() => Partner?.ID ?? -1);
 
-                    if (await NetworkUtils.GetCount<Message>(this, (nameof(Message.ToID), App.Account.ID), (nameof(Message.IsRead), false)) > 0 ||
+                    if (await NetworkUtils.CheckMessages() > 0 ||
 
                     ((lastMessage = ((IList<Message>)MessagesLV?.ItemsSource)?.LastOrDefault()) != null && lastMessage.Sender.ID == App.Account.ID && !lastMessage.IsRead &&
-                    ((await NetworkUtils.RequestData<Message>(this, (nameof(Message.FromID), App.Account.ID), (nameof(Message.ToID), partnerID)))?.LastOrDefault()?.IsRead ?? false)))
+                    ((await NetworkUtils.RequestConversation(partnerID))?.LastOrDefault()?.IsRead ?? false)))
                         await Dispatcher.Invoke(UpdateData);
 
                     bool onlineNeedsUpdate = false;
@@ -131,13 +128,13 @@ namespace InCollege.Client.UI.ChatUI
 
         async Task SendCurrentMessage()
         {
-            await NetworkUtils.ExecuteDataAction<Message>(this, new Message
+            await NetworkUtils.SendMessage(Partner.ID, new Message
             {
-                Sender = App.Account,
                 Receiver = Partner,
                 MessageDate = DateTime.Now,
                 MessageText = MessageTB.Text
-            }, DataAction.Save);
+            });
+            await UpdateData();
             MessageTB.Text = string.Empty;
         }
 

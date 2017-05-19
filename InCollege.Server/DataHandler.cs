@@ -22,7 +22,7 @@ namespace InCollege.Server
                     var validationResult = AuthorizationHandler.VerifyToken(tokenString, false);
                     if (validationResult.valid)
                     {
-                        if ((DateTime.Now.Subtract(validationResult.account.LastAction ?? new DateTime()).TotalSeconds) > Account.OnlineTimeoutSeconds)
+                        if ((DateTime.Now.Subtract(validationResult.account.LastAction ?? new DateTime()).TotalSeconds) > Account.OnlineTimeoutSeconds - 1)
                         {
                             validationResult.account.LastAction = DateTime.Now;
                             DBHolderSQL.Save(nameof(Account), (nameof(Account.ID), validationResult.account.ID), (nameof(Account.LastAction), validationResult.account.LastAction));
@@ -31,6 +31,7 @@ namespace InCollege.Server
                             context.Response = Actions[action]?.Invoke(request.Post.Parsed, validationResult.account);
                         else context.Response = new HttpResponse(HttpResponseCode.MethodNotAllowed, "Эм.. что от меня требуется???", false);
                     }
+                    else context.Response = new HttpResponse(HttpResponseCode.Forbidden, "Доступ запрещен! Ошибка разбора токена!", false);
                 }
                 else context.Response = new HttpResponse(HttpResponseCode.Forbidden, "Доступ запрещен! Нужен токен!", false);
             else context.Response = new HttpResponse(HttpResponseCode.MethodNotAllowed, "Метод недоступен!", false);
@@ -43,9 +44,69 @@ namespace InCollege.Server
             { "GetRange", GetRangeProcessor },
             { "Save", SaveProcessor },
             { "Remove", RemoveProcessor },
-            { "RemoveWhere", RemoveWhereProcessor}
+            { "RemoveWhere", RemoveWhereProcessor},
+            { "Chat", ChatProcessor },
+            { "Disconnect", DisconnectProcessor }
         };
 
+        static HttpResponse DisconnectProcessor(IHttpHeaders query, Account account)
+        {
+            return new HttpResponse(HttpResponseCode.Ok, string.Empty, false);
+        }
+
+        static HttpResponse ChatProcessor(IHttpHeaders query, Account account)
+        {
+            if (account.Approved)
+            {
+                if (query.TryGetByName("mode", out byte mode))
+                {
+                    switch (mode)
+                    {
+                        case (byte)ChatRequestMode.CheckMessages:
+
+                            (string, object)[] whereParams;
+                            if (query.TryGetByName("partnerID", out int partnerID))
+                                whereParams = new[] { (nameof(Message.FromID), (object)partnerID), (nameof(Message.ToID), account.ID), (nameof(Message.IsRead), false) };
+                            else whereParams = new[] { (nameof(Message.ToID), (object)account.ID), (nameof(Message.IsRead), false) };
+
+                            return new HttpResponse(HttpResponseCode.Ok, DBHolderSQL.GetRange(nameof(Message), null, -1, -1, true, true, false, whereParams)
+                                        .Rows?[0]?[0].ToString(), true);
+
+                        case (byte)ChatRequestMode.Conversation:
+                            if (query.TryGetByName("partnerID", out partnerID))
+                            {
+                                var range = DBHolderSQL.GetRange(nameof(Message), null, -1, -1, true, false, false,
+                                                                (nameof(Message.FromID), partnerID),
+                                                                (nameof(Message.ToID), account.ID));
+                                range.Merge(DBHolderSQL.GetRange(nameof(Message), null, -1, -1, true, false, false,
+                                                                (nameof(Message.FromID), account.ID),
+                                                                (nameof(Message.ToID), partnerID)));
+
+                                foreach (DataRow current in range.Rows)
+                                    if ((current[nameof(Message.IsRead)] == DBNull.Value || (long)current[nameof(Message.IsRead)] == 0) && (long)current[nameof(Message.FromID)] != account.ID)
+                                        DBHolderSQL.Save(nameof(Message), ("ID", current["ID"]), (nameof(Message.IsRead), 1));
+
+                                return new HttpResponse(HttpResponseCode.Ok, JsonConvert.SerializeObject(range), true);
+                            }
+                            else return new HttpResponse(HttpResponseCode.BadRequest, "Укажите partnerID!", false);
+
+                        case (byte)ChatRequestMode.Friends:
+
+                            return null;//TODO:Implement!
+
+                        case (byte)ChatRequestMode.Send:
+                            var fields = query
+                                .Where(c => c.Key != nameof(Message.FromID))
+                                .Select(c => (name: c.Key, value: (object)c.Value))
+                                .ToList();
+                            fields.Add((nameof(Message.FromID), account.ID));
+                            return new HttpResponse(HttpResponseCode.Ok, DBHolderSQL.Save(nameof(Message), fields.ToArray()).ToString(), true);
+                    }
+                }
+                return new HttpResponse(HttpResponseCode.BadRequest, "Ошибка! Режим не определен.", false);
+            }
+            else return new HttpResponse(HttpResponseCode.Forbidden, "Аккаунт не подтвержден, отправка сообщений невозможна!", false);
+        }
         //TODO:Improve data protection
         #region Here
         static HttpResponse GetRangeProcessor(IHttpHeaders query, Account account)
@@ -59,11 +120,8 @@ namespace InCollege.Server
                     bool fixedString = query.TryGetByName("fixedString", out int fixedStringResult) && fixedStringResult == 1;
                     bool justCount = query.TryGetByName("justCount", out int justCountResult) && justCountResult == 1;
                     bool reverse = query.TryGetByName("reverse", out int reverseResult) && reverseResult == 1;
-                    var whereParams = new List<(string, object)>();
-
-                    foreach (var current in query)
-                        if (current.Key.StartsWith("where"))
-                            whereParams.Add((current.Key.Split(new[] { "where" }, StringSplitOptions.RemoveEmptyEntries)[0], current.Value));
+                    var whereParams = query.Where(c => c.Key.StartsWith("where"))
+                                           .Select(c => (name: c.Key.Split(new[] { "where" }, StringSplitOptions.RemoveEmptyEntries)[0], value: (object)c.Value));
 
                     var range = DBHolderSQL.GetRange(table, column, skip, count, fixedString, justCount, reverse, whereParams.ToArray());
 
@@ -82,10 +140,7 @@ namespace InCollege.Server
                     if (table == nameof(Message) && !justCount)
                         foreach (DataRow current in range.Rows)
                             if ((current[nameof(Message.IsRead)] == DBNull.Value || (long)current[nameof(Message.IsRead)] == 0) && (long)current[nameof(Message.FromID)] != account.ID)
-                            {
-                                current[nameof(Message.IsRead)] = 1;
-                                DBHolderSQL.Save(table, current.ItemArray.Select((c, i) => (range.Columns[i].ColumnName, c)).ToArray());
-                            }
+                                DBHolderSQL.Save(table, ("ID", current["ID"]), (nameof(Message.IsRead), 1));
                     #endregion
 
                     if (!justCount)
@@ -101,16 +156,13 @@ namespace InCollege.Server
             if (CheckAccess(query, account, true))
                 if (query.TryGetByName("table", out string table))
                 {
-                    var fields = new List<(string name, object value)>();
-                    foreach (var current in query)
-                        if (current.Key.StartsWith("field"))
-                            fields.Add((current.Key.Split(new[] { "field" }, StringSplitOptions.RemoveEmptyEntries)[0], current.Value));
+                    var fields = query.Where(c => c.Key.StartsWith("field")).Select(c => (name: c.Key.Split(new[] { "field" }, StringSplitOptions.RemoveEmptyEntries)[0], value: (object)c.Value)).ToArray();
 
                     #region Special rules for accounts. Need to be optimized.
                     if (table.Equals(nameof(Account)))
                     {
                         //Empty password field means that user don't want to change password.
-                        for (int i = 0; i < fields.Count; i++)
+                        for (int i = 0; i < fields.Length; i++)
                             if (fields[i].name.Equals("Password") && string.IsNullOrWhiteSpace((string)fields[i].value))
                                 fields[i] = ("Password", account.Password);
 
@@ -118,16 +170,16 @@ namespace InCollege.Server
                         //Aand admin can do really anything with them
                         if (account.AccountType != AccountType.Admin || !account.Approved)
                         {
-                            if (account.ID != (int)fields.Find(c => c.name == "ID").value)
+                            if (account.ID != (int)fields.FirstOrDefault(c => c.name == "ID").value)
                                 return new HttpResponse(HttpResponseCode.Forbidden, "Вы не можете редактировать данные другого аккаунта!", false);
 
-                            for (int i = 0; i < fields.Count; i++)
+                            for (int i = 0; i < fields.Length; i++)
                                 if (fields[i].name.Equals("Approved")) fields[i] = ("Approved", account.Approved);
 
                             //Account shouldn't be approved after AccountType switch.
                             if (query.TryGetByName("fieldAccountType", out byte accountType) &&
                                 accountType != (byte)account.AccountType)
-                                for (int i = 0; i < fields.Count; i++)
+                                for (int i = 0; i < fields.Length; i++)
                                     if (fields[i].name.Equals("Approved")) fields[i] = ("Approved", false);
                         }
                     }
