@@ -21,6 +21,14 @@
         Admin
     }
 
+    public enum ChatRequestMode : byte
+    {
+        CheckMessages,
+        Conversation,
+        Friends,
+        Send
+    }
+
     public enum TechnicalMarkValue : sbyte
     {
         Absent = -1,
