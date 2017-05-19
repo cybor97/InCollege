@@ -32,8 +32,14 @@ namespace InCollege.Core.Data.Base
 
         public string POSTSerialized
         {
-            get => $"table={GetType().Name}&" + string.Join("&", Columns.Select(c => $"field{c.name}=" + WebUtility.UrlEncode(c.value.ToString())));
+            get => $"table={GetType().Name}&" + string.Join("&", Columns.Select(c => $"field{c.name}={WebUtility.UrlEncode(c.value.ToString())}"));
         }
+
+        public string POSTSerializedClear
+        {
+            get => $"table={GetType().Name}&" + string.Join("&", Columns.Select(c => $"{c.name}={WebUtility.UrlEncode(c.value.ToString())}"));
+        }
+
         public IEnumerable<(string name, object value)> Columns
         {
             get => GetType().GetProperties(BindingFlags.Public | BindingFlags.Instance)
