@@ -62,9 +62,18 @@ namespace InCollege.Server
                 if (rows.Count == 1)
                     return new HttpResponse(HttpResponseCode.Ok, CreateToken(int.Parse(rows[0]["ID"].ToString()), userName, password), true);
                 else if (rows.Count > 1)
+                {
+                    DBHolderSQL.Log($"[КОНФЛИКТ] Конфликт аккаунтов {userName}.",
+                        $"Попытка входа при наличии более одного аккаунта с одинаковым именем пользователя ({userName}).\n" +
+                        $"Измените имя пользователя для одного из аккаунтов.");
                     return new HttpResponse(HttpResponseCode.InternalServerError, "Ошибка! Найдено более 1 аккаунта. Обратитесь к администратору.", false);
+                }
                 else
+                {
+                    DBHolderSQL.Log($"[НЕВЕРНЫЙ ВВОД] Ошибка авторизации пользователя {userName}.",
+                                    $"Пользователь ввел неверные данные. Осторожно! Это может означать попытку взлома \"Грубой силой\"(BruteForce)");
                     return new HttpResponse(HttpResponseCode.Forbidden, "Ошибка! Пользователь с таким именем пользователя и паролем не найден.", false);
+                }
             }
             else return new HttpResponse(HttpResponseCode.Forbidden, "Укажите 'UserName' и 'Password'!", false);
         }
@@ -139,8 +148,8 @@ namespace InCollege.Server
                         subject: new ClaimsIdentity(new Claim[]
                         {
                             new Claim("ID",id.ToString(),typeof(int).Name,"InCollege_Auth","InCollege_Auth"),
-                            new Claim("UserName",userName,typeof(string).Name,"InCollege_Auth","InCollege_Auth"),
-                            new Claim("Password",password,typeof(string).Name,"InCollege_Auth","InCollege_Auth"),
+                            new Claim("UserName",userName??"_default_",typeof(string).Name,"InCollege_Auth","InCollege_Auth"),
+                            new Claim("Password",password??"_default_",typeof(string).Name,"InCollege_Auth","InCollege_Auth"),
                         }),
                         notBefore: DateTime.Now,
                         expires: DateTime.Now.AddMonths(1),
@@ -165,13 +174,13 @@ namespace InCollege.Server
         {
             var data = GetToken(tokenString);
 
-            if (data.id == -1 || string.IsNullOrWhiteSpace(data.userName) || string.IsNullOrWhiteSpace(data.password))
+            if (data.id == -1 || string.IsNullOrWhiteSpace(data.userName))
                 return (false, null);
 
             DataTable table = DBHolderSQL.GetRange("Account", null, 0, 1, true, false, false,
                 ("ID", data.id),
-                ("UserName", data.userName),
-                ("Password", data.password));
+                ("UserName", data.userName == "_default_" ? string.Empty : data.userName),
+                ("Password", data.password == "_default_" ? string.Empty : data.password));
 
             if (table.Rows.Count == 1)
             {
@@ -183,8 +192,8 @@ namespace InCollege.Server
                         ID = (int)(long)table.Rows[0]["ID"],
                         AccountType = (AccountType)(int)(long)table.Rows[0]["AccountType"],
                         Approved = ((long)table.Rows[0]["Approved"] == 1),
-                        LastAction = (DateTime)table.Rows[0]["LastAction"],
-                        Password = (string)table.Rows[0]["Password"],
+                        LastAction = table.Rows[0]["LastAction"] == DBNull.Value ? null : (DateTime?)table.Rows[0]["LastAction"],
+                        Password = table.Rows[0]["Password"] == DBNull.Value ? null : (string)table.Rows[0]["Password"],
                     } :
                     JsonConvert.SerializeObject(table, new JsonSerializerSettings() { NullValueHandling = NullValueHandling.Ignore }));
             }
@@ -210,15 +219,11 @@ namespace InCollege.Server
                 {
                     token = TokenHandler.ReadJwtToken(Cipher.Decrypt(tokenString.Replace(' ', '+'), EncryptionKey));
                     if (TokensCache.Count >= TOKENS_CACHE_SIZE_LIMIT)
-                    {
-                        string key = "";
                         foreach (var current in TokensCache.Keys)
                         {
-                            key = current;
+                            TokensCache.Remove(current);
                             break;
                         }
-                        TokensCache.Remove(key);
-                    }
                     TokensCache.Add(tokenString, token);
                 }
 

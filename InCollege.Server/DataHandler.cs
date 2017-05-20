@@ -31,7 +31,12 @@ namespace InCollege.Server
                             context.Response = Actions[action]?.Invoke(request.Post.Parsed, validationResult.account);
                         else context.Response = new HttpResponse(HttpResponseCode.MethodNotAllowed, "Эм.. что от меня требуется???", false);
                     }
-                    else context.Response = new HttpResponse(HttpResponseCode.Forbidden, "Доступ запрещен! Ошибка разбора токена!", false);
+                    else
+                    {
+                        DBHolderSQL.Log($"[ОШИБКА ДОСТУПА] Пользователь с поврежденным или подделанным токеном пытался войти в систему. Экземпляр токена предоставлен в описании.",
+                                        $"{tokenString}");
+                        context.Response = new HttpResponse(HttpResponseCode.Forbidden, "Доступ запрещен! Ошибка разбора токена!", false);
+                    }
                 }
                 else context.Response = new HttpResponse(HttpResponseCode.Forbidden, "Доступ запрещен! Нужен токен!", false);
             else context.Response = new HttpResponse(HttpResponseCode.MethodNotAllowed, "Метод недоступен!", false);
@@ -86,17 +91,16 @@ namespace InCollege.Server
                                     if ((current[nameof(Message.IsRead)] == DBNull.Value || (long)current[nameof(Message.IsRead)] == 0) && (long)current[nameof(Message.FromID)] != account.ID)
                                         DBHolderSQL.Save(nameof(Message), ("ID", current["ID"]), (nameof(Message.IsRead), 1));
 
-                                return new HttpResponse(HttpResponseCode.Ok, JsonConvert.SerializeObject(range), true);
+                                return new HttpResponse(HttpResponseCode.Ok, JsonConvert.SerializeObject(range, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore }), true);
                             }
                             else return new HttpResponse(HttpResponseCode.BadRequest, "Укажите partnerID!", false);
 
                         case (byte)ChatRequestMode.Friends:
-
-                            return null;//TODO:Implement!
+                            return new HttpResponse(HttpResponseCode.Ok, JsonConvert.SerializeObject(DBHolderSQL.GetFriends(account.ID)), true);
 
                         case (byte)ChatRequestMode.Send:
                             var fields = query
-                                .Where(c => c.Key != nameof(Message.FromID))
+                                .Where(c => c.Key != nameof(Message.FromID) && c.Key != "Action" && c.Key != "token" && c.Key != "mode" && c.Key != "partnerID" && c.Key != "table")
                                 .Select(c => (name: c.Key, value: (object)c.Value))
                                 .ToList();
                             fields.Add((nameof(Message.FromID), account.ID));
@@ -148,7 +152,13 @@ namespace InCollege.Server
                     else return new HttpResponse(HttpResponseCode.Ok, range.Rows[0][0].ToString(), true);
                 }
                 else return new HttpResponse(HttpResponseCode.BadRequest, "Ошибка! Таблица не найдена!", false);
-            else return new HttpResponse(HttpResponseCode.Forbidden, "У вас нет прав на получение данных!", false);
+            else
+            {
+                DBHolderSQL.Log($"[ОШИБКА ДОСТУПА] Пользователь с неподходящим уровнем доступа пытается получить данные.",
+                                $"ФИО:{account?.FullName}\nИмя пользователя(логин):{account?.UserName}\nТип аккаунта:{account?.AccountTypeString}\n" +
+                                $"Текст запроса:{query.ToUriData()}", account?.ID ?? -1);
+                return new HttpResponse(HttpResponseCode.Forbidden, "У вас нет прав на получение данных!", false);
+            }
         }
 
         static HttpResponse SaveProcessor(IHttpHeaders query, Account account)
@@ -187,7 +197,13 @@ namespace InCollege.Server
                     return new HttpResponse(HttpResponseCode.Ok, DBHolderSQL.Save(table, fields.ToArray()).ToString(), true);
                 }
                 else return new HttpResponse(HttpResponseCode.BadRequest, "Куда сохранять???", false);
-            else return new HttpResponse(HttpResponseCode.Forbidden, "У вас нет прав на изменение данных!", false);
+            else
+            {
+                DBHolderSQL.Log($"[ОШИБКА ДОСТУПА] Пользователь с неподходящим уровнем доступа пытается изменить данные.",
+                                $"ФИО:{account?.FullName}\nИмя пользователя(логин):{account?.UserName}\nТип аккаунта:{account?.AccountTypeString}\n" +
+                                $"Текст запроса:{query.ToUriData()}", account?.ID ?? -1);
+                return new HttpResponse(HttpResponseCode.Forbidden, "У вас нет прав на изменение данных!", false);
+            }
         }
 
         static HttpResponse RemoveProcessor(IHttpHeaders query, Account account)
@@ -198,7 +214,13 @@ namespace InCollege.Server
                         return new HttpResponse(HttpResponseCode.Ok, DBHolderSQL.Remove(table, id).ToString(), true);
                     else return new HttpResponse(HttpResponseCode.BadRequest, "Откуда удалять???", false);
                 else return new HttpResponse(HttpResponseCode.BadRequest, "Что удалять???", false);
-            else return new HttpResponse(HttpResponseCode.Forbidden, "У вас нет прав на удаление данных!", false);
+            else
+            {
+                DBHolderSQL.Log($"[ОШИБКА ДОСТУПА] Пользователь с неподходящим уровнем доступа пытается удалить данные.",
+                                $"ФИО:{account?.FullName}\nИмя пользователя(логин):{account?.UserName}\nТип аккаунта:{account?.AccountTypeString}\n" +
+                                $"Текст запроса:{query.ToUriData()}", account?.ID ?? -1);
+                return new HttpResponse(HttpResponseCode.Forbidden, "У вас нет прав на удаление данных!", false);
+            }
         }
 
         static HttpResponse RemoveWhereProcessor(IHttpHeaders query, Account account)
@@ -219,7 +241,13 @@ namespace InCollege.Server
                 }
                 return new HttpResponse(HttpResponseCode.BadRequest, "Что удалять???", false);
             }
-            else return new HttpResponse(HttpResponseCode.Forbidden, "У вас нет прав на удаление данных!", false);
+            else
+            {
+                DBHolderSQL.Log($"[ОШИБКА ДОСТУПА] Пользователь с неподходящим уровнем доступа пытается МАССОВО удалить данные.",
+                                $"ФИО:{account?.FullName}\nИмя пользователя(логин):{account?.UserName}\nТип аккаунта:{account?.AccountTypeString}\n" +
+                                $"Текст запроса:{query.ToUriData()}", account?.ID ?? -1);
+                return new HttpResponse(HttpResponseCode.Forbidden, "У вас нет прав на удаление данных!", false);
+            }
         }
 
         static bool CheckAccess(IHttpHeaders query, Account account, bool write)
