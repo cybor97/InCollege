@@ -10,7 +10,10 @@
               VerticalAlignment="Center" 
               HorizontalAlignment="Center">
             <StackPanel Orientation="Vertical" VerticalAlignment="Top">
-                <TextBox Name="FullNameTB" material:HintAssist.IsFloating="True" Text="{Binding FullName}">
+                <TextBox Name="FullNameTB"
+                         material:HintAssist.IsFloating="True" 
+                         Text="{Binding FullName}"
+                         TextChanged="FullNameTB_TextChanged">
                     <material:HintAssist.Hint>
                         <StackPanel Orientation="Horizontal" Margin="-2 0 0 0">
                             <material:PackIcon Kind="Account" />
@@ -82,6 +85,7 @@
                                 VerticalAlignment="Bottom" 
                                 Click="ProfileCancelButton_Click"/>
                 <Button Content="Сохранить" 
+                        Name="SaveButton"
                                 Grid.Column="1"
                                 Style="{StaticResource MaterialDesignFlatAccentButton}" 
                                 VerticalAlignment="Bottom" 

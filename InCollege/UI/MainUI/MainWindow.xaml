@@ -15,6 +15,25 @@
     </Window.Resources>
     <Window.ContextMenu>
         <ContextMenu Name="MainMenu" Grid.Row="0">
+            <MenuItem Name="CurrentAccountItem" Click="CurrentAccountItem_Click" HorizontalAlignment="Stretch">
+                <MenuItem.Header>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Name="CurrentAccountItemHeaderTB" VerticalAlignment="Top"/>
+                        <Button Margin="5 0 5 0" VerticalAlignment="Top" Height="Auto" Click="MessagesButton_Click">
+                            <Button.Template>
+                                <ControlTemplate TargetType="Button">
+                                    <Viewbox Width="20" Height="20" HorizontalAlignment="Right">
+                                        <Canvas Width="20" Height="20" Background="Transparent">
+                                            <Path Data="M20,4H4A2,2 0 0,0 2,6V18A2,2 0 0,0 4,20H20A2,2 0 0,0 22,18V6A2,2 0 0,0 20,4M20,18H4V8L12,13L20,8V18M20,6L12,11L4,6V6H20V6Z" 
+                                                  Fill="Black" />
+                                        </Canvas>
+                                    </Viewbox>
+                                </ControlTemplate>
+                            </Button.Template>
+                        </Button>
+                    </StackPanel>
+                </MenuItem.Header>
+            </MenuItem>
             <MenuItem Header="Файл">
                 <MenuItem Header="Экспорт" IsEnabled="False"/>
                 <MenuItem Header="Импорт" IsEnabled="False"/>
@@ -33,28 +52,9 @@
                 <MenuItem Header="Дисциплины" Click="DictionariesItem_Click"/>
             </MenuItem>
             <MenuItem Header="Учетные записи" >
-                <MenuItem Name="CurrentAccountItem" Click="CurrentAccountItem_Click">
-                    <MenuItem.Header>
-                        <StackPanel Orientation="Horizontal">
-                            <TextBlock Name="CurrentAccountItemHeaderTB" VerticalAlignment="Top"/>
-                            <Button Margin="5 0 5 0" VerticalAlignment="Top" Height="Auto" Click="MessagesButton_Click">
-                                <Button.Template>
-                                    <ControlTemplate TargetType="Button">
-                                        <Viewbox Width="20" Height="20">
-                                            <Canvas Width="20" Height="20" Background="Transparent">
-                                                <Path Data="M20,4H4A2,2 0 0,0 2,6V18A2,2 0 0,0 4,20H20A2,2 0 0,0 22,18V6A2,2 0 0,0 20,4M20,18H4V8L12,13L20,8V18M20,6L12,11L4,6V6H20V6Z" 
-                                                  Fill="Black" />
-                                            </Canvas>
-                                        </Viewbox>
-                                    </ControlTemplate>
-                                </Button.Template>
-                            </Button>
-                        </StackPanel>
-                    </MenuItem.Header>
-                </MenuItem>
                 <MenuItem Header="Студенты" Click="ParticipantsItem_Click"/>
-                <MenuItem Header="Заведующие отделениями" Click="ParticipantsItem_Click"/>
                 <MenuItem Header="Преподаватели" Click="ParticipantsItem_Click"/>
+                <MenuItem Header="Заведующие отделениями" Click="ParticipantsItem_Click"/>
                 <MenuItem Header="Администраторы" Click="ParticipantsItem_Click"/>
                 <MenuItem Header="Не назначенные" Click="ParticipantsItem_Click"/>
             </MenuItem>

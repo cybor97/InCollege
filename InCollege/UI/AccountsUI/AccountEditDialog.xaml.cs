@@ -1,8 +1,10 @@
 ﻿using InCollege.Core.Data;
 using InCollege.Core.Data.Base;
 using MaterialDesignThemes.Wpf;
+using System;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Data;
 
 namespace InCollege.Client.UI.AccountsUI
 {
@@ -81,6 +83,17 @@ namespace InCollege.Client.UI.AccountsUI
         void ProfileCancelButton_Click(object sender, RoutedEventArgs e)
         {
             RaiseEvent(new RoutedEventArgs(OnCancelEvent));
+        }
+
+        void FullNameTB_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            if (Account.IsLocal)
+            {
+                Account.UserName = string.IsNullOrWhiteSpace(FullNameTB.Text) ?
+                                   string.Empty :
+                                   FullNameTB.Text.Split(new[] { " " }, StringSplitOptions.RemoveEmptyEntries)[0];
+                BindingOperations.GetBindingExpression(UserNameTB, TextBox.TextProperty).UpdateTarget();
+            }
         }
     }
 }

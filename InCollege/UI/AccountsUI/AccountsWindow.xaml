@@ -5,6 +5,7 @@
         xmlns:dragablz="http://dragablz.net/winfx/xaml/dragablz"
         xmlns:accountsui="clr-namespace:InCollege.Client.UI.AccountsUI"
         Title="Учетные записи" Height="500" Width="650"
+        KeyDown="AccountsWindow_KeyDown"
         Loaded="ParticipantsWindow_Loaded">
     <Grid>
         <Grid>
@@ -64,6 +65,7 @@
                 HorizontalAlignment="Right" VerticalAlignment="Bottom"/>
 
         <accountsui:AccountEditDialog x:Name="ProfileDialog"
+                                      KeyDown="ProfileDialog_KeyDown"
                                            OnSave="ProfileDialog_OnSave"
                                            OnCancel="ProfileDialog_OnCancel"/>
     </Grid>

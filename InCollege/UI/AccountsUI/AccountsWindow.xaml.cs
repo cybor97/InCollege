@@ -6,6 +6,7 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 
 namespace InCollege.Client.UI.AccountsUI
 {
@@ -109,6 +110,38 @@ namespace InCollege.Client.UI.AccountsUI
             }
 
             await NetworkUtils.ExecuteDataAction<Account>(this, account, DataAction.Save);
+        }
+
+        private void ProfileDialog_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (ProfileDialog.IsOpen)
+                if (e.Key == Key.Enter)
+                {
+                    ProfileDialog.FullNameTB.Focus();
+                    ProfileDialog.MoveFocus(new TraversalRequest(FocusNavigationDirection.Next));
+                    ProfileDialog_OnSave(null, null);
+                }
+                else if (e.Key == Key.Escape)
+                    ProfileDialog_OnCancel(null, null);
+        }
+
+        private async void AccountsWindow_KeyDown(object sender, KeyEventArgs e)
+        {
+            switch (e.Key)
+            {
+                case Key.Add:
+                case Key.OemPlus:
+                    AddButton_Click(null, null);
+                    break;
+                case Key.Subtract:
+                case Key.OemMinus:
+                case Key.Delete:
+                    RemoveItem_Click(null, null);
+                    break;
+                case Key.F5:
+                    await UpdateData();
+                    break;
+            }
         }
     }
 }

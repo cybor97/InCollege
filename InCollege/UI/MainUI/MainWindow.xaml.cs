@@ -10,8 +10,6 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Linq;
-using System;
-using System.Reflection.Emit;
 
 namespace InCollege.Client.UI.MainUI
 {
@@ -75,14 +73,14 @@ namespace InCollege.Client.UI.MainUI
         async void DictionariesItem_Click(object sender, RoutedEventArgs e)
         {
             int itemIndex = ((MenuItem)(((MenuItem)sender).Parent)).Items.IndexOf(sender);
-            if (itemIndex == 0) new DictionariesWindow().ShowDialog();
+            if (itemIndex == 0) new AttestationTypesWindow().ShowDialog();
             else new StudyObjectsWindow(itemIndex - 1).ShowDialog();
             await UpdateData();
         }
 
         async void ParticipantsItem_Click(object sender, RoutedEventArgs e)
         {
-            new AccountsWindow((AccountType)((MenuItem)(((MenuItem)sender).Parent)).Items.IndexOf(sender)).ShowDialog();
+            new AccountsWindow((AccountType)(((MenuItem)(((MenuItem)sender).Parent)).Items.IndexOf(sender) + 1)).ShowDialog();
             await UpdateData();
         }
 
@@ -185,11 +183,7 @@ namespace InCollege.Client.UI.MainUI
             await NetworkUtils.ExecuteDataAction<Statement>(null, statement, DataAction.Remove);
             await NetworkUtils.RemoveWhere<StatementAttestationType>(null, (nameof(StatementAttestationType.StatementID), statement.ID));
             await NetworkUtils.RemoveWhere<CommissionMember>(null, (nameof(CommissionMember.StatementID), statement.ID));
-
-            await NetworkUtils.RemoveWhere<MiddleStatementResult>(null, (nameof(MiddleStatementResult.MiddleStatementID), statement.ID));
-            await NetworkUtils.RemoveWhere<MiddleStatementResult>(null, (nameof(MiddleStatementResult.QualificationStatementID), statement.ID));
-
-            await NetworkUtils.RemoveWhere<ExamStatementResult>(null, (nameof(ExamStatementResult.ExamStatementID), statement.ID));
+            await NetworkUtils.RemoveWhere<StatementResult>(null, (nameof(StatementResult.StatementID), statement.ID));
         }
     }
 }
