@@ -56,7 +56,7 @@ namespace InCollege.Client.UI.StatementsUI
             {
                 var studentsData = await NetworkUtils.RequestData<Account>(null, (nameof(Account.AccountType), AccountType.Student), (nameof(Account.GroupID), ((Group)GroupCB.SelectedItem).ID));
 
-                var statementResultsData = await NetworkUtils.RequestData<MiddleStatementResult>(null, (nameof(MiddleStatementResult.MiddleStatementID), Statement.ID));
+                var statementResultsData = await NetworkUtils.RequestData<StatementResult>(null, (nameof(StatementResult.StatementID), Statement.ID));
                 foreach (var current in statementResultsData)
                     current.Student = studentsData.FirstOrDefault(c => c.ID == current.StudentID);
 
@@ -118,9 +118,9 @@ namespace InCollege.Client.UI.StatementsUI
         {
             if (SubjectCB.SelectedItem != null)
             {
-                MiddleStatementResultDialog.DataContext = new MiddleStatementResult
+                MiddleStatementResultDialog.DataContext = new StatementResult
                 {
-                    MiddleStatementID = Statement.ID,
+                    StatementID = Statement.ID,
                     SubjectID = ((Subject)SubjectCB.SelectedItem).ID,
                 };
                 MiddleStatementResultDialog.IsOpen = true;
@@ -132,7 +132,7 @@ namespace InCollege.Client.UI.StatementsUI
         {
             if (StatementResultsLV.SelectedItem != null)
             {
-                StudentCB.ItemsSource = new[] { ((MiddleStatementResult)StatementResultsLV.SelectedItem).Student };
+                StudentCB.ItemsSource = new[] { ((StatementResult)StatementResultsLV.SelectedItem).Student };
                 MiddleStatementResultDialog.DataContext = StatementResultsLV.SelectedItem;
                 MiddleStatementResultDialog.IsOpen = true;
             }
@@ -141,14 +141,14 @@ namespace InCollege.Client.UI.StatementsUI
         async void RemoveStatementResultItem_Click(object sender, RoutedEventArgs e)
         {
             foreach (var current in StatementResultsLV.SelectedItems)
-                await NetworkUtils.ExecuteDataAction<MiddleStatementResult>(null, (DBRecord)current, DataAction.Remove);
+                await NetworkUtils.ExecuteDataAction<StatementResult>(null, (DBRecord)current, DataAction.Remove);
             await UpdateData();
         }
 
         async void SaveMiddleStatementButton_Click(object sender, RoutedEventArgs e)
         {
             if (StudentCB.SelectedItem != null && !string.IsNullOrEmpty(MarkTB.Text))
-                await NetworkUtils.ExecuteDataAction<MiddleStatementResult>(this, (DBRecord)MiddleStatementResultDialog.DataContext, DataAction.Save);
+                await NetworkUtils.ExecuteDataAction<StatementResult>(this, (DBRecord)MiddleStatementResultDialog.DataContext, DataAction.Save);
             MiddleStatementResultDialog.IsOpen = false;
         }
 
