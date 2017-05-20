@@ -259,6 +259,28 @@ namespace InCollege
             return null;
         }
 
+        public static async Task<List<Account>> RequestFriendList()
+        {
+            try
+            {
+                HttpResponseMessage response;
+                if ((response = (await Client
+                .PostAsync(ClientConfiguration.Instance.DataHandlerPath,
+                new StringContent(
+                $"Action=Chat&" +
+                $"token={App.Token}&" +
+                $"mode={(byte)ChatRequestMode.Friends}")))).StatusCode == HttpStatusCode.OK)
+                    return JsonConvert.DeserializeObject<List<Account>>(await response.Content.ReadAsStringAsync(), new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore });
+                else
+                    MessageBox.Show(await response.Content.ReadAsStringAsync());
+            }
+            catch (HttpRequestException exc)
+            {
+                MessageBox.Show($"Ошибка подключения к серверу. Проверьте:\n-запущен ли сервер\n-настройки брандмауэра\n-правильно ли указан адрес\nТехническая информация:\n\n{exc.Message}");
+            }
+            return null;
+        }
+
         public static async Task<bool> SendMessage(int partnerID, Message message)
         {
             try

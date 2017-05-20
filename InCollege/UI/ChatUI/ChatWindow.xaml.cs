@@ -23,7 +23,7 @@ namespace InCollege.Client.UI.ChatUI
 
         public async Task UpdateAccounts()
         {
-            PeopleLV.ItemsSource = (await NetworkUtils.RequestData<Account>(this)).Where(c => c.ID != App.Account.ID);
+            PeopleLV.ItemsSource = (await NetworkUtils.RequestFriendList());
             PoolOnline.Clear();
         }
 
@@ -128,14 +128,17 @@ namespace InCollege.Client.UI.ChatUI
 
         async Task SendCurrentMessage()
         {
-            await NetworkUtils.SendMessage(Partner.ID, new Message
+            if (!string.IsNullOrWhiteSpace(MessageTB.Text))
             {
-                Receiver = Partner,
-                MessageDate = DateTime.Now,
-                MessageText = MessageTB.Text
-            });
-            await UpdateData();
-            MessageTB.Text = string.Empty;
+                await NetworkUtils.SendMessage(Partner.ID, new Message
+                {
+                    Receiver = Partner,
+                    MessageDate = DateTime.Now,
+                    MessageText = MessageTB.Text
+                });
+                await UpdateData();
+                MessageTB.Text = string.Empty;
+            }
         }
 
         async void PeopleLV_SelectionChanged(object sender, SelectionChangedEventArgs e)
