@@ -32,6 +32,8 @@
     public enum TechnicalMarkValue : sbyte
     {
         Absent = -1,
-
+        Passed = -2,
+        Unpassed = -3,
+        Blank = -4
     }
 }
