@@ -26,11 +26,10 @@ namespace InCollege.Core.Data.Base
                     typeof(AttestationType),
                     typeof(ConfigurationParameter),
                     typeof(Department),
-                    typeof(ExamStatementResult),
                     typeof(Group),
                     typeof(Log),
                     typeof(Message),
-                    typeof(MiddleStatementResult),
+                    typeof(StatementResult),
                     typeof(CommissionMember),
                     typeof(Specialty),
                     typeof(Statement),
@@ -58,12 +57,12 @@ namespace InCollege.Core.Data.Base
             return DataConnection.Query<T>(string.Format("SELECT * FROM {0} LIMIT {1}, {2}", typeof(T).Name, skip, count));
         }
 
-        public static void Save(AttestationType record)
+        public static void Save(DBRecord record)
         {
             DataConnection.InsertOrReplace(record);
         }
 
-        public static void Remove(AttestationType record)
+        public static void Remove(DBRecord record)
         {
             DataConnection.Delete(record);
         }

@@ -59,11 +59,10 @@
     <Compile Include="Data\CommissionMember.cs" />
     <Compile Include="Data\Configuration.cs" />
     <Compile Include="Data\Department.cs" />
-    <Compile Include="Data\ExamStatementResult.cs" />
     <Compile Include="Data\Group.cs" />
     <Compile Include="Data\Log.cs" />
     <Compile Include="Data\Message.cs" />
-    <Compile Include="Data\MiddleStatementResult.cs" />
+    <Compile Include="Data\StatementResult.cs" />
     <Compile Include="Data\Specialty.cs" />
     <Compile Include="Data\Statement.cs" />
     <Compile Include="Data\StatementAttestationType.cs" />
