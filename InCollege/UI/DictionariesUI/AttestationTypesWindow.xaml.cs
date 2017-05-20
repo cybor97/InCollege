@@ -6,9 +6,9 @@ using System.Windows.Input;
 
 namespace InCollege.Client.UI.DictionariesUI
 {
-    public partial class DictionariesWindow : Window, IUpdatable
+    public partial class AttestationTypesWindow : Window, IUpdatable
     {
-        public DictionariesWindow()
+        public AttestationTypesWindow()
         {
             InitializeComponent();
         }
@@ -36,7 +36,8 @@ namespace InCollege.Client.UI.DictionariesUI
 
         private async void SaveButton_Click(object sender, RoutedEventArgs e)
         {
-            await NetworkUtils.ExecuteDataAction<AttestationType>(this, (DBRecord)AttestationTypeDialog.DataContext, DataAction.Save);
+            if (!string.IsNullOrWhiteSpace(TypeNameTB.Text))
+                await NetworkUtils.ExecuteDataAction<AttestationType>(this, (DBRecord)AttestationTypeDialog.DataContext, DataAction.Save);
             AttestationTypeDialog.IsOpen = false;
         }
 
@@ -60,10 +61,14 @@ namespace InCollege.Client.UI.DictionariesUI
 
         private void AttestationTypeDialog_KeyDown(object sender, KeyEventArgs e)
         {
-            if (e.Key == Key.Enter)
-                SaveButton_Click(null, null);
-            else if (e.Key == Key.Escape)
-                CancelButton_Click(null, null);
+            if (AttestationTypeDialog.IsOpen)
+                if (e.Key == Key.Enter)
+                {
+                    TypeNameTB.MoveFocus(new TraversalRequest(FocusNavigationDirection.Next));
+                    SaveButton_Click(null, null);
+                }
+                else if (e.Key == Key.Escape)
+                    CancelButton_Click(null, null);
         }
 
         private async void DictionariesWindow_KeyDown(object sender, KeyEventArgs e)
