@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.26403.7
+VisualStudioVersion = 15.0.26430.6
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InCollege.Client", "InCollege\InCollege.Client.csproj", "{379036D8-95D5-41D3-B930-A8C9F3D40F55}"
 EndProject
@@ -10,6 +10,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InCollege.Server", "InCollege.Server\InCollege.Server.csproj", "{A9BAC3FA-E5CC-408B-BF59-0880747617DA}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InCollege.Installer", "InCollege.Installer\InCollege.Installer.csproj", "{FC307E61-696E-4790-80BA-49EA6B229912}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InCollege.ClientTests", "InCollege.ClientTests\InCollege.ClientTests.csproj", "{81C42750-C359-4A63-92E4-EDA4DF4F2125}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -33,6 +35,10 @@ Global
 		{FC307E61-696E-4790-80BA-49EA6B229912}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FC307E61-696E-4790-80BA-49EA6B229912}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FC307E61-696E-4790-80BA-49EA6B229912}.Release|Any CPU.Build.0 = Release|Any CPU
+		{81C42750-C359-4A63-92E4-EDA4DF4F2125}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{81C42750-C359-4A63-92E4-EDA4DF4F2125}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{81C42750-C359-4A63-92E4-EDA4DF4F2125}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{81C42750-C359-4A63-92E4-EDA4DF4F2125}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
