@@ -1,5 +1,8 @@
-﻿using InCollege.Core.Data.Base;
+﻿using InCollege.Core.Data;
+using InCollege.Core.Data.Base;
 using System;
+using System.IO;
+using System.Linq;
 using System.Threading;
 
 namespace InCollege.Server
@@ -19,9 +22,20 @@ namespace InCollege.Server
             Console.WriteLine("Welcome to InCollege.Server! Don't hesitate, open http://localhost/ to see what we got!");
             Console.WriteLine("Made by [CYBOR] = Muhametshin R.A.");
 
-            Console.WriteLine($"Initializing SQLite DB(thanks Frank A. Krueger and other 53 team members for sqlite-net engine) in \n{CommonVariables.DBLocation}\n");
+            Console.WriteLine($"Initializing SQLite DB(thanks Frank A. Krueger and other 53 team members for sqlite-net engine) in \n{CommonVariables.DBLocation}...\n");
+            bool createAdmin = !File.Exists(CommonVariables.DBLocation);
+
             DBHolderSQL.Init(CommonVariables.DBLocation);
-            Console.WriteLine($"Initializing uHttpSharp server engine(thanks Elad Zelingher and other 6 team members for uHttpSharp engine).");
+            if (createAdmin)
+                DBHolderSQL.Save(nameof(Account), new Account
+                {
+                    FullName = "Администратор",
+                    UserName = "Admin",
+                    AccountType = AccountType.Admin,
+                    Approved = true
+                }.Columns.ToArray());
+
+            Console.WriteLine($"Initializing uHttpSharp server engine(thanks Elad Zelingher and other 6 team members for uHttpSharp engine)...");
             InCollegeServer.Start();
 
             while (true) Thread.Sleep(1000);
