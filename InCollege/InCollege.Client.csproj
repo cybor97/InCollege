@@ -136,10 +136,14 @@
     <Compile Include="UI\StatementsUI\StatementResultsWindow.xaml.cs">
       <DependentUpon>StatementResultsWindow.xaml</DependentUpon>
     </Compile>
+    <Compile Include="UI\Util\Generators\TotalStatementViewModelGenerator.cs" />
+    <Compile Include="UI\Util\Generators\StatementViewModelTypeBuilder.cs" />
+    <Compile Include="UI\Util\Generators\StatementViewModelGeneratorFactory.cs" />
     <Compile Include="UI\Util\GridViewSort.cs" />
     <Compile Include="UI\Util\ImageToSourceConverter.cs" />
     <Compile Include="NetworkUtils.cs" />
     <Compile Include="UI\Util\UIUtils.cs" />
+    <Compile Include="UI\Util\Generators\ComplexStatementViewModelGenerator.cs" />
     <Page Include="UI\AccountsUI\AccountEditDialog.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -156,7 +160,7 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="UI\DictionariesUI\DictionariesWindow.xaml">
+    <Page Include="UI\DictionariesUI\AttestationTypesWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -184,8 +188,8 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="UI\DictionariesUI\DictionariesWindow.xaml.cs">
-      <DependentUpon>DictionariesWindow.xaml</DependentUpon>
+    <Compile Include="UI\DictionariesUI\AttestationTypesWindow.xaml.cs">
+      <DependentUpon>AttestationTypesWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="UI\AccountsUI\AuthorizationWindow.xaml.cs">
       <DependentUpon>AuthorizationWindow.xaml</DependentUpon>
