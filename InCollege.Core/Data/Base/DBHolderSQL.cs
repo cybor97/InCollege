@@ -22,9 +22,29 @@ namespace InCollege.Core.Data.Base
             //I hope this isn't shit-code-design.
             DBHolderORM.Init(filename);
 
-            DataConnection = new SQLiteConnection(ConnectionString = $"Data Source={filename}; Version=3;") { Flags = SQLiteConnectionFlags.GetAllAsText };
+            ConnectionString =
+                new SQLiteConnectionStringBuilder(string.Empty)
+                {
+                    DataSource = filename,
+                    Version = 3,
+                    JournalMode = SQLiteJournalModeEnum.Wal,
+                }.ConnectionString;
+
+            DataConnection = new SQLiteConnection(ConnectionString) { Flags = SQLiteConnectionFlags.GetAllAsText };
             DataConnection.Open();
             ReadAdapter = new SQLiteDataAdapter { AcceptChangesDuringFill = false };
+        }
+
+        public static DataTable GetFriends(int accountID)
+        {
+            ReadAdapter.SelectCommand = new SQLiteCommand("SELECT DISTINCT Account.FullName, Account.ID " +
+                "FROM Message " +
+                "LEFT JOIN Account ON Account.ID = Message.FromID OR Account.ID = Message.ToID " +
+                "WHERE (Message.FromID=@accountID OR Message.ToID=@accountID) AND Account.ID<>@accountID;", DataConnection);
+            ReadAdapter.SelectCommand.Parameters.AddWithValue("@accountID", accountID);
+            var table = new DataTable();
+            ReadAdapter.Fill(table);
+            return table;
         }
 
         public static DataTable GetRange(string table, string column, int skip, int count, bool fixedString, bool justCount, bool reverse, params (string name, object value)[] whereParams)
@@ -32,7 +52,7 @@ namespace InCollege.Core.Data.Base
             column = string.IsNullOrWhiteSpace(column) ? "*" : $"[{column}]";
 
             string whereString = string.Join(" AND ", whereParams
-                .Where(c => !string.IsNullOrWhiteSpace(c.name) && !string.IsNullOrWhiteSpace(c.value.ToString()))
+                .Where(c => !string.IsNullOrWhiteSpace(c.name) && !string.IsNullOrWhiteSpace(c.value?.ToString()))
                 .Select(c => !(c.value is string) || fixedString ?
                         $"{c.name} LIKE @{c.name}" :
                         $"instr({c.name}, @{c.name}) > 0"));
@@ -48,7 +68,7 @@ namespace InCollege.Core.Data.Base
                 ReadAdapter.SelectCommand.Parameters.AddWithValue($"@{current.name}", current.value);
 
             var result = new DataTable(table);
-            
+
             ReadAdapter.Fill(result);
 
             return result;
@@ -60,6 +80,18 @@ namespace InCollege.Core.Data.Base
             var adapter = new SQLiteDataAdapter($"SELECT * FROM [{table}] WHERE ID={id}", DataConnection);
             adapter.Fill(result);
             return result.Rows.Count > 0 ? result.Rows[0] : null;
+        }
+
+
+        public static void Log(string message, string description, int accountID = -1)
+        {
+            Save(nameof(Log), new Log
+            {
+                AccountID = accountID,
+                Message = message,
+                Description = description,
+                LogDate = DateTime.Now,
+            }.Columns.ToArray());
         }
 
         public static long Save(string table, params (string key, object value)[] columns)
