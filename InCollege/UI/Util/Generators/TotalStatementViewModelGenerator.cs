@@ -11,7 +11,7 @@ namespace InCollege.Client.UI.Util.Generators
             throw new NotImplementedException();
         }
 
-        public override IList<object> GetResults(IEnumerable<string> columns, IEnumerable<StatementResult> results)
+        public override IList<StatementResultViewModel> GetResults(IEnumerable<string> columns, IEnumerable<StatementResult> results)
         {
             throw new NotImplementedException();
         }

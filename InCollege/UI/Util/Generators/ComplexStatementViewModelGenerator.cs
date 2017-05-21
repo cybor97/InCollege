@@ -12,8 +12,7 @@ namespace InCollege.Client.UI.Util.Generators
         {
             var result = new List<(string name, string uiName)>
             {
-                ("studentID", ""),
-                ("fullName", "ФИО обучающегося")
+                ("StudentFullName", "ФИО обучающегося")
             };
 
             result.AddRange(data.Distinct(new DistinctBySubject()).Select(c => (name: $"subject{c.SubjectID}", uiName: c.SubjectIndex)));
@@ -21,19 +20,19 @@ namespace InCollege.Client.UI.Util.Generators
             return result;
         }
 
-        public override IList<object> GetResults(IEnumerable<string> columns, IEnumerable<StatementResult> statementResults)
+        public override IList<StatementResultViewModel> GetResults(IEnumerable<string> columns, IEnumerable<StatementResult> statementResults)
         {
-            var type = StatementViewModelTypeBuilder.BuildTypeForFields(columns);
-            var result = new List<object>();
+            var type = StatementViewModelTypeBuilder.BuildTypeForFields(columns.Where(c => c != "StudentFullName"));
+            var result = new List<StatementResultViewModel>();
             var distinctor = new DistinctByStudent();// :D
 
             if (statementResults != null)
             {
                 foreach (var current in statementResults.Distinct(distinctor))
                 {
-                    var obj = Activator.CreateInstance(type);
-                    type.GetProperty("studentID").SetValue(obj, current.StudentID.ToString());
-                    type.GetProperty("fullName").SetValue(obj, current.StudentFullName);
+                    var obj = (StatementResultViewModel)Activator.CreateInstance(type);
+                    obj.StudentID = current.StudentID;
+                    obj.StudentFullName = current.StudentFullName;
                     result.Add(obj);
                 }
 
@@ -42,9 +41,7 @@ namespace InCollege.Client.UI.Util.Generators
                     foreach (var currentColumn in columns.Where(c => c.StartsWith("subject")))
                         if (currentResult.SubjectID.ToString() == currentColumn.Split(new[] { "subject" }, StringSplitOptions.RemoveEmptyEntries)[0])
                             type.GetProperty(currentColumn)
-                                .SetValue(result.First(c => (string)type.GetProperty("studentID")
-                                                                       .GetValue(c) == currentResult.StudentID.ToString()),
-                                                            currentResult.MarkValueString);
+                                .SetValue(result.First(c => c.StudentID == currentResult.StudentID), currentResult.MarkValueString);
             }
             return result;
         }

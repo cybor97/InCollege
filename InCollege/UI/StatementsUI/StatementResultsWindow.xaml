@@ -6,11 +6,15 @@
         Loaded="StatementResultsWindow_Loaded"
         Height="500" Width="1000">
     <Grid>
-        <ListView Name="ContentLV">
+        <ListView Name="ContentLV" SelectionMode="Single">
+            <ListView.ContextMenu>
+                <ContextMenu>
+                    <MenuItem Header="Редактировать"  Name="EditStatementResultItem" MouseEnter="EditStatementResultItem_MouseEnter"/>
+                    <MenuItem Header="Удалить" Name="RemoveStatementResultItem" MouseEnter="RemoveStatementResultItem_MouseEnter"/>
+                </ContextMenu>
+            </ListView.ContextMenu>
             <ListView.View>
-                <GridView>
-
-                </GridView>
+                <GridView x:Name="ContentGridView"/>
             </ListView.View>
         </ListView>
 
@@ -20,35 +24,42 @@
                         HorizontalAlignment="Right" VerticalAlignment="Bottom"
                         Click="AddButton_Click"/>
 
-        <material:DialogHost Name="MiddleStatementResultDialog">
+        <material:DialogHost Name="StatementResultDialog">
             <material:DialogHost.DialogContent>
                 <StackPanel>
                     <StackPanel Orientation="Vertical" MinWidth="300">
+                        <ComboBox material:HintAssist.Hint="Дисциплина"
+                                  Name="SubjectCB"
+                                  DisplayMemberPath="SubjectName"
+                                  SelectedItem="{Binding Subject}"
+                                  material:HintAssist.IsFloating="True" 
+                                  HorizontalContentAlignment="Center"
+                                  Grid.Column="0"/>
                         <ComboBox material:HintAssist.Hint="Студент"
-                                          Name="StudentCB"
-                                          DisplayMemberPath="FullName"
-                                          SelectedItem="{Binding Student}"
-                                          material:HintAssist.IsFloating="True" 
-                                          HorizontalContentAlignment="Center"
-                                          Grid.Column="0"/>
+                                  Name="StudentCB"
+                                  DisplayMemberPath="FullName"
+                                  SelectedItem="{Binding Student}"
+                                  material:HintAssist.IsFloating="True" 
+                                  HorizontalContentAlignment="Center"
+                                  Grid.Column="0"/>
                         <TextBox material:HintAssist.Hint="Оценка"
-                                         Name="MarkTB"
-                                         PreviewTextInput="MarkTB_PreviewTextInput"
-                                         PreviewKeyDown="MarkTB_PreviewKeyDown"
-                                         Text="{Binding MarkValue}"
-                                         material:HintAssist.IsFloating="True" 
-                                         HorizontalContentAlignment="Center"
-                                         Grid.Column="0"/>
+                                 Name="MarkTB"
+                                 PreviewTextInput="MarkTB_PreviewTextInput"
+                                 PreviewKeyDown="MarkTB_PreviewKeyDown"
+                                 Text="{Binding MarkValue}"
+                                 material:HintAssist.IsFloating="True" 
+                                 HorizontalContentAlignment="Center"
+                                 Grid.Column="0"/>
                         <Button Grid.Column="1"
-                                        Click="SaveMiddleStatementButton_Click"
-                                        Style="{StaticResource MaterialDesignFlatAccentButton}"
-                                        Margin="0 15 0 0"
-                                        Content="Сохранить"/>
+                                Click="SaveStatementButton_Click"
+                                Style="{StaticResource MaterialDesignFlatAccentButton}"
+                                Margin="0 15 0 0"
+                                Content="Сохранить"/>
                         <Button Grid.Column="2"
-                                        Foreground="Red"
-                                        Click="CancelMiddleStatementButton_Click"
-                                        Style="{StaticResource MaterialDesignFlatAccentButton}"
-                                        Content="Отмена"/>
+                                Foreground="Red"
+                                Click="CancelStatementButton_Click"
+                                Style="{StaticResource MaterialDesignFlatAccentButton}"
+                                Content="Отмена"/>
                     </StackPanel>
 
                 </StackPanel>

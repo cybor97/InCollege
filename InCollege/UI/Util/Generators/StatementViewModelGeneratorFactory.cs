@@ -28,6 +28,6 @@ namespace InCollege.Client.UI.Util.Generators
     public abstract class StatementResultViewModelGenerator
     {
         public abstract IList<(string name, string uiName)> GetColumns(IEnumerable<StatementResult> data);
-        public abstract IList<object> GetResults(IEnumerable<string> columns, IEnumerable<StatementResult> data);
+        public abstract IList<StatementResultViewModel> GetResults(IEnumerable<string> columns, IEnumerable<StatementResult> data);
     }
 }

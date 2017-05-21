@@ -32,7 +32,7 @@ namespace InCollege.Client.UI.Util.Generators
                     TypeAttributes.AnsiClass |
                     TypeAttributes.BeforeFieldInit |
                     TypeAttributes.AutoLayout,
-                    null); ;
+                    typeof(StatementResultViewModel)); ;
         }
 
         private static void CreateProperty(TypeBuilder tb, string propertyName, Type propertyType)
