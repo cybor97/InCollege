@@ -1,6 +1,7 @@
 ﻿using InCollege.Core.Data.Base;
 using Newtonsoft.Json;
 using SQLite;
+using System;
 
 namespace InCollege.Core.Data
 {
@@ -11,7 +12,10 @@ namespace InCollege.Core.Data
         public int SubjectID { get; set; }
         public sbyte MarkValue { get; set; } = 2;
         public int TicketNumber { get; set; } = -1;
+        public DateTime? StatementResultDate { get; set; }
 
+        [Ignore]
+        [JsonIgnore]
         public string MarkValueString
         {
             get
