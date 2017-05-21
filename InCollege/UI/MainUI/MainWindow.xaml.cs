@@ -30,7 +30,7 @@ namespace InCollege.Client.UI.MainUI
 
         public async Task UpdateData()
         {
-            CurrentAccountItemHeaderTB.Text = (ProfileDialog.Account = App.Account = await NetworkUtils.WhoAmI())?.FullName;
+            App.Account = await NetworkUtils.WhoAmI();
 
             if (App.Account == null || !App.Account.Approved)
             {
@@ -38,6 +38,8 @@ namespace InCollege.Client.UI.MainUI
                     MessageBox.Show("Извините, ваша должность не подтверждена. Обратитесь к администратору.");
                 await AccountExit();
             }
+
+            CurrentAccountItemHeaderTB.Text = (ProfileDialog.Account = App.Account)?.FullName;
 
             //TODO:
             //if(teacher) request<statement>(teacher.subjects);
@@ -142,6 +144,7 @@ namespace InCollege.Client.UI.MainUI
             EditStatementDialog.Statement = statement;
             EditStatementDialog.AddMode = true;
             EditStatementDialog.StatementResultsLV.ItemsSource = null;
+            EditStatementDialog.GroupCB.Visibility = Visibility.Collapsed;
             await EditStatementDialog.UpdateData();
             EditStatementDialog.IsOpen = true;
         }
