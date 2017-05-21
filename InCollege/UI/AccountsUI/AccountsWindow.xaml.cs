@@ -93,6 +93,8 @@ namespace InCollege.Client.UI.AccountsUI
                     MessageBoxButton.YesNo,
                     MessageBoxImage.Warning) == MessageBoxResult.Yes)
                     await SaveAccount(account);
+                else if (account.ID == App.Account.ID)
+                    await UpdateData();
             }
         }
 

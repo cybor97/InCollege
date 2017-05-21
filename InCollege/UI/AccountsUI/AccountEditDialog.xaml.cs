@@ -43,12 +43,12 @@ namespace InCollege.Client.UI.AccountsUI
             }
             set
             {
-                DataContext = value;
                 if (value != null)
                 {
                     PasswordTB.Password = value.Password;
                     AccountTypeCB.SelectedIndex = (byte)value.AccountType;
                 }
+                DataContext = value;
             }
         }
 
