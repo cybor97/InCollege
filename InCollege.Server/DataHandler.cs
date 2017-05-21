@@ -180,7 +180,7 @@ namespace InCollege.Server
                         //Aand admin can do really anything with them
                         if (account.AccountType != AccountType.Admin || !account.Approved)
                         {
-                            if (account.ID != (int)fields.FirstOrDefault(c => c.name == "ID").value)
+                            if (account.ID != int.Parse((string)fields.FirstOrDefault(c => c.name == "ID").value))
                                 return new HttpResponse(HttpResponseCode.Forbidden, "Вы не можете редактировать данные другого аккаунта!", false);
 
                             for (int i = 0; i < fields.Length; i++)
