@@ -68,7 +68,10 @@ namespace InCollege.Client.UI.StatementsUI
             }
 
             GroupCB.IsEnabled = StatementTypeCB.IsEnabled = SubjectCB.IsEnabled = SpecialtyCB.IsEnabled = StatementResultsLV.Items.Count == 0;
-            StatementResultsContainer.Visibility = SpecialtyCB.SelectedItem != null && GroupCB.SelectedItem != null && SubjectCB.SelectedItem != null ? Visibility.Visible : Visibility.Collapsed;
+
+            bool canContainResults = SpecialtyCB.SelectedItem != null && GroupCB.SelectedItem != null && SubjectCB.SelectedItem != null;
+            StatementResultsContainer.Visibility = canContainResults ? Visibility.Visible : Visibility.Collapsed;
+            UnfilledBlankResults.Visibility = canContainResults ? Visibility.Collapsed : Visibility.Visible;
         }
         #endregion
 
