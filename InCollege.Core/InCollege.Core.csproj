@@ -62,6 +62,7 @@
     <Compile Include="Data\Group.cs" />
     <Compile Include="Data\Log.cs" />
     <Compile Include="Data\Message.cs" />
+    <Compile Include="Data\RePass.cs" />
     <Compile Include="Data\StatementResult.cs" />
     <Compile Include="Data\Specialty.cs" />
     <Compile Include="Data\Statement.cs" />

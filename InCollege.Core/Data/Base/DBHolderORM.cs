@@ -33,6 +33,7 @@ namespace InCollege.Core.Data.Base
                     typeof(CommissionMember),
                     typeof(Specialty),
                     typeof(Statement),
+                    typeof(RePass),
                     typeof(StatementAttestationType),
                     typeof(Subject),
                     typeof(Teacher));
