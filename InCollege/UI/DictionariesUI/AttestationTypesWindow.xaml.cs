@@ -64,7 +64,7 @@ namespace InCollege.Client.UI.DictionariesUI
             if (AttestationTypeDialog.IsOpen)
                 if (e.Key == Key.Enter)
                 {
-                    TypeNameTB.MoveFocus(new TraversalRequest(FocusNavigationDirection.Next));
+                    Focus();
                     SaveButton_Click(null, null);
                 }
                 else if (e.Key == Key.Escape)
