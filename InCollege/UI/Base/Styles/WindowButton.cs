@@ -2,7 +2,7 @@
 using System.Windows.Controls;
 using System.Windows.Media;
 
-namespace InCollege.UI.Base.Styles
+namespace InCollege.Client.UI.Base.Styles
 {
     public class WindowButton : Button
     {
