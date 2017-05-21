@@ -136,6 +136,7 @@
     <Compile Include="UI\StatementsUI\StatementResultsWindow.xaml.cs">
       <DependentUpon>StatementResultsWindow.xaml</DependentUpon>
     </Compile>
+    <Compile Include="UI\Util\Generators\StatementResultViewModel.cs" />
     <Compile Include="UI\Util\Generators\TotalStatementViewModelGenerator.cs" />
     <Compile Include="UI\Util\Generators\StatementViewModelTypeBuilder.cs" />
     <Compile Include="UI\Util\Generators\StatementViewModelGeneratorFactory.cs" />
