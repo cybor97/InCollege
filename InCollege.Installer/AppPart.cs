@@ -1,14 +1,21 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 
 namespace InCollege.Installer
 {
+    [Serializable]
     public class AppPart
     {
         //Yeah, string-id.
         public string ID { get; set; }
         public string ExecutablePath { get; set; }
+        public bool IsRequired { get; set; }
+
+        public bool SwitchEnabled => !IsRequired;
+
+        public bool Selected { get; set; }
 
         public string Contact { get; set; }
         public string DisplayIcon { get; set; }
@@ -20,7 +27,7 @@ namespace InCollege.Installer
         public string InstallLocation { get; set; }
         public string UninstallString { get; set; }
 
-        private AppPart() { }
+        public AppPart() { }
 
         public IEnumerable<(string name, object value)> Columns =>
             GetType().GetProperties(BindingFlags.Public | BindingFlags.Instance)
