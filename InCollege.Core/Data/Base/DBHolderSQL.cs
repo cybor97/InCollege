@@ -47,11 +47,15 @@ namespace InCollege.Core.Data.Base
             return table;
         }
 
-        public static DataTable GetRange(string table, string column, int skip, int count, bool fixedString, bool justCount, bool reverse, params (string name, object value)[] whereParams)
+        public static DataTable GetRange(string table, string column, int skip, int count, bool fixedString, bool justCount, bool reverse, bool orAll, params (string name, object value)[] whereParams)
         {
             column = string.IsNullOrWhiteSpace(column) ? "*" : $"[{column}]";
 
-            string whereString = string.Join(" AND ", whereParams
+            string whereString = string.Join(
+
+                orAll ? " OR " : " AND ",
+
+                whereParams
                 .Where(c => !string.IsNullOrWhiteSpace(c.name) && !string.IsNullOrWhiteSpace(c.value?.ToString()))
                 .Select(c => !(c.value is string) || fixedString ?
                         $"{c.name} LIKE @{c.name}" :
@@ -124,7 +128,7 @@ namespace InCollege.Core.Data.Base
 
                 DataRow row;
                 bool addMode = true;
-                if (!isLocal && (long)new SQLiteCommand($"SELECT Count() FROM {table} WHERE ID LIKE '{id}'") { Transaction = transaction }.ExecuteScalar() > 0)
+                if (!isLocal && (long)new SQLiteCommand($"SELECT Count() FROM [{table}] WHERE ID LIKE '{id}'") { Transaction = transaction }.ExecuteScalar() > 0)
                 {
                     adapter.SelectCommand = new SQLiteCommand($"SELECT * FROM [{table}] WHERE ID LIKE '{id}'") { Transaction = transaction };
                     data.Clear();
