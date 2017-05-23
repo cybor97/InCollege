@@ -10,6 +10,8 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Linq;
+using System;
+using System.Collections.Generic;
 
 namespace InCollege.Client.UI.MainUI
 {
@@ -137,9 +139,14 @@ namespace InCollege.Client.UI.MainUI
 
         async void AddButton_Click(object sender, RoutedEventArgs e)
         {
+            await AddStatement();
+        }
+
+        async Task<int> AddStatement()
+        {
             var statement = new Statement();
             //Attention                    'HERE. It cannot be optimized that way, you thought about.
-            statement.ID = int.Parse(await NetworkUtils.ExecuteDataAction<Statement>(this, statement, DataAction.Save));
+            int id = statement.ID = int.Parse(await NetworkUtils.ExecuteDataAction<Statement>(this, statement, DataAction.Save));
             statement.IsLocal = false;
             EditStatementDialog.Statement = statement;
             EditStatementDialog.AddMode = true;
@@ -147,6 +154,7 @@ namespace InCollege.Client.UI.MainUI
             EditStatementDialog.GroupCB.Visibility = Visibility.Collapsed;
             await EditStatementDialog.UpdateData();
             EditStatementDialog.IsOpen = true;
+            return id;
         }
 
         async void EditStatementDialog_OnSave(object sender, RoutedEventArgs e)
@@ -163,7 +171,7 @@ namespace InCollege.Client.UI.MainUI
             await UpdateData();
         }
 
-        private async void ProfileDialog_OnSave(object sender, RoutedEventArgs e)
+        async void ProfileDialog_OnSave(object sender, RoutedEventArgs e)
         {
             if (ProfileDialog.Account != null)
                 await NetworkUtils.ExecuteDataAction<Account>(this, ProfileDialog.Account, DataAction.Save);
@@ -171,12 +179,12 @@ namespace InCollege.Client.UI.MainUI
             ProfileDialog.IsOpen = false;
         }
 
-        private void ProfileDialog_OnCancel(object sender, RoutedEventArgs e)
+        void ProfileDialog_OnCancel(object sender, RoutedEventArgs e)
         {
             ProfileDialog.IsOpen = false;
         }
 
-        private void MessagesButton_Click(object sender, RoutedEventArgs e)
+        void MessagesButton_Click(object sender, RoutedEventArgs e)
         {
             new ChatWindow().ShowDialog();
         }
@@ -187,6 +195,57 @@ namespace InCollege.Client.UI.MainUI
             await NetworkUtils.RemoveWhere<StatementAttestationType>(null, (nameof(StatementAttestationType.StatementID), statement.ID));
             await NetworkUtils.RemoveWhere<CommissionMember>(null, (nameof(CommissionMember.StatementID), statement.ID));
             await NetworkUtils.RemoveWhere<StatementResult>(null, (nameof(StatementResult.StatementID), statement.ID));
+        }
+
+        async void GenerateComplexStatementItem_Click(object sender, RoutedEventArgs e)
+        {
+            //At least one is selected
+            if (StatementsLV.SelectedItem != null)
+            {
+                int statementID = await AddStatement();
+                var data = await NetworkUtils.RequestData<StatementResult>(this, strict: true, orAll: true, preserveContext: true, column: null,
+                                                                           whereParams: StatementsLV.SelectedItems
+                                                                           .OfType<Statement>()
+                                                                           .Select(c => (
+                                                                            name: nameof(StatementResult.StatementID),
+                                                                            value: (object)c.ID))
+                                                                           .ToArray());
+                var distinctor = new DistinctByStudentAndSubject();
+
+                data.Sort((c1, c2) => c1.StatementResultDate > c2.StatementResultDate ? 1 : -1);
+
+                data.Select(c => (studentID: c.StudentID, subjectID: c.SubjectID))
+                    .Select(c => data.LastOrDefault(currentResult => currentResult.StudentID == c.studentID &&
+                                                                     currentResult.SubjectID == c.subjectID))
+                    .Distinct(distinctor)
+                    .ToList()
+                    .ForEach(async c =>
+                    {
+                        c.StatementID = statementID;
+                        c.IsLocal = true;
+                        await NetworkUtils.ExecuteDataAction<StatementResult>(null, c, DataAction.Save);
+                    });
+                await EditStatementDialog.UpdateData();
+            }
+        }
+
+        void GenerateTotalStatementItem_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+    }
+
+    class DistinctByStudentAndSubject : IEqualityComparer<StatementResult>
+    {
+        public bool Equals(StatementResult x, StatementResult y)
+        {
+            return x.StudentID == y.StudentID &&
+                   x.SubjectID == y.SubjectID;
+        }
+
+        public int GetHashCode(StatementResult obj)
+        {
+            return int.Parse($"{obj.StudentID}{obj.SubjectID}");
         }
     }
 }

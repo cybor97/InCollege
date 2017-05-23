@@ -80,6 +80,8 @@
         <ListView Grid.Row="1" Name="StatementsLV">
             <ListView.ContextMenu>
                 <ContextMenu>
+                    <MenuItem Header="Сформировать составную ведомость" Click="GenerateComplexStatementItem_Click"/>
+                    <MenuItem Header="Сформировать сводную ведомость" Click="GenerateTotalStatementItem_Click"/>
                     <MenuItem Header="Редактировать" Click="EditItem_Click"/>
                     <MenuItem Header="Удалить" Click="RemoveItem_Click"/>
                 </ContextMenu>
