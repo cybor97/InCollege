@@ -156,7 +156,7 @@ namespace InCollege.Client.UI.ChatUI
         {
             if (e.Key == Key.Enter)
                 if (!string.IsNullOrWhiteSpace(SearchTB.Text))
-                    PeopleLV.ItemsSource = (await NetworkUtils.RequestData<Account>(this, false, false, null, (nameof(Account.FullName), SearchTB.Text.Trim())))?.Where(c => c.ID != App.Account.ID);
+                    PeopleLV.ItemsSource = (await NetworkUtils.RequestData<Account>(this, false, false, false, null, (nameof(Account.FullName), SearchTB.Text.Trim())))?.Where(c => c.ID != App.Account.ID);
                 else await UpdateAccounts();
         }
 

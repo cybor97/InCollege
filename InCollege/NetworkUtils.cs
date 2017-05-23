@@ -27,7 +27,7 @@ namespace InCollege
             Client = new HttpClient();
             Client.DefaultRequestHeaders.Accept.Clear();
             Client.DefaultRequestHeaders.Add("Connection", "Keep-Alive");
-            Client.DefaultRequestHeaders.Add("Keep-Alive", "timeout=600");
+            Client.DefaultRequestHeaders.Add("Keep-Alive", "timeout=2000");
         }
 
         public static async Task<Account> WhoAmI()
@@ -93,20 +93,20 @@ namespace InCollege
 
         public static async Task<List<T>> RequestData<T>(Window context, params (string name, object value)[] whereParams) where T : DBRecord
         {
-            return await RequestData<T>(context, true, false, null, whereParams);
+            return await RequestData<T>(context, true, false, false, null, whereParams);
         }
 
         public static async Task<List<T>> RequestData<T>(Window context, string column, params (string name, object value)[] whereParams) where T : DBRecord
         {
-            return await RequestData<T>(context, true, false, column, whereParams);
+            return await RequestData<T>(context, true, false, false, column, whereParams);
         }
 
         public static async Task<List<T>> RequestData<T>(Window context, bool preserveContext, string column, params (string name, object value)[] whereParams) where T : DBRecord
         {
-            return await RequestData<T>(context, true, preserveContext, column, whereParams);
+            return await RequestData<T>(context, true, false, preserveContext, column, whereParams);
         }
 
-        public static async Task<List<T>> RequestData<T>(Window context, bool strict, bool preserveContext, string column, params (string name, object value)[] whereParams) where T : DBRecord
+        public static async Task<List<T>> RequestData<T>(Window context, bool strict, bool orAll, bool preserveContext, string column, params (string name, object value)[] whereParams) where T : DBRecord
         {
             try
             {
@@ -124,6 +124,7 @@ namespace InCollege
                       $"Action=GetRange&" +
                       $"table={typeof(T).Name}&" +
                       $"token={App.Token}&" +
+                      $"orAll={(orAll ? 1 : 0)}&" +
                       (!string.IsNullOrWhiteSpace(column) ? $"column={column}&" : "") +
                       $"fixedString={(strict ? 1 : 0)}" +
                       //Not an error! Little more attension, & is  ' here

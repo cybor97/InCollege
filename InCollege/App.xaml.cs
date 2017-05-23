@@ -49,7 +49,7 @@ namespace InCollege.Client
             {
                 NetworkUtils.Disconnect().Wait();
             }
-            catch (AggregateException e) when (e.InnerException is HttpRequestException)
+            catch (Exception e) when (e is AggregateException || e is HttpRequestException || e is WebException)
             {
 
             }
@@ -63,11 +63,11 @@ namespace InCollege.Client
                 task.Wait();
                 return task.Result.StatusCode == HttpStatusCode.OK;
             }
-            catch (AggregateException e)
+            catch (Exception e) when (e is AggregateException || e is HttpRequestException || e is WebException)
             {
                 //UNDONE:Remove this debug staff!
-                MessageBox.Show(e.ToString());
-                return true;
+                MessageBox.Show($"Ошибка подключения к серверу!\n\nТехническая информация:\n{e}");
+                return false;
             }
         }
     }
