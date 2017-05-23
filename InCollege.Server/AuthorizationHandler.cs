@@ -55,7 +55,7 @@ namespace InCollege.Server
             if (query.TryGetByName("UserName", out string userName) &&
                 query.TryGetByName("Password", out string password))
             {
-                var rows = DBHolderSQL.GetRange("Account", null, 0, 1, true, false, false,
+                var rows = DBHolderSQL.GetRange("Account", null, 0, 1, true, false, false, false,
                     ("UserName", userName),
                     ("Password", password)).Rows;
 
@@ -92,7 +92,7 @@ namespace InCollege.Server
                 var validationResult = Account.Validate(userName, password, birthDate, fullName);
                 if (validationResult == AccountValidationResult.OK)
                 {
-                    var rows = DBHolderSQL.GetRange("Account", null, 0, 1, true, false, false, ("UserName", userName)).Rows;
+                    var rows = DBHolderSQL.GetRange("Account", null, 0, 1, true, false, false, false, ("UserName", userName)).Rows;
                     if (rows.Count == 0)
                     {
                         query.TryGetByName("ProfileImage", out byte[] profileImage);
@@ -177,7 +177,7 @@ namespace InCollege.Server
             if (data.id == -1 || string.IsNullOrWhiteSpace(data.userName))
                 return (false, null);
 
-            DataTable table = DBHolderSQL.GetRange("Account", null, 0, 1, true, false, false,
+            DataTable table = DBHolderSQL.GetRange("Account", null, 0, 1, true, false, false, false,
                 ("ID", data.id),
                 ("UserName", data.userName == "_default_" ? string.Empty : data.userName),
                 ("Password", data.password == "_default_" ? string.Empty : data.password));

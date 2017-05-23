@@ -4,6 +4,52 @@
              StartupUri="MainWindow.xaml">
     <Application.Resources>
         <ResourceDictionary>
+            <ControlTemplate x:Key="AcceptButtonTemplate" TargetType="Button">
+                <Border CornerRadius="10 0 10 0" Background="{TemplateBinding Background}">
+                    <ContentPresenter Margin="3"/>
+                </Border>
+                <ControlTemplate.Triggers>
+                    <EventTrigger RoutedEvent="MouseEnter">
+                        <BeginStoryboard>
+                            <Storyboard>
+                                <ColorAnimation To="Lime" Duration="0:0:0.2" Storyboard.TargetProperty="(Button.Foreground).(SolidColorBrush.Color)"/>
+                            </Storyboard>
+                        </BeginStoryboard>
+                    </EventTrigger>
+                    <EventTrigger RoutedEvent="MouseLeave">
+                        <BeginStoryboard>
+                            <Storyboard>
+                                <ColorAnimation From="Lime" Duration="0:0:0.2" Storyboard.TargetProperty="(Button.Foreground).(SolidColorBrush.Color)"/>
+                            </Storyboard>
+                        </BeginStoryboard>
+                    </EventTrigger>
+                </ControlTemplate.Triggers>
+
+            </ControlTemplate>
+
+            <ControlTemplate x:Key="DeAcceptButtonTemplate" TargetType="Button">
+                <Border CornerRadius="0 10 0 10" Background="{TemplateBinding Background}">
+                    <ContentPresenter Margin="3"/>
+                </Border>
+                <ControlTemplate.Triggers>
+                    <EventTrigger RoutedEvent="MouseEnter">
+                        <BeginStoryboard>
+                            <Storyboard>
+                                <ColorAnimation To="Red" Duration="0:0:0.2" Storyboard.TargetProperty="(Button.Foreground).(SolidColorBrush.Color)"/>
+                            </Storyboard>
+                        </BeginStoryboard>
+                    </EventTrigger>
+                    <EventTrigger RoutedEvent="MouseLeave">
+                        <BeginStoryboard>
+                            <Storyboard>
+                                <ColorAnimation From="Red" Duration="0:0:0.2" Storyboard.TargetProperty="(Button.Foreground).(SolidColorBrush.Color)"/>
+                            </Storyboard>
+                        </BeginStoryboard>
+                    </EventTrigger>
+                </ControlTemplate.Triggers>
+
+            </ControlTemplate>
+
         </ResourceDictionary>
     </Application.Resources>
 </Application>

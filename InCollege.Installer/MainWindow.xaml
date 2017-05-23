@@ -10,49 +10,92 @@
     </x:Code>
     <Grid>
         <Border CornerRadius="10" Background="White"
-                    BorderBrush="#EEE"
+                    BorderBrush="WhiteSmoke"
                     BorderThickness="2">
             <Grid>
-                <TextBlock Text="InCollege" FontSize="50" FontWeight="Bold" 
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+
+                <TextBlock Name="PreInstallTB" 
+                           FontSize="20" FontWeight="SemiBold" 
+                           HorizontalAlignment="Center" Margin="0 10 0 0"
+                           Foreground="Gray" Text="Идет подготовка к установке..."/>
+
+                <Grid Name="InstallButtons" Margin="0 -20 0 0" Opacity="0">
+
+                    <Button Name="CancelButton" Click="CancelButton_Click"
+                            HorizontalAlignment="Left" Content="Отмена" 
+                            FontWeight="SemiBold" FontSize="16"
+                            Foreground="Gray" Background="WhiteSmoke"
+                            Template="{StaticResource DeAcceptButtonTemplate}"/>
+                    <Button Name="InstallButton"
+                            IsEnabled="False" Click="InstallButton_Click"
+                            HorizontalAlignment="Right" Content="Установить" 
+                            FontWeight="SemiBold" FontSize="16"
+                            Foreground="Gray" Background="WhiteSmoke"
+                            Template="{StaticResource AcceptButtonTemplate}"/>
+
+                    <Grid.Resources>
+                        <Storyboard x:Key="InstallButtonsAppearStoryboard" TargetName="InstallButtons">
+                            <DoubleAnimation Storyboard.TargetProperty="Opacity" To="1" Duration="0:0:0.5"/>
+                            <ThicknessAnimation Storyboard.TargetProperty="Margin" To="0" Duration="0:0:0.5"/>
+                        </Storyboard>
+                        <Storyboard x:Key="InstallButtonsDisappearStoryboard" TargetName="InstallButtons">
+                            <DoubleAnimation Storyboard.TargetProperty="Opacity" From="1" Duration="0:0:0.5"/>
+                            <ThicknessAnimation Storyboard.TargetProperty="Margin" From="0" Duration="0:0:0.5"/>
+                        </Storyboard>
+                    </Grid.Resources>
+                </Grid>
+
+                <Grid Grid.Row="1">
+                    <TextBlock Text="InCollege" FontSize="50" FontWeight="Bold" 
                    Foreground="WhiteSmoke" 
                    Name="LogoTB"
                    HorizontalAlignment="Center" VerticalAlignment="Center">
-                    <TextBlock.Triggers>
-                        <EventTrigger RoutedEvent="Loaded">
-                            <BeginStoryboard>
-                                <Storyboard TargetName="LogoTB" TargetProperty="(TextBlock.Foreground).(SolidColorBrush.Color)">
-                                    <ColorAnimation To="LimeGreen" Duration="0:0:3" Completed="LogoAnimation_Completed"/>
-                                </Storyboard>
-                            </BeginStoryboard>
-                        </EventTrigger>
-                    </TextBlock.Triggers>
-                </TextBlock>
-                <ListView Name="ComponentsLV"
+                        <TextBlock.Triggers>
+                            <EventTrigger RoutedEvent="Loaded">
+                                <BeginStoryboard>
+                                    <Storyboard TargetName="LogoTB" TargetProperty="(TextBlock.Foreground).(SolidColorBrush.Color)">
+                                        <ColorAnimation To="LimeGreen" Duration="0:0:0.5" Completed="LogoAnimation_Completed"/>
+                                    </Storyboard>
+                                </BeginStoryboard>
+                            </EventTrigger>
+                        </TextBlock.Triggers>
+                    </TextBlock>
+                    <ListView Name="ComponentsLV"
                           Height="250" Margin="0 250 0 -250" VerticalAlignment="Bottom"
                           Opacity="0" Background="#CCFFFFFF">
-                    <ListView.Resources>
-                        <Storyboard x:Key="ComponentsLVAppearStoryboard" TargetName="ComponentsLV">
-                            <DoubleAnimation Storyboard.TargetProperty="Opacity" To="1" Duration="0:0:0.5"/>
-                            <ThicknessAnimation Storyboard.TargetProperty="Margin" To="0 0 0 0" Duration="0:0:0.5"/>
-                        </Storyboard>
-                    </ListView.Resources>
-                    <ListView.View>
-                        <GridView>
-                            <GridViewColumn Header="Компонент" DisplayMemberBinding="{Binding DisplayName}"/>
-                            <GridViewColumn Header="Версия" DisplayMemberBinding="{Binding DisplayVersion}"/>
-                            <GridViewColumn Header="Установить">
-                                <GridViewColumn.CellTemplate>
-                                    <DataTemplate>
-                                        <CheckBox IsChecked="{Binding Selected, Mode=TwoWay}" 
+                        <ListView.Resources>
+                            <Storyboard x:Key="ComponentsLVAppearStoryboard" TargetName="ComponentsLV">
+                                <DoubleAnimation Storyboard.TargetProperty="Opacity" To="1" Duration="0:0:0.5"/>
+                                <ThicknessAnimation Storyboard.TargetProperty="Margin" To="0 0 0 0" Duration="0:0:0.5"/>
+                            </Storyboard>
+                            <Storyboard x:Key="ComponentsLVDisappearStoryboard" TargetName="ComponentsLV">
+                                <DoubleAnimation Storyboard.TargetProperty="Opacity" From="1" Duration="0:0:0.5"/>
+                                <ThicknessAnimation Storyboard.TargetProperty="Margin" From="0 0 0 0" Duration="0:0:0.5"/>
+                            </Storyboard>
+                        </ListView.Resources>
+
+                        <ListView.View>
+                            <GridView>
+                                <GridViewColumn Header="Компонент" DisplayMemberBinding="{Binding DisplayName}"/>
+                                <GridViewColumn Header="Версия" DisplayMemberBinding="{Binding DisplayVersion}"/>
+                                <GridViewColumn Header="Установить">
+                                    <GridViewColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <CheckBox IsChecked="{Binding Selected, Mode=TwoWay}" 
                                                   IsEnabled="{Binding SwitchEnabled}"
                                                   Checked="SelectedCB_CheckChanged"
                                                   Unchecked="SelectedCB_CheckChanged"/>
-                                    </DataTemplate>
-                                </GridViewColumn.CellTemplate>
-                            </GridViewColumn>
-                        </GridView>
-                    </ListView.View>
-                </ListView>
+                                        </DataTemplate>
+                                    </GridViewColumn.CellTemplate>
+                                </GridViewColumn>
+                            </GridView>
+                        </ListView.View>
+                    </ListView>
+                </Grid>
             </Grid>
         </Border>
     </Grid>

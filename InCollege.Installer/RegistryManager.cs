@@ -1,4 +1,5 @@
 ﻿using Microsoft.Win32;
+using System;
 using System.Linq;
 
 namespace InCollege.Installer
@@ -13,7 +14,7 @@ namespace InCollege.Installer
                 if (key.GetSubKeyNames().Count(c => c.Equals(part.ID)) == 0)
                     using (var CreatedKey = key.CreateSubKey(part.ID))
                         foreach (var current in part.Columns)
-                            CreatedKey.SetValue(current.name, current.value);
+                            CreatedKey.SetValue(current.Item1, current.Item2);
                 else
                 {
                     RemoveApplicationEntry(part.ID);
@@ -33,7 +34,7 @@ namespace InCollege.Installer
             using (var key = Registry.LocalMachine.OpenSubKey(WINDOWS_APPS_SUBKEY))
                 if (key.GetSubKeyNames().Count(c => c.Equals(partName)) > 0)
                     using (var currentKey = key.OpenSubKey(partName))
-                        return AppPart.ImportFromColumns(currentKey.GetValueNames().Select(c => (c, currentKey.GetValue(c))));
+                        return AppPart.ImportFromColumns(currentKey.GetValueNames().Select(c => new Tuple<string, object>(c, currentKey.GetValue(c))));
             return null;
 
         }

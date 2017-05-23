@@ -74,16 +74,16 @@ namespace InCollege.Server
                                 whereParams = new[] { (nameof(Message.FromID), (object)partnerID), (nameof(Message.ToID), account.ID), (nameof(Message.IsRead), false) };
                             else whereParams = new[] { (nameof(Message.ToID), (object)account.ID), (nameof(Message.IsRead), false) };
 
-                            return new HttpResponse(HttpResponseCode.Ok, DBHolderSQL.GetRange(nameof(Message), null, -1, -1, true, true, false, whereParams)
+                            return new HttpResponse(HttpResponseCode.Ok, DBHolderSQL.GetRange(nameof(Message), null, -1, -1, true, true, false, false, whereParams)
                                         .Rows?[0]?[0].ToString(), true);
 
                         case (byte)ChatRequestMode.Conversation:
                             if (query.TryGetByName("partnerID", out partnerID))
                             {
-                                var range = DBHolderSQL.GetRange(nameof(Message), null, -1, -1, true, false, false,
+                                var range = DBHolderSQL.GetRange(nameof(Message), null, -1, -1, true, false, false, false,
                                                                 (nameof(Message.FromID), partnerID),
                                                                 (nameof(Message.ToID), account.ID));
-                                range.Merge(DBHolderSQL.GetRange(nameof(Message), null, -1, -1, true, false, false,
+                                range.Merge(DBHolderSQL.GetRange(nameof(Message), null, -1, -1, true, false, false, false,
                                                                 (nameof(Message.FromID), account.ID),
                                                                 (nameof(Message.ToID), partnerID)));
 
@@ -124,10 +124,11 @@ namespace InCollege.Server
                     bool fixedString = query.TryGetByName("fixedString", out int fixedStringResult) && fixedStringResult == 1;
                     bool justCount = query.TryGetByName("justCount", out int justCountResult) && justCountResult == 1;
                     bool reverse = query.TryGetByName("reverse", out int reverseResult) && reverseResult == 1;
+                    bool orAll = query.TryGetByName("orAll", out int orAllResult) && orAllResult == 1;
                     var whereParams = query.Where(c => c.Key.StartsWith("where"))
                                            .Select(c => (name: c.Key.Split(new[] { "where" }, StringSplitOptions.RemoveEmptyEntries)[0], value: (object)c.Value));
 
-                    var range = DBHolderSQL.GetRange(table, column, skip, count, fixedString, justCount, reverse, whereParams.ToArray());
+                    var range = DBHolderSQL.GetRange(table, column, skip, count, fixedString, justCount, reverse, orAll, whereParams.ToArray());
 
                     #region Special rules for accounts
                     //We never should send passwords...
