@@ -23,7 +23,7 @@ namespace InCollege.Core.Data
                 switch (MarkValue)
                 {
                     case (sbyte)TechnicalMarkValue.Absent:
-                        return "Н";
+                        return "Не присутствовал";
                     case (sbyte)TechnicalMarkValue.Passed:
                         return "Зачтено";
                     case (sbyte)TechnicalMarkValue.Unpassed:
