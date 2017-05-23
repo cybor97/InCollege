@@ -29,11 +29,11 @@ namespace InCollege.Installer
                     key.DeleteSubKey(key.GetSubKeyNames().FirstOrDefault(c => c.Equals(partID)), false);
         }
 
-        public static AppPart GetInstalledEntryInfo(string partName)
+        public static AppPart GetInstalledEntryInfo(string partID)
         {
             using (var key = Registry.LocalMachine.OpenSubKey(WINDOWS_APPS_SUBKEY))
-                if (key.GetSubKeyNames().Count(c => c.Equals(partName)) > 0)
-                    using (var currentKey = key.OpenSubKey(partName))
+                if (key.GetSubKeyNames().Count(c => c.Equals(partID)) > 0)
+                    using (var currentKey = key.OpenSubKey(partID))
                         return AppPart.ImportFromColumns(currentKey.GetValueNames().Select(c => new Tuple<string, object>(c, currentKey.GetValue(c))));
             return null;
 
