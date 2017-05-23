@@ -42,7 +42,11 @@ namespace InCollege.Installer
         {
             var result = new AppPart();
             foreach (var current in typeof(AppPart).GetProperties())
-                current.SetValue(result, columns.FirstOrDefault(c => c.Item1 == current.Name).Item2);
+                if (current.SetMethod != null)
+                {
+                    var value = columns.FirstOrDefault(c => c.Item1 == current.Name).Item2;
+                    current.SetValue(result, current.PropertyType == typeof(bool) ? (int)value == 1 : value);
+                }
             return result;
         }
     }
