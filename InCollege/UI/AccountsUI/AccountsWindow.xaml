@@ -19,7 +19,7 @@
                 <TabItem Header="Не назначенные"/>
                 <TabItem Header="Студенты"/>
                 <TabItem Header="Преподаватели"/>
-                <TabItem Header="Заведующиее отделениями"/>
+                <TabItem Header="Заведующие отделениями"/>
                 <TabItem Header="Администраторы"/>
             </dragablz:TabablzControl>
 
