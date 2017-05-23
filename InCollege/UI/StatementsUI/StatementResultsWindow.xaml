@@ -42,14 +42,23 @@
                                   material:HintAssist.IsFloating="True" 
                                   HorizontalContentAlignment="Center"
                                   Grid.Column="0"/>
-                        <TextBox material:HintAssist.Hint="Оценка"
-                                 Name="MarkTB"
-                                 PreviewTextInput="MarkTB_PreviewTextInput"
-                                 PreviewKeyDown="MarkTB_PreviewKeyDown"
-                                 Text="{Binding MarkValue}"
-                                 material:HintAssist.IsFloating="True" 
-                                 HorizontalContentAlignment="Center"
-                                 Grid.Column="0"/>
+                        <ComboBox material:HintAssist.Hint="Оценка"
+                                         Name="MarkCB"
+                                         SelectedIndex="5"
+                                         material:HintAssist.IsFloating="True" 
+                                         HorizontalContentAlignment="Center"
+                                         Grid.Column="0">
+                            <ComboBoxItem Content="2"/>
+                            <ComboBoxItem Content="3"/>
+                            <ComboBoxItem Content="4"/>
+                            <ComboBoxItem Content="5"/>
+
+                            <ComboBoxItem Content="Отсутствовал" Name="AbsentItem"/>
+                            <ComboBoxItem Content="Зачтено" Name="PassedItem"/>
+                            <ComboBoxItem Content="Не зачтено" Name="UnpassedItem"/>
+                            <ComboBoxItem Content="" Name="BlankItem"/>
+
+                        </ComboBox>
                         <Button Grid.Column="1"
                                 Click="SaveStatementButton_Click"
                                 Style="{StaticResource MaterialDesignFlatAccentButton}"

@@ -69,7 +69,7 @@ namespace InCollege.Client.UI.StatementsUI
 
             GroupCB.IsEnabled = StatementTypeCB.IsEnabled = SubjectCB.IsEnabled = SpecialtyCB.IsEnabled = StatementResultsLV.Items.Count == 0;
 
-            bool canContainResults = SpecialtyCB.SelectedItem != null && GroupCB.SelectedItem != null && SubjectCB.SelectedItem != null;
+            bool canContainResults = SpecialtyCB.SelectedItem != null && GroupCB.SelectedItem != null;
             StatementResultsContainer.Visibility = canContainResults ? Visibility.Visible : Visibility.Collapsed;
             UnfilledBlankResults.Visibility = canContainResults ? Visibility.Collapsed : Visibility.Visible;
         }
@@ -88,10 +88,23 @@ namespace InCollege.Client.UI.StatementsUI
 
         void StatementTypeCB_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            if (StatementTypeCB.SelectedIndex == 0)
+            if (StatementTypeCB.SelectedIndex <= 1)
             {
                 MiddleStatementResultsContainer.Visibility = Visibility.Visible;
                 ComplexStatementPanel.Visibility = Visibility.Collapsed;
+
+                if (StatementTypeCB.SelectedIndex == 0)
+                {
+                    TicketNumberColumnHeader.Visibility = Visibility.Collapsed;
+                    TicketNumberColumn.Width = 0;
+                    TicketNumberTB.Visibility = Visibility.Collapsed;
+                }
+                else
+                {
+                    TicketNumberColumnHeader.Visibility = Visibility.Visible;
+                    TicketNumberColumn.Width = 120;
+                    TicketNumberTB.Visibility = Visibility.Visible;
+                }
             }
             else
             {
@@ -121,12 +134,13 @@ namespace InCollege.Client.UI.StatementsUI
         {
             if (SubjectCB.SelectedItem != null)
             {
-                MiddleStatementResultDialog.DataContext = new StatementResult
+                StatementResultDialog.DataContext = new StatementResult
                 {
                     StatementID = Statement.ID,
                     SubjectID = ((Subject)SubjectCB.SelectedItem).ID,
+                    StatementResultDate = Statement.StatementDate
                 };
-                MiddleStatementResultDialog.IsOpen = true;
+                StatementResultDialog.IsOpen = true;
             }
             else MessageBox.Show("Выберите дисциплину!");
         }
@@ -136,8 +150,8 @@ namespace InCollege.Client.UI.StatementsUI
             if (StatementResultsLV.SelectedItem != null)
             {
                 StudentCB.ItemsSource = new[] { ((StatementResult)StatementResultsLV.SelectedItem).Student };
-                MiddleStatementResultDialog.DataContext = StatementResultsLV.SelectedItem;
-                MiddleStatementResultDialog.IsOpen = true;
+                StatementResultDialog.DataContext = StatementResultsLV.SelectedItem;
+                StatementResultDialog.IsOpen = true;
             }
         }
 
@@ -150,25 +164,31 @@ namespace InCollege.Client.UI.StatementsUI
 
         async void SaveMiddleStatementButton_Click(object sender, RoutedEventArgs e)
         {
-            if (StudentCB.SelectedItem != null && !string.IsNullOrEmpty(MarkTB.Text))
-                await NetworkUtils.ExecuteDataAction<StatementResult>(this, (DBRecord)MiddleStatementResultDialog.DataContext, DataAction.Save);
-            MiddleStatementResultDialog.IsOpen = false;
+            if (StudentCB.SelectedItem != null && MarkCB.SelectedItem != null)
+            {
+                var statementResult = (StatementResult)StatementResultDialog.DataContext;
+                statementResult.MarkValue = MarkCB.SelectedIndex >= 0 && MarkCB.SelectedIndex < 4 ? (sbyte)(MarkCB.SelectedIndex + 2) :
+                    (sbyte)(TechnicalMarkValue)Enum.Parse(typeof(TechnicalMarkValue), ((ComboBoxItem)MarkCB.SelectedItem).Name.Split(new[] { "Item" }, StringSplitOptions.RemoveEmptyEntries)[0]);
+
+                await NetworkUtils.ExecuteDataAction<StatementResult>(this, statementResult, DataAction.Save);
+            }
+            StatementResultDialog.IsOpen = false;
         }
 
         async void CancelMiddleStatementButton_Click(object sender, RoutedEventArgs e)
         {
-            MiddleStatementResultDialog.IsOpen = false;
+            StatementResultDialog.IsOpen = false;
             await UpdateData();
         }
         #endregion
         #region Text filters
-        void MarkTB_PreviewTextInput(object sender, TextCompositionEventArgs e)
+        void StatementNumberTB_PreviewTextInput(object sender, TextCompositionEventArgs e)
         {
-            string futureText = MarkTB.Text + e.Text;
-            e.Handled = string.IsNullOrWhiteSpace(futureText) || !System.Text.RegularExpressions.Regex.IsMatch(futureText, "^[1-5]$");
+            string futureText = StatementNumberTB.Text + e.Text;
+            e.Handled = string.IsNullOrWhiteSpace(futureText) || !System.Text.RegularExpressions.Regex.IsMatch(futureText, "^\\d{1,10}$");
         }
 
-        void StatementNumberTB_PreviewTextInput(object sender, TextCompositionEventArgs e)
+        private void TicketNumberTB_PreviewTextInput(object sender, TextCompositionEventArgs e)
         {
             string futureText = StatementNumberTB.Text + e.Text;
             e.Handled = string.IsNullOrWhiteSpace(futureText) || !System.Text.RegularExpressions.Regex.IsMatch(futureText, "^\\d{1,10}$");
@@ -179,7 +199,7 @@ namespace InCollege.Client.UI.StatementsUI
             e.Handled = e.Key == Key.Space;
         }
 
-        void MarkTB_PreviewKeyDown(object sender, KeyEventArgs e)
+        private void TicketNumberTB_PreviewKeyDown(object sender, KeyEventArgs e)
         {
             e.Handled = e.Key == Key.Space;
         }
@@ -192,6 +212,7 @@ namespace InCollege.Client.UI.StatementsUI
 
         private void CancelButton_Click(object sender, RoutedEventArgs e)
         {
+            StatementResultDialog.IsOpen = false;
             OnCancel?.Invoke(sender, e);
         }
 

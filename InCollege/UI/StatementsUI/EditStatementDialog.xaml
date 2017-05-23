@@ -149,14 +149,24 @@
                                                                            AncestorType={x:Type ListViewItem}}, 
                                                                            Converter={StaticResource IndexConverter}}" />
 
+                                <GridViewColumn x:Name="TicketNumberColumn"
+                                                DisplayMemberBinding="{Binding TicketNumber}"
+                                                Width="0">
+                                    <GridViewColumn.Header>
+                                        <GridViewColumnHeader Content="Номер билета" Name="TicketNumberColumnHeader" Visibility="Collapsed"/>
+                                    </GridViewColumn.Header>
+                                </GridViewColumn>
+
                                 <GridViewColumn Header="ФИО обучающегося"
-                                            DisplayMemberBinding="{Binding StudentFullName}" />
+                                                DisplayMemberBinding="{Binding StudentFullName}" />
 
                                 <GridViewColumn Header="Итоговая оценка"
-                                            DisplayMemberBinding="{Binding MarkValue}" />
+                                                DisplayMemberBinding="{Binding MarkValueString}" />
                             </GridView>
                         </ListView.View>
                     </ListView>
+
+
 
                     <Button Grid.Row="1" 
                         Foreground="WhiteSmoke" FontSize="30" FontStretch="Medium" 
@@ -164,7 +174,7 @@
                         HorizontalAlignment="Right" VerticalAlignment="Bottom"
                         Click="AddButton_Click"/>
 
-                    <material:DialogHost Name="MiddleStatementResultDialog">
+                    <material:DialogHost Name="StatementResultDialog">
                         <material:DialogHost.DialogContent>
                             <StackPanel>
                                 <StackPanel Orientation="Vertical" MinWidth="300">
@@ -175,14 +185,35 @@
                                           material:HintAssist.IsFloating="True" 
                                           HorizontalContentAlignment="Center"
                                           Grid.Column="0"/>
-                                    <TextBox material:HintAssist.Hint="Оценка"
-                                         Name="MarkTB"
-                                         PreviewTextInput="MarkTB_PreviewTextInput"
-                                         PreviewKeyDown="MarkTB_PreviewKeyDown"
-                                         Text="{Binding MarkValue}"
+
+                                    <TextBox material:HintAssist.Hint="Номер билета"
+                                         Visibility="Collapsed"
+                                         Name="TicketNumberTB"
+                                         PreviewTextInput="TicketNumberTB_PreviewTextInput"
+                                         PreviewKeyDown="TicketNumberTB_PreviewKeyDown"
+                                         Text="{Binding TicketNumber}"
                                          material:HintAssist.IsFloating="True" 
                                          HorizontalContentAlignment="Center"
                                          Grid.Column="0"/>
+
+                                    <ComboBox material:HintAssist.Hint="Оценка"
+                                         Name="MarkCB"
+                                         SelectedIndex="5"
+                                         material:HintAssist.IsFloating="True" 
+                                         HorizontalContentAlignment="Center"
+                                         Grid.Column="0">
+                                        <ComboBoxItem Content="2"/>
+                                        <ComboBoxItem Content="3"/>
+                                        <ComboBoxItem Content="4"/>
+                                        <ComboBoxItem Content="5"/>
+
+                                        <ComboBoxItem Content="Отсутствовал" Name="AbsentItem"/>
+                                        <ComboBoxItem Content="Зачтено" Name="PassedItem"/>
+                                        <ComboBoxItem Content="Не зачтено" Name="UnpassedItem"/>
+                                        <ComboBoxItem Content="" Name="BlankItem"/>
+
+                                    </ComboBox>
+
                                     <Button Grid.Column="1"
                                         Click="SaveMiddleStatementButton_Click"
                                         Style="{StaticResource MaterialDesignFlatAccentButton}"

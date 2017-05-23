@@ -9,6 +9,7 @@ using InCollege.Client.UI.Util.Generators;
 using System.Windows.Data;
 using System.Collections.Generic;
 using System.Windows.Input;
+using System;
 
 namespace InCollege.Client.UI.StatementsUI
 {
@@ -23,7 +24,7 @@ namespace InCollege.Client.UI.StatementsUI
             InitializeComponent();
             Statement = statement;
             Title = $"Содержимое ведомости от {statement?.StatementDate.ToString("dd MMMM yyyy")}";
-            Generator = GetGenerator((statement?.StatementType ?? StatementType.Middle) == StatementType.Total ? GeneratorType.TotalStatement : GeneratorType.ComplexStatement);
+            Generator = GetGenerator((statement?.StatementType ?? StatementType.CourceProject) == StatementType.Total ? GeneratorType.TotalStatement : GeneratorType.ComplexStatement);
         }
 
         async void StatementResultsWindow_Loaded(object sender, RoutedEventArgs e)
@@ -78,7 +79,7 @@ namespace InCollege.Client.UI.StatementsUI
 
         async void SaveStatementButton_Click(object sender, RoutedEventArgs e)
         {
-            if (StudentCB.SelectedItem != null && SubjectCB.SelectedItem != null && !string.IsNullOrWhiteSpace(MarkTB.Text))
+            if (StudentCB.SelectedItem != null && SubjectCB.SelectedItem != null && MarkCB.SelectedItem != null)
             {
                 Focus();
                 var dataContext = (StatementResult)StatementResultDialog.DataContext;
@@ -91,6 +92,10 @@ namespace InCollege.Client.UI.StatementsUI
                         dataContext.IsLocal = false;
                     }
                 }
+
+                dataContext.MarkValue = MarkCB.SelectedIndex >= 0 && MarkCB.SelectedIndex < 4 ? (sbyte)(MarkCB.SelectedIndex + 2) :
+                    (sbyte)(TechnicalMarkValue)Enum.Parse(typeof(TechnicalMarkValue), ((ComboBoxItem)MarkCB.SelectedItem).Name.Split(new[] { "Item" }, StringSplitOptions.RemoveEmptyEntries)[0]);
+
                 await NetworkUtils.ExecuteDataAction<StatementResult>(this, dataContext, DataAction.Save);
                 StatementResultDialog.IsOpen = false;
             }
