@@ -38,6 +38,9 @@
   <PropertyGroup>
     <StartupObject>InCollege.Client.App</StartupObject>
   </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationIcon>in_college_icon.ico</ApplicationIcon>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="Dragablz, Version=0.0.3.186, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Dragablz.0.0.3.186\lib\net45\Dragablz.dll</HintPath>
@@ -136,15 +139,15 @@
     <Compile Include="UI\StatementsUI\StatementResultsWindow.xaml.cs">
       <DependentUpon>StatementResultsWindow.xaml</DependentUpon>
     </Compile>
-    <Compile Include="UI\Util\Generators\StatementResultViewModel.cs" />
-    <Compile Include="UI\Util\Generators\TotalStatementViewModelGenerator.cs" />
-    <Compile Include="UI\Util\Generators\StatementViewModelTypeBuilder.cs" />
-    <Compile Include="UI\Util\Generators\StatementViewModelGeneratorFactory.cs" />
+    <Compile Include="UI\Util\ViewModelGenerators\StatementResultViewModel.cs" />
+    <Compile Include="UI\Util\ViewModelGenerators\TotalStatementViewModelGenerator.cs" />
+    <Compile Include="UI\Util\ViewModelGenerators\StatementViewModelTypeBuilder.cs" />
+    <Compile Include="UI\Util\ViewModelGenerators\StatementViewModelGeneratorFactory.cs" />
     <Compile Include="UI\Util\GridViewSort.cs" />
     <Compile Include="UI\Util\ImageToSourceConverter.cs" />
     <Compile Include="NetworkUtils.cs" />
     <Compile Include="UI\Util\UIUtils.cs" />
-    <Compile Include="UI\Util\Generators\ComplexStatementViewModelGenerator.cs" />
+    <Compile Include="UI\Util\ViewModelGenerators\ComplexStatementViewModelGenerator.cs" />
     <Page Include="UI\AccountsUI\AccountEditDialog.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -262,6 +265,9 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Resources\Unseen.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="in_college_icon.ico" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
