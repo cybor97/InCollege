@@ -38,7 +38,19 @@ namespace InCollege.Client.UI.StatementsUI
             }
         }
 
-        async void StatementAttestationTypeDialog_KeyDown(object sender, KeyEventArgs e)
+        void StatementAttestationTypeDialog_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (StatementAttestationTypeDialog.IsOpen)
+                if (e.Key == Key.Enter)
+                {
+                    StatementAttestationTypeDialog.Focus();
+                    SaveButton_Click(null, null);
+                }
+                else if (e.Key == Key.Escape)
+                    CancelButton_Click(null, null);
+        }
+
+        async void StatementAttestationTypesWindow_KeyDown(object sender, KeyEventArgs e)
         {
             switch (e.Key)
             {

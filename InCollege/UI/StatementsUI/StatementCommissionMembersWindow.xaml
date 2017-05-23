@@ -5,6 +5,7 @@
         Style="{StaticResource BaseWindow}"
         Title="Состав комиссии"
         Loaded="StatementCommissionMembersWindow_Loaded"
+        KeyDown="StatementCommissionMembersWindow_KeyDown"
         Height="300" Width="300">
     <Grid>
         <ListView Name="CommissionMembersLV">

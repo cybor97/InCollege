@@ -72,7 +72,19 @@ namespace InCollege.Client.UI.StatementsUI
             CommissionMemberDialog.IsOpen = false;
         }
 
-        async void CommissionMemberDialog_KeyDown(object sender, KeyEventArgs e)
+        void CommissionMemberDialog_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (CommissionMemberDialog.IsOpen)
+                if (e.Key == Key.Enter)
+                {
+                    CommissionMemberDialog.Focus();
+                    SaveButton_Click(null, null);
+                }
+                else if (e.Key == Key.Escape)
+                    CancelButton_Click(null, null);
+        }
+
+        async void StatementCommissionMembersWindow_KeyDown(object sender, KeyEventArgs e)
         {
             switch (e.Key)
             {

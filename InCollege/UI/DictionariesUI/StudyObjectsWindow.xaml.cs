@@ -6,6 +6,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 
 namespace InCollege.Client.UI.DictionariesUI
 {
@@ -89,7 +90,7 @@ namespace InCollege.Client.UI.DictionariesUI
 
         async void SaveButton_Click(object sender, RoutedEventArgs e)
         {
-            var saveButton = (Button)sender;
+            var saveButton = (Control)sender;
             var dialog = Views[saveButton.Tag].Dialog;
             dialog.IsOpen = false;
             await NetworkUtils.ExecuteDataAction(saveButton.Tag.ToString(), this, (DBRecord)dialog.DataContext, DataAction.Save);
@@ -97,7 +98,8 @@ namespace InCollege.Client.UI.DictionariesUI
 
         void CancelButton_Click(object sender, RoutedEventArgs e)
         {
-            Views[((Button)sender).Tag].Dialog.IsOpen = false;
+            if (sender is DialogHost senderDialog) senderDialog.IsOpen = false;
+            else Views[((Button)sender).Tag].Dialog.IsOpen = false;
         }
 
         void Something_SelectionChanged_Ignore(object sender, SelectionChangedEventArgs e)
@@ -149,6 +151,38 @@ namespace InCollege.Client.UI.DictionariesUI
             {
                 new GroupStudentsWindow((Group)GroupsLV.SelectedItem).ShowDialog();
                 await UpdateData();
+            }
+        }
+
+        private void StudyObjectDialog_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (sender is DialogHost dialog)
+                if (dialog.IsOpen)
+                    if (e.Key == Key.Enter)
+                    {
+                        dialog.Focus();
+                        SaveButton_Click(dialog, null);
+                    }
+                    else if (e.Key == Key.Escape)
+                        CancelButton_Click(dialog, null);
+        }
+
+        private async void StudyObjectsWindow_KeyDown(object sender, KeyEventArgs e)
+        {
+            switch (e.Key)
+            {
+                case Key.Add:
+                case Key.OemPlus:
+                    AddButton_Click(null, null);
+                    break;
+                case Key.Subtract:
+                case Key.OemMinus:
+                case Key.Delete:
+                    RemoveItem_Click(null, null);
+                    break;
+                case Key.F5:
+                    await UpdateData();
+                    break;
             }
         }
     }

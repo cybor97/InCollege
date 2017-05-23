@@ -3,6 +3,7 @@ using InCollege.Core.Data.Base;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Input;
 
 namespace InCollege.Client.UI.DictionariesUI
 {
@@ -59,11 +60,6 @@ namespace InCollege.Client.UI.DictionariesUI
             StudentDialog.IsOpen = false;
         }
 
-        private void StudentDialog_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
-        {
-
-        }
-
         void EditItem_Click(object sender, RoutedEventArgs e)
         {
             if (StudentsLV.SelectedItem != null && !StudentCB.Items.IsEmpty)
@@ -86,6 +82,37 @@ namespace InCollege.Client.UI.DictionariesUI
         async void GroupStudentsWindow_Loaded(object sender, RoutedEventArgs e)
         {
             await UpdateData();
+        }
+
+        void StudentDialog_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (StudentDialog.IsOpen)
+                if (e.Key == Key.Enter)
+                {
+                    StudentDialog.Focus();
+                    SaveButton_Click(null, null);
+                }
+                else if (e.Key == Key.Escape)
+                    CancelButton_Click(null, null);
+        }
+
+        async void GroupStudentsWindow_KeyDown(object sender, KeyEventArgs e)
+        {
+            switch (e.Key)
+            {
+                case Key.Add:
+                case Key.OemPlus:
+                    AddButton_Click(null, null);
+                    break;
+                case Key.Subtract:
+                case Key.OemMinus:
+                case Key.Delete:
+                    RemoveItem_Click(null, null);
+                    break;
+                case Key.F5:
+                    await UpdateData();
+                    break;
+            }
         }
     }
 }

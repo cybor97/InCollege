@@ -5,6 +5,7 @@
         Loaded="StatementAttestationTypesWindow_Loaded"
         Style="{StaticResource BaseWindow}"
         Title="Виды аттестации"
+        KeyDown="StatementAttestationTypesWindow_KeyDown"
         Width="300" Height="300">
     <Grid>
         <ListView Name="StatementAttestationTypesLV">
