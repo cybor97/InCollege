@@ -101,11 +101,13 @@
                           material:HintAssist.IsFloating="True"
                           SelectedValue="{Binding Course}"
                           Name="CourseCB"
+                          SelectionChanged="CourseCB_SelectionChanged"
                           Margin="0 0 5 0"/>
 
                 <ComboBox Grid.Column="1"
                           IsEditable="True"
                           Name="SemesterCB"
+                          SelectionChanged="SemesterCB_SelectionChanged"
                           SelectedValue="{Binding Semester}"
                           material:HintAssist.Hint="Семестр"
                           material:HintAssist.IsFloating="True"/>

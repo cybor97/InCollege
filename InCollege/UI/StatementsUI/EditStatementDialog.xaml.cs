@@ -9,6 +9,7 @@ using System.Windows.Controls;
 using System.Threading.Tasks;
 using System.Linq;
 using System.Windows.Input;
+using System.Windows.Controls.Primitives;
 
 namespace InCollege.Client.UI.StatementsUI
 {
@@ -74,7 +75,6 @@ namespace InCollege.Client.UI.StatementsUI
             UnfilledBlankResults.Visibility = canContainResults ? Visibility.Collapsed : Visibility.Visible;
         }
         #endregion
-
         #region Selection callbacks
         async void GroupCB_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
@@ -110,6 +110,27 @@ namespace InCollege.Client.UI.StatementsUI
             {
                 MiddleStatementResultsContainer.Visibility = Visibility.Collapsed;
                 ComplexStatementPanel.Visibility = Visibility.Visible;
+            }
+        }
+
+        void SemesterCB_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (Statement != null)
+            {
+                var optimal = (int)Math.Ceiling((double)Statement.Semester / 2);
+                Statement.Course = optimal == 0 ? 1 : optimal;
+                BindingOperations.GetBindingExpressionBase(CourseCB, Selector.SelectedValueProperty).UpdateTarget();
+            }
+        }
+
+        void CourseCB_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (Statement != null)
+            {
+                var optimal = Statement.Course * 2;
+                if (optimal > Statement.Semester || optimal < Statement.Semester)
+                    Statement.Semester = optimal - 1;
+                BindingOperations.GetBindingExpressionBase(SemesterCB, Selector.SelectedValueProperty).UpdateTarget();
             }
         }
         #endregion
@@ -222,7 +243,7 @@ namespace InCollege.Client.UI.StatementsUI
         }
         #endregion
     }
-
+    #region Converters
     public class IndexConverter : IValueConverter
     {
         public object Convert(object value, Type TargetType, object parameter, CultureInfo culture)
@@ -249,4 +270,5 @@ namespace InCollege.Client.UI.StatementsUI
             return (StatementType)(int)value;
         }
     }
+    #endregion
 }
