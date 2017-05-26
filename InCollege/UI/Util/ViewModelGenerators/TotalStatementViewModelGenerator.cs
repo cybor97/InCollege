@@ -1,4 +1,5 @@
 ﻿using InCollege.Core.Data;
+using InCollege.Core.Data.Base;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,15 +14,23 @@ namespace InCollege.Client.UI.Util.Generators
             {
                 ("StudentFullName", "ФИО обучающегося")
             };
-
-            result.AddRange(data.Distinct(new DistinctBySubject()).Select(c => (name: $"subject{c.SubjectID}", uiName: $"{c.SubjectIndex}|{c.StatementResultDate?.ToString("dd.MM.yyyy")}")));
+            //Make nulls at the end.
+            result.AddRange(data.Distinct(new DistinctBySubject())
+                                .Select(c =>
+                                {
+                                    var statementResultDate = c.StatementResultDate ??
+                                                              data.FirstOrDefault(currentHelpfulResult => currentHelpfulResult.SubjectID == c.SubjectID &&
+                                                                                                          currentHelpfulResult.StatementResultDate != null)
+                                                                  .StatementResultDate;
+                                    return (name: $"subject{c.SubjectID}", uiName: $"{c.SubjectIndex}({statementResultDate?.ToString("dd.MM.yyyy")})");
+                                }));
+            result.Add(("average", "Средний балл"));
 
             return result;
         }
 
         public override IList<StatementResultViewModel> GetResults(IEnumerable<string> columns, IEnumerable<StatementResult> statementResults)
         {
-            //   List<string> properties = 
             var type = StatementViewModelTypeBuilder.BuildTypeForFields(columns.Where(c => c != "StudentFullName"));
             var result = new List<StatementResultViewModel>();
             var distinctor = new DistinctByStudent();// :D
@@ -35,13 +44,28 @@ namespace InCollege.Client.UI.Util.Generators
                     obj.StudentFullName = current.StudentFullName;
                     result.Add(obj);
                 }
-
-                //TODO:Check me on free mind
+                //Get all results.
+                //For each column, what is subject and contains subject ID set it's string value, store it in first 'result', that is for current student.  
                 foreach (var currentResult in statementResults)
                     foreach (var currentColumn in columns.Where(c => c.StartsWith("subject")))
                         if (currentResult.SubjectID.ToString() == currentColumn.Split(new[] { "subject" }, StringSplitOptions.RemoveEmptyEntries)[0])
                             type.GetProperty(currentColumn)
                                 .SetValue(result.First(c => c.StudentID == currentResult.StudentID), currentResult.MarkValueString);
+                //Get all results for this student. 
+                //If has any 'Blanks' - result will blank. 
+                //If has any absents or unpasseds(does this word exist, btw? :D ) then result will be 'Unpassed'
+                //Else result is average of all subject marks.
+                //Aaaand we don't count "Passed".
+                foreach (var current in result)
+                {
+                    var currentStudentResults = statementResults.Where(c => c.StudentID == current.StudentID && c.MarkValue != (sbyte)TechnicalMarkValue.Passed);
+                    type.GetProperty("average")
+                        .SetValue(current, currentStudentResults.Any(c => c.MarkValue == (sbyte)TechnicalMarkValue.Blank) ?
+                                           StatementResult.GetMarkValueString((sbyte)TechnicalMarkValue.Blank) :
+                                           currentStudentResults.Any(c => c.MarkValue == (sbyte)TechnicalMarkValue.Absent || c.MarkValue == (sbyte)TechnicalMarkValue.Unpassed) ?
+                                           StatementResult.GetMarkValueString((sbyte)TechnicalMarkValue.Unpassed) :
+                                           StatementResult.GetMarkValueString((sbyte)currentStudentResults.Average(c => c.MarkValue)));
+                }
             }
             return result;
         }
