@@ -36,7 +36,6 @@ namespace InCollege.Client.UI.Util.Generators
                     result.Add(obj);
                 }
 
-                //TODO:Check me on free mind
                 foreach (var currentResult in statementResults)
                     foreach (var currentColumn in columns.Where(c => c.StartsWith("subject")))
                         if (currentResult.SubjectID.ToString() == currentColumn.Split(new[] { "subject" }, StringSplitOptions.RemoveEmptyEntries)[0])
