@@ -1,6 +1,7 @@
 ﻿using InCollege.Core.Data;
 using NPOI.XWPF.UserModel;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 
@@ -8,34 +9,81 @@ namespace InCollege
 {
     public static class DocumentsUtil
     {
-        public static void SaveStatementWithTemplate(Statement statement, List<object> results, string templateFilename, string saveFilename)
+        public static void SaveStatementWithTemplate(Statement statement,
+            List<StatementResult> results,
+            List<AttestationType> attestationTypes,
+            List<Account> commissionMembers,
+            string templateFilename, string saveFilename)
         {
             if (statement != null)
             {
-                var document = new XWPFDocument();
-                document.ReplaceText("{StatementNumber}", statement.StatementNumber.ToString());
+                using (var templateFile = new FileStream(templateFilename, FileMode.Open, FileAccess.Read, FileShare.Read))
+                {
+                    var document = new XWPFDocument(templateFile);
+                    document.ReplaceText("{StatementNumber}", statement.StatementNumber.ToString())
 
-                document.ReplaceText("{Subject.Name}", statement.Subject?.SubjectName);
-                document.ReplaceText("{Subject.Index}", statement.Subject?.SubjectIndex?.ToString());
+                            .ReplaceText("{Subject.Name}", statement.Subject?.SubjectName)
+                            .ReplaceText("{Subject.Index}", statement.Subject?.SubjectIndex?.ToString())
 
-                document.ReplaceText("{Specialty.Name}", statement.Specialty?.SpecialtyName);
-                document.ReplaceText("{Specialty.Code}", statement.Specialty?.SpecialtyCode);
+                            .ReplaceText("{Specialty.Name}", statement.Specialty?.SpecialtyName)
+                            .ReplaceText("{Specialty.Code}", statement.Specialty?.SpecialtyCode)
 
-                document.ReplaceText("{Group.Name}", statement.Group?.GroupName);
-                document.ReplaceText("{Group.Code}", statement.Group?.GroupCode);
+                            .ReplaceText("{Group.Name}", statement.Group?.GroupName)
+                            .ReplaceText("{Group.Code}", statement.Group?.GroupCode)
 
-                document.ReplaceText("{Course}", statement.Course.ToRoman());
-                document.ReplaceText("{Semester}", statement.Semester.ToString());
+                            .ReplaceText("{Course}", statement.Course.ToRoman())
+                            .ReplaceText("{Semester}", statement.Semester.ToString())
 
-                document.ReplaceText("{StatementDate.Day}", statement.StatementDate.Day.ToString());
-                document.ReplaceText("{StatementDate.Month}", statement.StatementDate.ToString("MMMM"));
-                document.ReplaceText("{StatementDate.Year}", statement.StatementDate.Year.ToString());
+                            .ReplaceText("{StatementDate.Day}", statement.StatementDate.Day.ToString())
+                            .ReplaceText("{StatementDate.Month}", statement.StatementDate.ToString("MMMM"))
+                            .ReplaceText("{StatementDate.Year}", statement.StatementDate.Year.ToString())
+
+                            .ReplaceText("{StatementAttestationTypes}", string.Join(", ", attestationTypes?.Select(c => c.TypeName)))
+                            .ReplaceText("{StatementCommissionMembers}", string.Join(", ", commissionMembers?.Select(c => c.FullName)))
+                            .ReplaceText("{StatementCommissionMembers_Signs}", string.Join("\n", commissionMembers?.Select(c => $"_________ {c.FullName}")));
+
+
+                    templateFile.Close();
+                    using (var resultFileStream = new FileStream(saveFilename, FileMode.OpenOrCreate))
+                    {
+                        document.Write(resultFileStream);
+                        resultFileStream.Flush();
+                    }
+                }
+
+
+                //TODO:Table detection
+                //TODO:OrderNumber
+                //TODO:StatementResult.Student.FullName
+                //TODO:StatementResult.MarkValue
             }
         }
 
-        public static void ReplaceText(this XWPFDocument document, string template, string value)
+        public static XWPFDocument ReplaceText(this XWPFDocument document, string token, string textToReplace)
         {
-            document.Paragraphs.FirstOrDefault(c => c.Text.Contains(template))?.ReplaceText(template, value);
+            ReplaceInParagraphs(document.Paragraphs, token, textToReplace);
+            return document;
+        }
+
+        static void ReplaceInParagraphs(IList<XWPFParagraph> paragraphs, string placeHolder, string replaceText)
+        {
+            foreach (XWPFParagraph xwpfParagraph in paragraphs)
+            {
+                IList<XWPFRun> runs = xwpfParagraph.Runs;
+                foreach (XWPFRun run in runs)
+                {
+                    string runText = run.Text;
+
+                    if (!string.IsNullOrWhiteSpace(placeHolder))
+                    {
+                        if (runText != null && placeHolder == runText)
+                        {
+                            run.ReplaceText(runText, replaceText);
+                        }
+                    }
+                    run.SetText(runText, 0);
+                }
+            }
         }
 
         static string ToRoman(this int number)
