@@ -27,7 +27,7 @@ namespace InCollege
             Client = new HttpClient();
             Client.DefaultRequestHeaders.Accept.Clear();
             Client.DefaultRequestHeaders.Add("Connection", "Keep-Alive");
-            Client.DefaultRequestHeaders.Add("Keep-Alive", "timeout=2000");
+            Client.DefaultRequestHeaders.Add("Keep-Alive", "timeout=10000");
         }
 
         public static async Task<Account> WhoAmI()
