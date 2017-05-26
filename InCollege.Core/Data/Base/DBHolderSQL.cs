@@ -10,11 +10,7 @@ namespace InCollege.Core.Data.Base
     /// </summary>
     public static class DBHolderSQL
     {
-        static SQLiteConnection DataConnection;
-
         static string ConnectionString { get; set; }
-
-        static SQLiteDataAdapter ReadAdapter;
 
         public static void Init(string filename)
         {
@@ -27,62 +23,78 @@ namespace InCollege.Core.Data.Base
                 {
                     DataSource = filename,
                     Version = 3,
-                    JournalMode = SQLiteJournalModeEnum.Wal,
+                    JournalMode = SQLiteJournalModeEnum.Memory,
                 }.ConnectionString;
-
-            DataConnection = new SQLiteConnection(ConnectionString) { Flags = SQLiteConnectionFlags.GetAllAsText };
-            DataConnection.Open();
-            ReadAdapter = new SQLiteDataAdapter { AcceptChangesDuringFill = false };
         }
 
         public static DataTable GetFriends(int accountID)
         {
-            ReadAdapter.SelectCommand = new SQLiteCommand("SELECT DISTINCT Account.FullName, Account.ID " +
-                "FROM Message " +
-                "LEFT JOIN Account ON Account.ID = Message.FromID OR Account.ID = Message.ToID " +
-                "WHERE (Message.FromID=@accountID OR Message.ToID=@accountID) AND Account.ID<>@accountID;", DataConnection);
-            ReadAdapter.SelectCommand.Parameters.AddWithValue("@accountID", accountID);
             var table = new DataTable();
-            ReadAdapter.Fill(table);
+            using (var connection = new SQLiteConnection(ConnectionString).OpenAndReturn())
+            using (var transaction = connection.BeginTransaction(IsolationLevel.Unspecified))
+            using (var adapter = new SQLiteDataAdapter { AcceptChangesDuringFill = false })
+            {
+                adapter.SelectCommand = new SQLiteCommand("SELECT DISTINCT Account.FullName, Account.ID " +
+                    "FROM Message " +
+                    "LEFT JOIN Account ON Account.ID = Message.FromID OR Account.ID = Message.ToID " +
+                    "WHERE (Message.FromID=@accountID OR Message.ToID=@accountID) AND Account.ID<>@accountID;", connection)
+                { Transaction = transaction };
+                adapter.SelectCommand.Parameters.AddWithValue("@accountID", accountID);
+                adapter.Fill(table);
+            }
             return table;
         }
 
         public static DataTable GetRange(string table, string column, int skip, int count, bool fixedString, bool justCount, bool reverse, bool orAll, params (string name, object value)[] whereParams)
         {
-            column = string.IsNullOrWhiteSpace(column) ? "*" : $"[{column}]";
-
-            string whereString = string.Join(
-
-                orAll ? " OR " : " AND ",
-
-                whereParams
-                .Where(c => !string.IsNullOrWhiteSpace(c.name) && !string.IsNullOrWhiteSpace(c.value?.ToString()))
-                .Select(c => !(c.value is string) || fixedString ?
-                        $"{c.name} LIKE @{c.name}" :
-                        $"instr({c.name}, @{c.name}) > 0"));
-
-            ReadAdapter.SelectCommand = new SQLiteCommand($"SELECT " +
-                                  (justCount ? "count()" : $"{column} ") +
-                                  $"FROM [{table}] " +
-                                  (string.IsNullOrWhiteSpace(whereString) ? "" : $"WHERE {whereString} ") +
-                                  (reverse ? column == "*" ? "ORDER BY ID DESC " : $"ORDER BY {column} DESC " : "") +
-                                  $"LIMIT {skip}, {(count == -1 ? DBHolderORM.DEFAULT_LIMIT : count)} ",
-                    DataConnection);
-            foreach (var current in whereParams)
-                ReadAdapter.SelectCommand.Parameters.AddWithValue($"@{current.name}", current.value);
-
             var result = new DataTable(table);
+            using (var connection = new SQLiteConnection(ConnectionString).OpenAndReturn())
+            using (var transaction = connection.BeginTransaction(IsolationLevel.Unspecified))
+            using (var adapter = new SQLiteDataAdapter { AcceptChangesDuringFill = false })
+                try
+                {
+                    column = string.IsNullOrWhiteSpace(column) ? "*" : $"[{column}]";
 
-            ReadAdapter.Fill(result);
+                    string whereString = string.Join(
 
+                        orAll ? " OR " : " AND ",
+
+                        whereParams
+                        .Where(c => !string.IsNullOrWhiteSpace(c.name) && !string.IsNullOrWhiteSpace(c.value?.ToString()))
+                        .Select(c => !(c.value is string) || fixedString ?
+                                $"{c.name} LIKE @{c.name}" :
+                                $"instr({c.name}, @{c.name}) > 0"));
+
+                    adapter.SelectCommand = new SQLiteCommand($"SELECT " +
+                                          (justCount ? "count()" : $"{column} ") +
+                                          $"FROM [{table}] " +
+                                          (string.IsNullOrWhiteSpace(whereString) ? "" : $"WHERE {whereString} ") +
+                                          (reverse ? column == "*" ? "ORDER BY ID DESC " : $"ORDER BY {column} DESC " : "") +
+                                          $"LIMIT {skip}, {(count == -1 ? DBHolderORM.DEFAULT_LIMIT : count)} ",
+                            connection)
+                    { Transaction = transaction };
+                    foreach (var current in whereParams)
+                        adapter.SelectCommand.Parameters.AddWithValue($"@{current.name}", current.value);
+
+                    adapter.Fill(result);
+                }
+                catch (ObjectDisposedException)
+                {
+                    lock (ConnectionString)
+                        result = GetRange(table, column, skip, count, fixedString, justCount, reverse, orAll, whereParams);
+                    return result;
+                }
             return result;
         }
 
         public static DataRow GetByID(string table, int id)
         {
             DataTable result = new DataTable();
-            var adapter = new SQLiteDataAdapter($"SELECT * FROM [{table}] WHERE ID={id}", DataConnection);
-            adapter.Fill(result);
+            using (var connection = new SQLiteConnection(ConnectionString).OpenAndReturn())
+            {
+                var adapter = new SQLiteDataAdapter($"SELECT * FROM [{table}] WHERE ID={id}", connection);
+                adapter.Fill(result);
+            }
             return result.Rows.Count > 0 ? result.Rows[0] : null;
         }
 
@@ -139,7 +151,7 @@ namespace InCollege.Core.Data.Base
                 else
                 {
                     row = data.NewRow();
-                    row["ID"] = id = GetFreeID(table);
+                    row["ID"] = id = GetFreeID(connection, table);
                 }
 
                 row["IsLocal"] = false;
@@ -213,10 +225,10 @@ namespace InCollege.Core.Data.Base
             return result;
         }
 
-        static int GetFreeID(string table)
+        static int GetFreeID(SQLiteConnection connection, string table)
         {
             var data = new DataTable();
-            new SQLiteDataAdapter($"SELECT * FROM sqlite_sequence WHERE name LIKE '{table}';", DataConnection).Fill(data);
+            new SQLiteDataAdapter($"SELECT * FROM sqlite_sequence WHERE name LIKE '{table}';", connection).Fill(data);
             return data.Rows.Count == 0 ? 0 : Convert.ToInt32(data.Rows[0]["seq"]) + 1;
         }
     }
