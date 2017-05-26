@@ -10,11 +10,13 @@ using System.Threading.Tasks;
 using System.Linq;
 using System.Windows.Input;
 using System.Windows.Controls.Primitives;
+using System.Collections.Generic;
 
 namespace InCollege.Client.UI.StatementsUI
 {
     public partial class EditStatementDialog : DialogHost, IUpdatable
     {
+        #region Properties
         public event RoutedEventHandler OnSave;
         public event RoutedEventHandler OnCancel;
 
@@ -26,6 +28,9 @@ namespace InCollege.Client.UI.StatementsUI
         }
 
         public bool AddMode { get; set; }
+        public bool GeneratedComplexMode { get; set; }
+        public bool GeneratedTotalMode { get; set; }
+        #endregion
 
         public EditStatementDialog()
         {
@@ -35,6 +40,29 @@ namespace InCollege.Client.UI.StatementsUI
                 SemesterCB.Items.Add(i);
             for (int i = 1; i <= 6; i++)
                 CourseCB.Items.Add(i);
+        }
+
+        public async Task Show(Statement statement, bool addMode, bool generatedComplexMode, bool generatedTotalMode)
+        {
+            if (generatedComplexMode && generatedTotalMode)
+                MessageBox.Show("Ошибка! Ведомость не может быть сгенерирована одновременно \"Составной\" и \"Сводной\"");
+            else
+            {
+                AddMode = addMode;
+                GeneratedComplexMode = generatedComplexMode;
+                GeneratedTotalMode = generatedTotalMode;
+
+                Statement = statement;
+                if (AddMode)
+                    if (GeneratedComplexMode)
+                        Statement.StatementType = StatementType.QualificationExam;
+                    else if (GeneratedTotalMode)
+                        Statement.StatementType = StatementType.Total;
+
+                await UpdateData();
+
+                IsOpen = true;
+            }
         }
 
         #region Updaters
@@ -52,6 +80,12 @@ namespace InCollege.Client.UI.StatementsUI
 
         public async Task UpdateData()
         {
+            if (AddMode)
+            {
+                StatementResultsLV.ItemsSource = null;
+                if (SpecialtyCB.SelectedItem == null)
+                    GroupCB.Visibility = Visibility.Collapsed;
+            }
 
             if (GroupCB.SelectedItem != null)
             {
@@ -68,9 +102,30 @@ namespace InCollege.Client.UI.StatementsUI
                 StatementResultsLV.ItemsSource = statementResultsData;
             }
 
-            GroupCB.IsEnabled = StatementTypeCB.IsEnabled = SubjectCB.IsEnabled = SpecialtyCB.IsEnabled = StatementResultsLV.Items.Count == 0;
+            if (GeneratedComplexMode || GeneratedTotalMode)
+            {
+                SubjectCB.Visibility = Visibility.Collapsed;
+                var binding = BindingOperations.GetBindingExpressionBase(StatementTypeCB, Selector.SelectedValueProperty);
+                if (GeneratedComplexMode)
+                    MiddleItem.IsEnabled = ExamItem.IsEnabled = TotalItem.IsEnabled = false;
+                else if (GeneratedTotalMode)
+                    StatementTypeCB.IsEnabled = false;
 
-            bool canContainResults = SpecialtyCB.SelectedItem != null && GroupCB.SelectedItem != null;
+                SubjectCB.IsEnabled = true;
+                GroupCB.IsEnabled = SpecialtyCB.IsEnabled = !GeneratedTotalMode;
+
+                BindingOperations.GetBindingExpressionBase(StatementTypeCB, Selector.SelectedIndexProperty).UpdateTarget();
+            }
+            else
+            {
+                GroupCB.IsEnabled = StatementTypeCB.IsEnabled = SubjectCB.IsEnabled = SpecialtyCB.IsEnabled = StatementResultsLV.Items.Count == 0;
+                SubjectCB.Visibility = Visibility.Visible;
+                foreach (ComboBoxItem current in StatementTypeCB.Items)
+                    current.IsEnabled = true;
+            }
+
+
+            bool canContainResults = SpecialtyCB.SelectedItem != null && GroupCB.SelectedItem != null || GeneratedTotalMode;
             StatementResultsContainer.Visibility = canContainResults ? Visibility.Visible : Visibility.Collapsed;
             UnfilledBlankResults.Visibility = canContainResults ? Visibility.Collapsed : Visibility.Visible;
         }
@@ -166,6 +221,16 @@ namespace InCollege.Client.UI.StatementsUI
             else MessageBox.Show("Выберите дисциплину!");
         }
 
+        async void RePassesItem_Click(object sender, RoutedEventArgs e)
+        {
+            if (StatementResultsLV.SelectedItem != null)
+            {
+                var item = (StatementResult)StatementResultsLV.SelectedItem;
+                new RePassesWindow(Statement.ID, item.ID, item.SubjectID, item.StudentFullName, this).ShowDialog();
+                await UpdateData();
+            }
+        }
+
         void EditStatementResultItem_Click(object sender, RoutedEventArgs e)
         {
             if (StatementResultsLV.SelectedItem != null)
@@ -178,8 +243,11 @@ namespace InCollege.Client.UI.StatementsUI
 
         async void RemoveStatementResultItem_Click(object sender, RoutedEventArgs e)
         {
-            foreach (var current in StatementResultsLV.SelectedItems)
-                await NetworkUtils.ExecuteDataAction<StatementResult>(null, (DBRecord)current, DataAction.Remove);
+            foreach (DBRecord current in StatementResultsLV.SelectedItems)
+            {
+                await NetworkUtils.ExecuteDataAction<StatementResult>(null, current, DataAction.Remove);
+                await NetworkUtils.RemoveWhere<RePass>(null, (nameof(RePass.StatementResultID), current.ID));
+            }
             await UpdateData();
         }
 
@@ -228,7 +296,10 @@ namespace InCollege.Client.UI.StatementsUI
         #region Dialog buttons
         void SaveButton_Click(object sender, RoutedEventArgs e)
         {
-            OnSave?.Invoke(sender, e);
+            BindingOperations.GetBindingExpressionBase(StatementDatePicker, DatePicker.SelectedDateProperty).UpdateSource();
+            if (Statement.StatementDate != null)
+                OnSave?.Invoke(sender, e);
+            else MessageBox.Show("Укажите дату!");
         }
 
         private void CancelButton_Click(object sender, RoutedEventArgs e)
@@ -237,9 +308,32 @@ namespace InCollege.Client.UI.StatementsUI
             OnCancel?.Invoke(sender, e);
         }
 
-        void PrintButton_Click(object sender, RoutedEventArgs e)
+        async void PrintButton_Click(object sender, RoutedEventArgs e)
         {
+            PrintButton.IsEnabled = false;
+            var attestationTypes = (await NetworkUtils.RequestData<StatementAttestationType>(null, (nameof(StatementAttestationType.StatementID), Statement.ID)))
+                                    .Select(async c => (await NetworkUtils.RequestData<AttestationType>(null, (nameof(AttestationType.ID), c.AttestationTypeID)))?.FirstOrDefault());
 
+            var commissionMembers = (await NetworkUtils.RequestData<CommissionMember>(null, (nameof(CommissionMember.StatementID), Statement.ID)))
+                                    .Select(async c => (await NetworkUtils.RequestData<Account>(null, (nameof(Account.ID), c.ProfessorID)))?.FirstOrDefault());
+
+            var attestationTypesResults = new List<AttestationType>();
+            var commissionMembersResults = new List<Account>();
+
+            foreach (var current in attestationTypes)
+                attestationTypesResults.Add(await current);
+
+            foreach (var current in commissionMembers)
+                commissionMembersResults.Add(await current);
+
+            DocumentsUtil.SaveStatementWithTemplate(Statement, (List<StatementResult>)StatementResultsLV.ItemsSource,
+                attestationTypesResults?.ToList(),
+                commissionMembersResults?.ToList(),
+                @"C:\Users\muham\AppData\Middle.docx",
+                @"C:\Users\muham\Desktop\MiddleTestResult.docx");
+            //FIXME
+            //JUST FIX ME! REMOVE THIS DEBUG STAFF!
+            PrintButton.IsEnabled = true;
         }
         #endregion
     }
@@ -254,7 +348,7 @@ namespace InCollege.Client.UI.StatementsUI
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            throw new NotImplementedException();
+            return null;
         }
     }
 

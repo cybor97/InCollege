@@ -42,14 +42,14 @@
                           SelectionChanged="StatementTypeCB_SelectionChanged"
                           Foreground="Gray"
                           Margin="0 0 5 0">
-                    <ComboBoxItem Content="Промежуточная"/>
-                    <ComboBoxItem Content="Экзаменационная" />
-                    <ComboBoxItem Content="Квалификационный экзамен" />
-                    <ComboBoxItem Content="Учебная практика" />
-                    <ComboBoxItem Content="Производственная практика" />
-                    <ComboBoxItem Content="Курсовой проект" />
-                    <ComboBoxItem Content="Сводная" />
-                    <ComboBoxItem Content="Прочее" />
+                    <ComboBoxItem Content="Промежуточная" Name="MiddleItem"/>
+                    <ComboBoxItem Content="Экзаменационная" Name="ExamItem"/>
+                    <ComboBoxItem Content="Квалификационный экзамен" Name="QualificationItem"/>
+                    <ComboBoxItem Content="Учебная практика" Name="StudyPracticeItem"/>
+                    <ComboBoxItem Content="Производственная практика" Name="IndustrialPracticeItem"/>
+                    <ComboBoxItem Content="Курсовой проект" Name="CourceProjectItem"/>
+                    <ComboBoxItem Content="Сводная" Name="TotalItem"/>
+                    <ComboBoxItem Content="Прочее" Name="OtherItem"/>
                 </ComboBox>
                 <TextBox Name="StatementNumberTB"
                          PreviewTextInput="StatementNumberTB_PreviewTextInput"
@@ -113,7 +113,7 @@
                           material:HintAssist.IsFloating="True"/>
             </Grid>
 
-            <Button Content="Состав коммиссии" 
+            <Button Content="Преподаватели" 
                     Style="{StaticResource MaterialDesignFlatButton}"
                     Click="CommissionMembersButton_Click"
                     Grid.Row="6"
@@ -140,6 +140,7 @@
                     <ListView  Name="StatementResultsLV">
                         <ListView.ContextMenu>
                             <ContextMenu>
+                                <MenuItem Header="Пересдачи" Click="RePassesItem_Click"/>
                                 <MenuItem Header="Редактировать" Click="EditStatementResultItem_Click"/>
                                 <MenuItem Header="Удалить" Click="RemoveStatementResultItem_Click"/>
                             </ContextMenu>
@@ -209,9 +210,9 @@
                                         <ComboBoxItem Content="4"/>
                                         <ComboBoxItem Content="5"/>
 
-                                        <ComboBoxItem Content="Отсутствовал" Name="AbsentItem"/>
+                                        <ComboBoxItem Content="Не явился" Name="AbsentItem"/>
                                         <ComboBoxItem Content="Зачтено" Name="PassedItem"/>
-                                        <ComboBoxItem Content="Не зачтено" Name="UnpassedItem"/>
+                                        <ComboBoxItem Content="Не аттестован" Name="UnpassedItem"/>
                                         <ComboBoxItem Content="" Name="BlankItem"/>
 
                                     </ComboBox>
@@ -242,7 +243,8 @@
                      TextWrapping="Wrap"
                      material:HintAssist.IsFloating="True"/>
 
-            <DatePicker Grid.Row="9"
+            <DatePicker Name="StatementDatePicker"
+                        Grid.Row="9"
                         SelectedDate="{Binding StatementDate}"
                         material:HintAssist.Hint="Дата проведения"
                         material:HintAssist.IsFloating="True"
@@ -264,7 +266,7 @@
                         Grid.Column="1"
                         Style="{StaticResource MaterialDesignFlatButton}" 
                         VerticalAlignment="Bottom" 
-                        IsEnabled="False"
+                        Name="PrintButton"
                         Click="PrintButton_Click"/>
 
                 <Button Content="Сохранить" 
