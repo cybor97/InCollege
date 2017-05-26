@@ -1,0 +1,89 @@
+﻿<Window x:Class="InCollege.Client.UI.StatementsUI.RePassesWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:material="http://materialdesigninxaml.net/winfx/xaml/themes"
+        Style="{StaticResource BaseWindow}"
+        KeyDown="RePassesWindow_KeyDown"
+        Loaded="RePassesWindow_Loaded"
+        Height="450" Width="600">
+    <Grid>
+        <ListView Name="RePassesLV">
+            <ListView.ContextMenu>
+                <ContextMenu>
+                    <MenuItem Header="Заменить в результате ведомости" Click="ReplaceSourceItem_Click"/>
+                    <MenuItem Header="Редактировать" Click="EditItem_Click"/>
+                    <MenuItem Header="Удалить" Click="RemoveItem_Click"/>
+                </ContextMenu>
+            </ListView.ContextMenu>
+            <ListView.View>
+                <GridView>
+                    <GridViewColumn>
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <Image Width="20" Height="20"
+                                       Source="{Binding Path=StateIconURI, Converter={StaticResource ImageToSourceConverter}}"/>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+                    <GridViewColumn Header="Номер" DisplayMemberBinding="{Binding RePassNumber}"/>
+                    <GridViewColumn Header="Дата пересдачи" DisplayMemberBinding="{Binding RePassDate, StringFormat=dd\\.MM\\.yyyy}"/>
+                    <GridViewColumn Header="ФИО" DisplayMemberBinding="{Binding Teacher.FullName}"/>
+                    <GridViewColumn Header="Новая оценка" DisplayMemberBinding="{Binding MarkValueString}"/>
+                </GridView>
+            </ListView.View>
+        </ListView>
+
+        <Button Grid.Row="1" 
+                Foreground="WhiteSmoke" FontSize="30" FontStretch="Medium" 
+                Style="{StaticResource MaterialDesignFloatingActionMiniAccentButton}" Content="+" 
+                Click="AddButton_Click"
+                HorizontalAlignment="Right" VerticalAlignment="Bottom"/>
+
+        <material:DialogHost Name="RePassDialog"
+                             CloseOnClickAway="True"
+                             KeyDown="RePassDialog_KeyDown">
+            <material:DialogHost.DialogContent>
+                <StackPanel Orientation="Vertical" MinWidth="300">
+                    <TextBox material:HintAssist.Hint="Номер"
+                             material:HintAssist.IsFloating="True"
+                             HorizontalAlignment="Center"
+                             Name="RePassNumberTB"
+                             Text="{Binding RePassNumber}"/>
+                    <ComboBox material:HintAssist.Hint="Преподаватель"
+                              Name="TeacherCB"
+                              material:HintAssist.IsFloating="True" 
+                              HorizontalContentAlignment="Center"
+                              SelectedValue="{Binding Teacher}"
+                              DisplayMemberPath="FullName"/>
+                    <ComboBox material:HintAssist.Hint="Оценка"
+                                         Name="MarkCB"
+                                         SelectedIndex="5"
+                                         material:HintAssist.IsFloating="True" 
+                                         HorizontalContentAlignment="Center"
+                                         Grid.Column="0">
+                        <ComboBoxItem Content="2"/>
+                        <ComboBoxItem Content="3"/>
+                        <ComboBoxItem Content="4"/>
+                        <ComboBoxItem Content="5"/>
+
+                        <ComboBoxItem Content="Не явился" Name="AbsentItem"/>
+                        <ComboBoxItem Content="Зачтено" Name="PassedItem"/>
+                        <ComboBoxItem Content="Не аттестован" Name="UnpassedItem"/>
+                    </ComboBox>
+
+                    <DatePicker material:HintAssist.Hint="Дата пересдачи"
+                                Margin="0 10 0 5"
+                                SelectedDate="{Binding RePassDate}"/>
+
+                    <Button Click="SaveButton_Click"
+                            Style="{StaticResource MaterialDesignFlatAccentButton}"
+                            Content="Сохранить"/>
+                    <Button Foreground="Red"
+                            Click="CancelButton_Click"
+                            Style="{StaticResource MaterialDesignFlatAccentButton}"
+                            Content="Отмена"/>
+                </StackPanel>
+            </material:DialogHost.DialogContent>
+        </material:DialogHost>
+    </Grid>
+</Window>
