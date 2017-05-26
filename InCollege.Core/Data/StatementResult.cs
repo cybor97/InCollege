@@ -18,20 +18,22 @@ namespace InCollege.Core.Data
         [JsonIgnore]
         public string MarkValueString
         {
-            get
+            get => GetMarkValueString(MarkValue);
+        }
+
+        public static string GetMarkValueString(sbyte markValue)
+        {
+            switch (markValue)
             {
-                switch (MarkValue)
-                {
-                    case (sbyte)TechnicalMarkValue.Absent:
-                        return "Не присутствовал";
-                    case (sbyte)TechnicalMarkValue.Passed:
-                        return "Зачтено";
-                    case (sbyte)TechnicalMarkValue.Unpassed:
-                        return "Не зачтено";
-                    case (sbyte)TechnicalMarkValue.Blank:
-                        return string.Empty;
-                    default: return MarkValue.ToString();
-                }
+                case (sbyte)TechnicalMarkValue.Absent:
+                    return "Не явился";
+                case (sbyte)TechnicalMarkValue.Passed:
+                    return "Зачтено";
+                case (sbyte)TechnicalMarkValue.Unpassed:
+                    return "Не аттестован";
+                case (sbyte)TechnicalMarkValue.Blank:
+                    return string.Empty;
+                default: return markValue.ToString();
             }
         }
 
