@@ -253,18 +253,22 @@ namespace InCollege.Server
 
         static bool CheckAccess(IHttpHeaders query, Account account, bool write)
         {
-            return account.AccountType > AccountType.Guest && account.Approved;
+            return account.AccountType >= (write ? AccountType.Professor : AccountType.Student) && account.Approved;
         }
 
         static bool CheckTableAccess(string tableName, Account account)
         {
-            //TODO:Implement
-            throw new NotImplementedException();
+            return tableName == nameof(StatementResult) && account.AccountType >= AccountType.Student
+                || account.AccountType >= AccountType.Professor;
         }
         static bool CheckInTableAcess(string tableName, IHttpHeaders query, Account account)
         {
-            //TODO:Implement
-            throw new NotImplementedException();
+            return tableName == nameof(StatementResult) &&
+                   query.TryGetByName(nameof(StatementResult.StudentID), out int studentID) &&
+                   studentID == account.ID &&
+                   account.AccountType >= AccountType.Student
+
+                  || account.AccountType >= AccountType.Professor;
         }
         #endregion
     }
