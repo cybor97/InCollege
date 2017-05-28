@@ -19,6 +19,15 @@ namespace InCollege
 
                 return _instance;
             }
+
+            set
+            {
+                if (value != null)
+                {
+                    _instance = value;
+                    _instance.Save();
+                }
+            }
         }
         private static ClientConfiguration _instance;
 
