@@ -5,8 +5,7 @@ using System.Linq;
 
 namespace InCollege.Client.UI.Util.Generators
 {
-    //TODO:Implement!
-    class ComplexStatementResultViewModelGenerator : StatementResultViewModelGenerator
+    public class ComplexStatementResultViewModelGenerator : StatementResultViewModelGenerator
     {
         public override IList<(string name, string uiName)> GetColumns(IEnumerable<StatementResult> data)
         {

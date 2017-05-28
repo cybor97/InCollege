@@ -20,9 +20,9 @@ namespace InCollege.Client.UI.Util.Generators
                                 {
                                     var statementResultDate = c.StatementResultDate ??
                                                               data.FirstOrDefault(currentHelpfulResult => currentHelpfulResult.SubjectID == c.SubjectID &&
-                                                                                                          currentHelpfulResult.StatementResultDate != null)
+                                                                                                          currentHelpfulResult.StatementResultDate != null)?
                                                                   .StatementResultDate;
-                                    return (name: $"subject{c.SubjectID}", uiName: $"{c.SubjectIndex}({statementResultDate?.ToString("dd.MM.yyyy")})");
+                                    return (name: $"subject{c.SubjectID}", uiName: $"{c.SubjectIndex}({statementResultDate?.ToString("dd.MM.yyyy") ?? ""})");
                                 }));
             result.Add(("average", "Средний балл"));
 
