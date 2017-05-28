@@ -40,6 +40,32 @@ namespace InCollege.Core.Data
 
         [Ignore]
         [JsonIgnore]
+        public string FullNameInitials
+        {
+            get
+            {
+                if (FullName.Contains(".")) return FullName;
+
+                var parts = FullName.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+                var result = string.Empty;
+                if (parts.Length > 0)
+                {
+                    result += parts[0];
+                    if (parts.Length > 1 && parts[1].Length > 0)
+                    {
+                        result += $" {parts[1][0]}.";
+                        if (parts.Length > 2 && parts[2].Length > 1)
+                            result += $" {parts[2][0]}.";
+                        else result += "  ";
+                    }
+                    else result += "    ";
+                }
+                return result;
+            }
+        }
+
+        [Ignore]
+        [JsonIgnore]
         public bool IsOnline => LastAction != null && DateTime.Now.Subtract(LastAction.Value).TotalSeconds < OnlineTimeoutSeconds;
 
         [Ignore]
