@@ -35,16 +35,14 @@
                 </MenuItem.Header>
             </MenuItem>
             <MenuItem Header="Файл">
-                <MenuItem Header="Экспорт" IsEnabled="False"/>
-                <MenuItem Header="Импорт" IsEnabled="False"/>
+                <MenuItem Header="Открыть" Click="OpenItem_Click"/>
                 <MenuItem Header="Выход" Click="ExitItem_Click"/>
             </MenuItem>
-            <MenuItem Header="Вывод" IsEnabled="False">
-                <MenuItem Header="Подробнее"/>
-                <MenuItem Header="Создать сводную ведомость"/>
-                <MenuItem Header="Печать"/>
+            <MenuItem Header="Вывод">
+                <MenuItem Header="Сформировать составную ведомость" Click="GenerateComplexStatementItem_Click"/>
+                <MenuItem Header="Сформировать сводную ведомость" Click="GenerateTotalStatementItem_Click"/>
             </MenuItem>
-            <MenuItem Header="Словари">
+            <MenuItem Header="Информация об учебном заведении">
                 <MenuItem Header="Виды аттестации" Click="DictionariesItem_Click"/>
                 <MenuItem Header="Отделения" Click="DictionariesItem_Click"/>
                 <MenuItem Header="Специальности" Click="DictionariesItem_Click"/>
@@ -58,14 +56,14 @@
                 <MenuItem Header="Администраторы" Click="ParticipantsItem_Click"/>
                 <MenuItem Header="Не назначенные" Click="ParticipantsItem_Click"/>
             </MenuItem>
-            <MenuItem Header="Сеть" IsEnabled="False">
-                <MenuItem Header="Синхронизировать"/>
-                <MenuItem Header="Аккаунт"/>
-                <MenuItem Header="Настройки"/>
+            <MenuItem Header="Сеть">
+                <MenuItem Header="Обновить данные (F5)" Click="UpdateItem_Click"/>
+                <MenuItem Header="Аккаунт" Click="CurrentAccountItem_Click"/>
+                <MenuItem Header="Проверить версию сервера" Click="CheckVersionItem_Click"/>
             </MenuItem>
             <MenuItem Header="Помощь">
                 <MenuItem Header="Справка"/>
-                <MenuItem Header="О программе"/>
+                <MenuItem Header="О программе" Click="AboutItem_Click"/>
             </MenuItem>
             <MenuItem Header="Выйти из учетной записи" Click="AccountExitItem_Click"/>
             <MenuItem Header="Выйти" Click="ExitItem_Click"/>

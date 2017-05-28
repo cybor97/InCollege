@@ -10,8 +10,9 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Linq;
-using System;
 using System.Collections.Generic;
+using Microsoft.Win32;
+using System.IO;
 
 namespace InCollege.Client.UI.MainUI
 {
@@ -200,18 +201,15 @@ namespace InCollege.Client.UI.MainUI
                 if (StatementsLV.SelectedItems.Count > strangeThreshold ||
                     MessageBox.Show($"Имеет ли смысл? Меньше {strangeThreshold + 1} ведомостей.", "Странная операция", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
                 {
-                    var statement = await AddStatement(complexMode, totalMode, false);
+                    var statement = await AddStatement(complexMode, totalMode, true);
                     if (statement != null && statement.ID != -1)
                     {
                         Cursor = Cursors.Wait;
 
-                        var data = await NetworkUtils.RequestData<StatementResult>(this, strict: true, orAll: true, preserveContext: true, column: null,
-                                                                                   whereParams: StatementsLV.SelectedItems
-                                                                                   .OfType<Statement>()
-                                                                                   .Select(c => (
-                                                                                    name: nameof(StatementResult.StatementID),
-                                                                                    value: (object)c.ID))
-                                                                                   .ToArray());
+                        var data = new List<StatementResult>();
+                        foreach (Statement current in StatementsLV.SelectedItems)
+                            data.AddRange(await NetworkUtils.RequestData<StatementResult>(this, strict: true, orAll: true, preserveContext: true, column: null,
+                                                                                       whereParams: (name: nameof(StatementResult.StatementID), value: current.ID)));
                         var distinctor = new DistinctByStudentAndSubject();
                         //Latest - at the end
                         data.Sort((c1, c2) => c1.StatementResultDate > c2.StatementResultDate ? 1 : c1.StatementResultDate < c2.StatementResultDate ? -1 : 0);
@@ -253,22 +251,53 @@ namespace InCollege.Client.UI.MainUI
 
                         await EditStatementDialog.Show(statement, true, complexMode, totalMode);
                     }
+                    await UpdateData();
                 }
         }
 
-        async Task<Statement> AddStatement(bool generatedComplexMode, bool generatedTotalMode, bool showDialog = true)
+        async Task<Statement> AddStatement(bool generatedComplexMode, bool generatedTotalMode, bool background = false)
         {
             if (!(generatedComplexMode && generatedTotalMode))
             {
                 var statement = new Statement();
                 //Attention                    'HERE. It cannot be optimized that way, you thought about.
-                statement.ID = int.Parse(await NetworkUtils.ExecuteDataAction<Statement>(this, statement, DataAction.Save));
+                statement.ID = int.Parse(await NetworkUtils.ExecuteDataAction<Statement>(background ? null : this, statement, DataAction.Save));
                 statement.IsLocal = false;
-                if (showDialog)
+                if (!background)
                     await EditStatementDialog.Show(statement, true, generatedComplexMode, generatedTotalMode);
                 return statement;
             }
             else return null;
+        }
+
+        async void UpdateItem_Click(object sender, RoutedEventArgs e)
+        {
+            await UpdateData();
+        }
+
+        async void CheckVersionItem_Click(object sender, RoutedEventArgs e)
+        {
+            MessageBox.Show(await NetworkUtils.CheckVersion());
+        }
+
+        void AboutItem_Click(object sender, RoutedEventArgs e)
+        {
+            new AboutWindow().ShowDialog();
+        }
+
+        async void OpenItem_Click(object sender, RoutedEventArgs e)
+        {
+            var dialog = new OpenFileDialog
+            {
+                Filter = "Токен авторизации|*.token|Конфигурация клиента|*.json",
+                FileName = CommonVariables.DataDirectory
+            };
+            if (dialog.ShowDialog() ?? false)
+                if (dialog.FileName.EndsWith(".token"))
+                    App.Token = File.ReadAllText(dialog.FileName);
+                else if (dialog.FileName.EndsWith(".json"))
+                    ClientConfiguration.Instance = Newtonsoft.Json.JsonConvert.DeserializeObject<ClientConfiguration>(File.ReadAllText(dialog.FileName));
+            await UpdateData();
         }
     }
 
