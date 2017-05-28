@@ -11,6 +11,8 @@ using System.Linq;
 using System.Windows.Input;
 using System.Windows.Controls.Primitives;
 using System.Collections.Generic;
+using System.IO;
+using Microsoft.Win32;
 
 namespace InCollege.Client.UI.StatementsUI
 {
@@ -308,32 +310,53 @@ namespace InCollege.Client.UI.StatementsUI
             OnCancel?.Invoke(sender, e);
         }
 
-        async void PrintButton_Click(object sender, RoutedEventArgs e)
+        async void SaveDocButton_Click(object sender, RoutedEventArgs e)
         {
-            PrintButton.IsEnabled = false;
-            var attestationTypes = (await NetworkUtils.RequestData<StatementAttestationType>(null, (nameof(StatementAttestationType.StatementID), Statement.ID)))
-                                    .Select(async c => (await NetworkUtils.RequestData<AttestationType>(null, (nameof(AttestationType.ID), c.AttestationTypeID)))?.FirstOrDefault());
+            SaveDocButton.IsEnabled = false;
+            var saveDialog = new SaveFileDialog
+            {
+                AddExtension = true,
+                Filter = "Документ Microsoft Word|*.docx"
+            };
+            if (saveDialog.ShowDialog() ?? false)
+                try
+                {
+                    var attestationTypes = (await NetworkUtils.RequestData<StatementAttestationType>(null, (nameof(StatementAttestationType.StatementID), Statement.ID)))
+                                            .Select(async c => (await NetworkUtils.RequestData<AttestationType>(null, (nameof(AttestationType.ID), c.AttestationTypeID)))?.FirstOrDefault());
 
-            var commissionMembers = (await NetworkUtils.RequestData<CommissionMember>(null, (nameof(CommissionMember.StatementID), Statement.ID)))
-                                    .Select(async c => (await NetworkUtils.RequestData<Account>(null, (nameof(Account.ID), c.ProfessorID)))?.FirstOrDefault());
+                    var commissionMembers = (await NetworkUtils.RequestData<CommissionMember>(null, (nameof(CommissionMember.StatementID), Statement.ID)))
+                                            .Select(async c => (await NetworkUtils.RequestData<Account>(null, (nameof(Account.ID), c.ProfessorID)))?.FirstOrDefault());
 
-            var attestationTypesResults = new List<AttestationType>();
-            var commissionMembersResults = new List<Account>();
+                    var attestationTypesResults = new List<AttestationType>();
+                    var commissionMembersResults = new List<Account>();
 
-            foreach (var current in attestationTypes)
-                attestationTypesResults.Add(await current);
+                    foreach (var current in attestationTypes)
+                        attestationTypesResults.Add(await current);
 
-            foreach (var current in commissionMembers)
-                commissionMembersResults.Add(await current);
+                    foreach (var current in commissionMembers)
+                        commissionMembersResults.Add(await current);
 
-            DocumentsUtil.SaveStatementWithTemplate(Statement, (List<StatementResult>)StatementResultsLV.ItemsSource,
-                attestationTypesResults?.ToList(),
-                commissionMembersResults?.ToList(),
-                @"C:\Users\muham\AppData\Middle.docx",
-                @"C:\Users\muham\Desktop\MiddleTestResult.docx");
-            //FIXME
-            //JUST FIX ME! REMOVE THIS DEBUG STAFF!
-            PrintButton.IsEnabled = true;
+                    var statementResults = (List<StatementResult>)StatementResultsLV.ItemsSource;
+                    var subjects = (List<Subject>)SubjectCB.ItemsSource;
+                    foreach (var current in statementResults)
+                    {
+                        var subject = subjects.FirstOrDefault(c => c.ID == current.SubjectID);
+                        //Do not use short form. We have to preserve SubjectID
+                        if (subject != null)
+                            current.Subject = subject;
+                    }
+
+                    DocumentUtils_DOCX.SaveStatementWithTemplate(Statement, statementResults,
+                        attestationTypesResults?.ToList(),
+                        commissionMembersResults?.ToList(),
+                        Path.Combine(CommonVariables.DataDirectory, "Templates", $"{Statement.StatementType}.docx"),
+                        saveDialog.FileName);
+                }
+                catch (IOException exc)
+                {
+                    MessageBox.Show($"Ошибка сохранения!\nCообщение:\n{exc.Message}");
+                }
+            SaveDocButton.IsEnabled = true;
         }
         #endregion
     }

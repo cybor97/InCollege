@@ -9,7 +9,7 @@
     </material:DialogHost.Resources>
     <material:DialogHost.DialogContent>
         <Grid Margin="5"
-              Width="500" Height="600" Background="White">
+              Width="550" Height="600" Background="White">
             <Grid.RowDefinitions>
                 <!--StatementType _ Number-->
                 <RowDefinition Height="Auto"/>
@@ -262,12 +262,12 @@
                         Foreground="Red"
                         Click="CancelButton_Click"/>
 
-                <Button Content="Печать" 
+                <Button Content="Сохранить в документ Word" 
                         Grid.Column="1"
                         Style="{StaticResource MaterialDesignFlatButton}" 
                         VerticalAlignment="Bottom" 
-                        Name="PrintButton"
-                        Click="PrintButton_Click"/>
+                        Name="SaveDocButton"
+                        Click="SaveDocButton_Click"/>
 
                 <Button Content="Сохранить" 
                         Grid.Column="2"
