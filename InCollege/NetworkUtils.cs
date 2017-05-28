@@ -260,6 +260,18 @@ namespace InCollege
             return null;
         }
 
+        public static async Task<string> CheckVersion()
+        {
+            try
+            {
+                return await (await Client.GetAsync($"http://{ClientConfiguration.Instance.HostName}:{ClientConfiguration.Instance.Port}/?CheckVersion=1")).Content.ReadAsStringAsync();
+            }
+            catch (HttpRequestException exc)
+            {
+                return $"Ошибка подключения к серверу. Проверьте:\n-запущен ли сервер\n-настройки брандмауэра\n-правильно ли указан адрес\nТехническая информация:\n\n{exc.Message}";
+            }
+        }
+
         public static async Task<List<Account>> RequestFriendList()
         {
             try
