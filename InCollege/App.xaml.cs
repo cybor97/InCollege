@@ -2,9 +2,12 @@
 using InCollege.Client.UI.MainUI;
 using InCollege.Core.Data;
 using System;
+using System.Collections;
+using System.Globalization;
 using System.IO;
 using System.Net;
 using System.Net.Http;
+using System.Resources;
 using System.Windows;
 
 namespace InCollege.Client
@@ -12,13 +15,14 @@ namespace InCollege.Client
     public partial class App : Application
     {
         static string _token = null;
+
         public static string Token
         {
             get
             {
                 if (_token == null && File.Exists(CommonVariables.TokenFileName))
                     _token = File.ReadAllText(CommonVariables.TokenFileName);
-                return _token;
+                return WebUtility.UrlEncode(_token);
             }
             set
             {
@@ -38,6 +42,15 @@ namespace InCollege.Client
             InitializeComponent();
 
             MainWindow = new MainWindow();
+
+            ResourceSet resourceSet = InCollege.Properties.Resources.ResourceManager.GetResourceSet(CultureInfo.CurrentUICulture, true, true);
+            if (!Directory.Exists(CommonVariables.TemplatesDirectory))
+            {
+                Directory.CreateDirectory(CommonVariables.TemplatesDirectory);
+                foreach (DictionaryEntry entry in resourceSet)
+                    if (entry.Key.ToString().EndsWith("_TEMPLATE"))
+                        File.WriteAllBytes(Path.Combine(CommonVariables.TemplatesDirectory, $"{entry.Key.ToString().Split(new[] { "_TEMPLATE" }, StringSplitOptions.RemoveEmptyEntries)[0]}.docx"), (byte[])entry.Value);
+            }
 
             var loginWindow = new AuthorizationWindow();
             if (Token != null && ValidateToken() ||
