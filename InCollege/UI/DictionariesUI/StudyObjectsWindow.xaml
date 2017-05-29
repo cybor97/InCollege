@@ -7,7 +7,7 @@
         Title="StudyObjectsWindow" 
         Loaded="StudyObjectsWindow_Loaded"
         KeyDown="StudyObjectsWindow_KeyDown"
-        Height="500" Width="600">
+        Height="500" Width="800">
     <Grid>
         <dragablz:TabablzControl Name="StudyObjectsTabs"
                                  SelectionChanged="StudyObjectsTabs_SelectionChanged"
@@ -25,9 +25,8 @@
                             <GridViewColumn>
                                 <GridViewColumn.CellTemplate>
                                     <DataTemplate>
-                                        <Image Width="20"
-                                       Height="20"
-                                    Source="{Binding Path=StateIconURI, Converter={StaticResource ImageToSourceConverter}}"/>
+                                        <Image Width="20" Height="20"
+                                               Source="{Binding Path=StateIconURI, Converter={StaticResource ImageToSourceConverter}}"/>
                                     </DataTemplate>
                                 </GridViewColumn.CellTemplate>
                             </GridViewColumn>
