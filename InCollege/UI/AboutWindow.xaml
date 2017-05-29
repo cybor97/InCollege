@@ -2,13 +2,25 @@
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Style="{StaticResource BaseWindow}"
-        Title="О программе" Height="400" Width="400">
-    <StackPanel Orientation="Vertical">
+        SizeToContent="Height"
+        Title="О программе" Height="Auto" MinHeight="200" Width="400"
+        ResizeMode="NoResize">
+    <StackPanel Orientation="Vertical" Height="Auto">
         <TextBlock Name="TitleTB"
                    Margin="0 10 0 10" HorizontalAlignment="Center" TextAlignment="Center"
                    FontSize="24" FontWeight="Bold" Foreground="Lime"
                    Text="InCollege" MouseLeftButtonDown="TitleTB_Click"/>
 
         <TextBlock FontSize="14" Foreground="Gray" TextWrapping="Wrap" Name="AboutContentTB"/>
+
+        <Button Margin="0 20 0 0" Style="{StaticResource MaterialDesignFlatAccentButton}"
+                Content="Сторонние компоненты" Foreground="Lime"
+                Name="ComponentsButton"
+                Click="ComponentsButton_Click"/>
+        
+        <Button Style="{StaticResource MaterialDesignFlatAccentButton}"
+                Content="Контакты" Foreground="Lime"
+                Name="ContactsButton"
+                Click="ContactsButton_Click"/>
     </StackPanel>
 </Window>
