@@ -155,7 +155,7 @@ namespace InCollege.Server
                         expires: DateTime.Now.AddMonths(1),
                         signingCredentials: new Microsoft.IdentityModel.Tokens.SigningCredentials(
                             new Microsoft.IdentityModel.Tokens.SymmetricSecurityKey(Encoding.UTF8.GetBytes(EncryptionKey)),
-                            Microsoft.IdentityModel.Tokens.SecurityAlgorithms.HmacSha256))), EncryptionKey);
+                            Microsoft.IdentityModel.Tokens.SecurityAlgorithms.HmacSha256))).Trim(), EncryptionKey);
         }
 
         public static (bool valid, Account account) VerifyToken(string tokenString, bool wipePassword)
@@ -240,7 +240,7 @@ namespace InCollege.Server
 
                 return (id, userName, password);
             }
-            catch (FormatException)
+            catch (FormatException e)
             {
                 return (-1, null, null);
             }
