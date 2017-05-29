@@ -24,6 +24,7 @@ namespace InCollege.Client.UI.StatementsUI
             InitializeComponent();
             Statement = statement;
             Title = $"Содержимое ведомости от {statement?.StatementDate.ToString("dd MMMM yyyy")}";
+
             Generator = GetGenerator((statement?.StatementType ?? StatementType.CourceProject) == StatementType.Total ? GeneratorType.TotalStatement : GeneratorType.ComplexStatement);
         }
 
@@ -49,11 +50,15 @@ namespace InCollege.Client.UI.StatementsUI
             ContentGridView.Columns.Clear();
             foreach (var current in columns)
                 if (!string.IsNullOrWhiteSpace(current.uiName))
+                {
+                    var header = new GridViewColumnHeader { Content = current.uiName, Tag = current.name };
+                    header.MouseDoubleClick += Header_MouseDoubleClick;
                     ContentGridView.Columns.Add(new GridViewColumn
                     {
-                        Header = current.uiName,
+                        Header = header,
                         DisplayMemberBinding = new Binding(current.name)
                     });
+                }
 
             ContentLV.ItemsSource = Generator.GetResults(Generator.GetColumns(StatementResults).Select(c => c.name), StatementResults);
 
@@ -65,16 +70,6 @@ namespace InCollege.Client.UI.StatementsUI
         {
             StatementResultDialog.DataContext = new StatementResult { StatementID = Statement?.ID ?? -1 };
             StatementResultDialog.IsOpen = true;
-        }
-
-        void MarkTB_PreviewTextInput(object sender, TextCompositionEventArgs e)
-        {
-
-        }
-
-        void MarkTB_PreviewKeyDown(object sender, KeyEventArgs e)
-        {
-
         }
 
         async void SaveStatementButton_Click(object sender, RoutedEventArgs e)
@@ -189,6 +184,41 @@ namespace InCollege.Client.UI.StatementsUI
                         await UpdateData();
                     }
             }
+        }
+
+        void Header_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+        {
+            if (Statement.StatementType == StatementType.Total &&
+                sender is GridViewColumnHeader header &&
+                header.Tag is string tagString &&
+                tagString.StartsWith("subject"))
+
+            {
+                StatementResultDateTB.SelectedDate = null;
+                StatementResultDateDialog.Tag = tagString;
+                StatementResultDateDialog.IsOpen = true;
+            }
+
+        }
+
+        void CancelStatementDateButton_Click(object sender, RoutedEventArgs e)
+        {
+            StatementResultDateDialog.IsOpen = false;
+        }
+
+        async void SaveStatementDateButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (StatementResultDateDialog.Tag is string tagString &&
+                int.TryParse(tagString.Split(new[] { "subject" }, StringSplitOptions.RemoveEmptyEntries).FirstOrDefault() ?? "", out int subjectID))
+            {
+                foreach (var current in StatementResults.Where(c => c.SubjectID == subjectID))
+                {
+                    current.StatementResultDate = StatementResultDateTB.SelectedDate;
+                    await NetworkUtils.ExecuteDataAction<StatementResult>(null, current, DataAction.Save);
+                }
+                await UpdateData();
+            }
+            StatementResultDateDialog.IsOpen = false;
         }
     }
 }

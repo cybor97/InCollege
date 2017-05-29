@@ -74,5 +74,29 @@
                 </StackPanel>
             </material:DialogHost.DialogContent>
         </material:DialogHost>
+
+        <material:DialogHost Name="StatementResultDateDialog">
+            <material:DialogHost.DialogContent>
+                <StackPanel>
+                    <StackPanel Orientation="Vertical" MinWidth="300">
+                        <DatePicker Name="StatementResultDateTB"
+                                    material:HintAssist.Hint="Дата"
+                                    material:HintAssist.IsFloating="True"
+                                    Margin="5 10 5 0"/>
+
+                        <Button Grid.Column="1"
+                                Click="SaveStatementDateButton_Click"
+                                Style="{StaticResource MaterialDesignFlatAccentButton}"
+                                Margin="0 15 0 0"
+                                Content="Сохранить"/>
+                        <Button Grid.Column="2"
+                                Foreground="Red"
+                                Click="CancelStatementDateButton_Click"
+                                Style="{StaticResource MaterialDesignFlatAccentButton}"
+                                Content="Отмена"/>
+                    </StackPanel>
+                </StackPanel>
+            </material:DialogHost.DialogContent>
+        </material:DialogHost>
     </Grid>
 </Window>
