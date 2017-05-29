@@ -10,5 +10,6 @@ namespace InCollege
         public static readonly string DBFileName = Path.Combine(DataDirectory, "InCollege.db");
         public static readonly string ConfigFileName = Path.Combine(DataDirectory, "Config.json");
         public static readonly string TokenFileName = Path.Combine(DataDirectory, "Account.token");
+        public static readonly string TemplatesDirectory = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), APP_NAME, "Templates");
     }
 }
