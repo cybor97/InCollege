@@ -47,12 +47,29 @@ namespace InCollege.Server
         static Dictionary<string, Func<IHttpHeaders, Account, HttpResponse>> Actions = new Dictionary<string, Func<IHttpHeaders, Account, HttpResponse>>()
         {
             { "GetRange", GetRangeProcessor },
+            { "GetStudyResults", GetStudyResultsProcessor },
             { "Save", SaveProcessor },
             { "Remove", RemoveProcessor },
             { "RemoveWhere", RemoveWhereProcessor},
             { "Chat", ChatProcessor },
             { "Disconnect", DisconnectProcessor }
         };
+
+        static HttpResponse GetStudyResultsProcessor(IHttpHeaders query, Account account)
+        {
+            if (account.Approved)
+                if (account.AccountType == AccountType.Student)
+                {
+                    var range = DBHolderSQL.GetRange(nameof(StatementResult), null, -1, -1, true, false, false, false, (nameof(StatementResult.StudentID), account.ID));
+                    range.Columns.Add(nameof(StatementResult.SubjectName_STUDENT_MODE));
+                    foreach (DataRow current in range.Rows)
+                        current[nameof(StatementResult.SubjectName_STUDENT_MODE)] = DBHolderSQL.GetByID(nameof(Subject), (int)(long)current[nameof(StatementResult.SubjectID)])[nameof(Subject.SubjectName)];
+
+                    return new HttpResponse(HttpResponseCode.Ok, JsonConvert.SerializeObject(range, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore }), true);
+                }
+                else return new HttpResponse(HttpResponseCode.BadRequest, "Увы, это доступно только для студентов.", false);
+            else return new HttpResponse(HttpResponseCode.Forbidden, "Аккаунт не подтвержден!", false);
+        }
 
         static HttpResponse DisconnectProcessor(IHttpHeaders query, Account account)
         {

@@ -237,6 +237,25 @@ namespace InCollege
             return -1;
         }
 
+        public static async Task<List<StatementResult>> RequestStudyResults()
+        {
+            try
+            {
+                HttpResponseMessage response;
+                if ((response = (await Client
+                .PostAsync(ClientConfiguration.Instance.DataHandlerPath,
+                new StringContent($"Action=GetStudyResults&token={App.Token}")))).StatusCode == HttpStatusCode.OK)
+                    return JsonConvert.DeserializeObject<List<StatementResult>>(await response.Content.ReadAsStringAsync(), new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore });
+                else
+                    MessageBox.Show(await response.Content.ReadAsStringAsync());
+            }
+            catch (HttpRequestException exc)
+            {
+                MessageBox.Show($"Ошибка подключения к серверу. Проверьте:\n-запущен ли сервер\n-настройки брандмауэра\n-правильно ли указан адрес\nТехническая информация:\n\n{exc.Message}");
+            }
+            return null;
+        }
+
         public static async Task<List<Message>> RequestConversation(int partnerID)
         {
             try
@@ -320,6 +339,7 @@ namespace InCollege
 
         public static async Task Disconnect()
         {
+            Client.DefaultRequestHeaders.Accept.Clear();
             await Client.PostAsync(ClientConfiguration.Instance.DataHandlerPath, new StringContent($"Action=Disconnect"));
         }
     }
