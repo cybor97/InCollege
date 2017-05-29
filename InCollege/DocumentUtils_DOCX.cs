@@ -145,7 +145,7 @@ namespace InCollege
                                 cell.Fill(cell.Paragraphs[0].Text, resultModels[result_i].GetType()
                                                                                          .GetProperty(cell.Paragraphs[0].Text.Split('{')[1].Split('}')[0])
                                                                                          .GetValue(resultModels[result_i])
-                                                                                         .ToString());
+                                                                                         ?.ToString() ?? string.Empty);
 
                             currentRow.Cells[cell_i]
                                       .Fill("{IndexNumber}", (result_i + 1).ToString())
@@ -178,60 +178,66 @@ namespace InCollege
                                        .Where(c => c.name?.StartsWith("subject") ?? false)
                                        .Reverse()
                                        .ToList();
-                #region Columns generating
-                //DO NOT TRY TO OPTIMIZE! DO NOT F*KIN' TRY! THE FAIR BUG IS WAITING HERE!
-                for (int column_i = 0; column_i < columns.Count; column_i++)
-                    if (column_i != 0)
-                        table.InsertColumn(table.ColumnCount - 2);
-
-                for (int column_i = 0; column_i < columns.Count; column_i++)
+                if (columns.Count > 0)
                 {
-                    var subjectCell = subjectsRow.Cells[table.ColumnCount - column_i - 2];
-                    subjectCell.TextDirection = TextDirection.btLr;
-                    subjectCell.VerticalAlignment = VerticalAlignment.Center;
+                    #region Columns generating
+                    //DO NOT TRY TO OPTIMIZE! DO NOT F*KIN' TRY! THE FAIR BUG IS WAITING HERE!
+                    for (int column_i = 0; column_i < columns.Count; column_i++)
+                        if (column_i != 0)
+                            table.InsertColumn(table.ColumnCount - 2);
 
-                    var paragraph = subjectCell.Paragraphs[0];
-
-                    paragraph.Alignment = Alignment.center;
-                    if (!string.IsNullOrWhiteSpace(paragraph.Text))
-                        paragraph.RemoveText(0);
-                    paragraph.InsertText(columns[column_i].uiName ?? " ");
-
-                    var contentCell = templateRow.Cells[table.ColumnCount - column_i - 2];
-                    paragraph = contentCell.Paragraphs[0];
-                    if (!string.IsNullOrWhiteSpace(paragraph.Text))
-                        paragraph.RemoveText(0);
-                    paragraph.InsertText($"{{{columns[column_i].name}}}");
-                }
-                #endregion
-                #region Data filling
-                var resultModels = generator.GetResults(columns.Select(c => c.name), results);
-
-                for (int result_i = 0; result_i < resultModels.Count; result_i++)
-                {
-                    var currentRow = table.InsertRow(templateRow);
-
-                    for (int cell_i = 0; cell_i < templateRow.Cells.Count - 3; cell_i++)
+                    for (int column_i = 0; column_i < columns.Count; column_i++)
                     {
-                        var cell = currentRow.Cells[cell_i + 2];
-                        if (cell.Paragraphs[0].Text != string.Empty)
-                        {
-                            if (Regex.IsMatch(cell.Paragraphs[0].Text, "^{.*}$"))
-                                cell.Fill(cell.Paragraphs[0].Text, resultModels[result_i].GetType()
-                                                                                         .GetProperty(cell.Paragraphs[0].Text.Split('{')[1].Split('}')[0])
-                                                                                         .GetValue(resultModels[result_i])
-                                                                                         .ToString());
+                        var subjectCell = subjectsRow.Cells[table.ColumnCount - column_i - 2];
+                        subjectCell.TextDirection = TextDirection.btLr;
+                        subjectCell.VerticalAlignment = VerticalAlignment.Center;
 
-                            currentRow.Cells[cell_i]
-                                      .Fill("{IndexNumber}", (result_i + 1).ToString())
-                                      .Fill("{StatementResult.Student.FullName}", resultModels[result_i].StudentFullName);
+                        var paragraph = subjectCell.Paragraphs[0];
+
+                        paragraph.Alignment = Alignment.center;
+                        if (!string.IsNullOrWhiteSpace(paragraph.Text))
+                            paragraph.RemoveText(0);
+                        paragraph.InsertText(columns[column_i].uiName ?? " ");
+
+                        var contentCell = templateRow.Cells[table.ColumnCount - column_i - 2];
+                        paragraph = contentCell.Paragraphs[0];
+                        if (!string.IsNullOrWhiteSpace(paragraph.Text))
+                            paragraph.RemoveText(0);
+                        paragraph.InsertText($"{{{columns[column_i].name}}}");
+                    }
+                    #endregion
+                    #region Data filling
+                    var resultModels = generator.GetResults(columns.Select(c => c.name), results);
+
+                    for (int result_i = 0; result_i < resultModels.Count; result_i++)
+                    {
+                        var currentRow = table.InsertRow(templateRow);
+
+                        for (int cell_i = 0; cell_i < templateRow.Cells.Count - 3; cell_i++)
+                        {
+                            var cell = currentRow.Cells[cell_i + 2];
+                            if (cell.Paragraphs[0].Text != string.Empty)
+                            {
+                                if (Regex.IsMatch(cell.Paragraphs[0].Text, "^{.*}$"))
+                                    cell.Fill(cell.Paragraphs[0].Text, resultModels[result_i].GetType()
+                                                                                             .GetProperty(cell.Paragraphs[0].Text.Split('{')[1].Split('}')[0])
+                                                                                             .GetValue(resultModels[result_i])
+                                                                                             .ToString());
+
+                                currentRow.Cells[cell_i]
+                                          .Fill("{IndexNumber}", (result_i + 1).ToString())
+                                          .Fill("{StatementResult.Student.FullName}", resultModels[result_i].StudentFullName);
+                            }
                         }
                     }
+                    #endregion
                 }
-                #endregion
+                else subjectsMarkerCell.Paragraphs.FirstOrDefault()?.RemoveText(0);
+
                 templateRow.Remove();
 
-                titleRow.MergeCells(table.ColumnCount - columns.Count() - 1, table.ColumnCount - 2);
+                if (columns.Count > 0)
+                    titleRow.MergeCells(table.ColumnCount - columns.Count() - 1, table.ColumnCount - 2);
             }
             return document;
         }
