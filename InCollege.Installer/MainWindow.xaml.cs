@@ -65,7 +65,7 @@ namespace InCollege.Installer
             if (UninstallerMode)
                 await UninstallApp();
             else
-                await InstallApp(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "IN_COLLEGE_INSTALLER_TEST"));
+                await InstallApp(CommonVariables.InstallRoot);
 
             Close();
         }
