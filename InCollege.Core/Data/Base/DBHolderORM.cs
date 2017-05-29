@@ -8,7 +8,7 @@ namespace InCollege.Core.Data.Base
     public static class DBHolderORM
     {
         static SQLiteConnection DataConnection;
-        public const int DEFAULT_LIMIT = 100;
+        public const int DEFAULT_LIMIT = int.MaxValue / 2;
         static bool InitCompleted;
 
         public static void Init(string filename)
