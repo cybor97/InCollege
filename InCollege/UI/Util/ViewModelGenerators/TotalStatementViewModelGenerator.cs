@@ -50,7 +50,7 @@ namespace InCollege.Client.UI.Util.Generators
                     foreach (var currentColumn in columns.Where(c => c.StartsWith("subject")))
                         if (currentResult.SubjectID.ToString() == currentColumn.Split(new[] { "subject" }, StringSplitOptions.RemoveEmptyEntries)[0])
                             type.GetProperty(currentColumn)
-                                .SetValue(result.First(c => c.StudentID == currentResult.StudentID), currentResult.MarkValueString);
+                                .SetValue(result.First(c => c.StudentID == currentResult.StudentID), currentResult.MarkValueStringTotal);
                 //Get all results for this student. 
                 //If has any 'Blanks' - result will blank. 
                 //If has any absents or unpasseds(does this word exist, btw? :D ) then result will be 'Unpassed'
@@ -61,10 +61,10 @@ namespace InCollege.Client.UI.Util.Generators
                     var currentStudentResults = statementResults.Where(c => c.StudentID == current.StudentID && c.MarkValue != (sbyte)TechnicalMarkValue.Passed);
                     type.GetProperty("average")
                         .SetValue(current, currentStudentResults.Any(c => c.MarkValue == (sbyte)TechnicalMarkValue.Blank) ?
-                                           StatementResult.GetMarkValueString((sbyte)TechnicalMarkValue.Blank) :
+                                           StatementResult.GetMarkValueStringTotal((sbyte)TechnicalMarkValue.Blank) :
                                            currentStudentResults.Any(c => c.MarkValue == (sbyte)TechnicalMarkValue.Absent || c.MarkValue == (sbyte)TechnicalMarkValue.Unpassed) ?
-                                           StatementResult.GetMarkValueString((sbyte)TechnicalMarkValue.Unpassed) :
-                                           StatementResult.GetMarkValueString((sbyte)currentStudentResults.Average(c => c.MarkValue)));
+                                           StatementResult.GetMarkValueStringTotal((sbyte)TechnicalMarkValue.Unpassed) :
+                                           StatementResult.GetMarkValueStringTotal((sbyte)currentStudentResults.Average(c => c.MarkValue)));
                 }
             }
             return result;
