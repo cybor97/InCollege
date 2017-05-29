@@ -61,11 +61,55 @@ namespace InCollege.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to .
+        ///   Looks up a localized string similar to Info
+        ///[Base]ПО разработано для нужд ГБПОУ РК &quot;Феодосийский политехнический техникум&quot;
+        ///
+        ///Разработчик - [CYBOR] = Muhametshin R.A.[/Base]
+        ///
+        ///[Components]В процессе разработки использовались такие сторонние компоненты:
+        ///
+        ///uHttpSharp - встраиваемый веб-сервер;
+        ///
+        ///sqlite-net - ORM для БД SQLite;
+        ///
+        ///MaterialDesignInXAMLToolkit - библиотека для разработки простых и понятных, но при этом функциональных визуальных компонентов;
+        ///
+        ///DocX - библиотека для формирования документов Word;
+        ///
+        ///Newtonsoft.Json - библиотека для [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string About {
             get {
                 return ResourceManager.GetString("About", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Byte[].
+        /// </summary>
+        internal static byte[] Exam_TEMPLATE {
+            get {
+                object obj = ResourceManager.GetObject("Exam_TEMPLATE", resourceCulture);
+                return ((byte[])(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        internal static string MainWindow_Help {
+            get {
+                return ResourceManager.GetString("MainWindow_Help", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Byte[].
+        /// </summary>
+        internal static byte[] Middle_TEMPLATE {
+            get {
+                object obj = ResourceManager.GetObject("Middle_TEMPLATE", resourceCulture);
+                return ((byte[])(obj));
             }
         }
         
@@ -76,6 +120,26 @@ namespace InCollege.Properties {
             get {
                 object obj = ResourceManager.GetObject("PaperTexture", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Byte[].
+        /// </summary>
+        internal static byte[] QualificationExam_TEMPLATE {
+            get {
+                object obj = ResourceManager.GetObject("QualificationExam_TEMPLATE", resourceCulture);
+                return ((byte[])(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Byte[].
+        /// </summary>
+        internal static byte[] Total_TEMPLATE {
+            get {
+                object obj = ResourceManager.GetObject("Total_TEMPLATE", resourceCulture);
+                return ((byte[])(obj));
             }
         }
         

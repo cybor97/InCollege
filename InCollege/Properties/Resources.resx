@@ -121,8 +121,23 @@
   <data name="About" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\About.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;Windows-1252</value>
   </data>
+  <data name="Exam_TEMPLATE" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\Exam_TEMPLATE;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="MainWindow_Help" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\MainWindow_Help.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;Windows-1252</value>
+  </data>
+  <data name="Middle_TEMPLATE" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\Middle_TEMPLATE;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
   <data name="PaperTexture" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\PaperTexture.jpg;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="QualificationExam_TEMPLATE" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\QualificationExam_TEMPLATE;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="Total_TEMPLATE" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\Total_TEMPLATE;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
   <data name="Unseen" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\Unseen.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
