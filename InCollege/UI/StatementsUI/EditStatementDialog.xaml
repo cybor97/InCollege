@@ -56,6 +56,7 @@
                          PreviewKeyDown="StatementNumberTB_PreviewKeyDown"
                          material:HintAssist.Hint="Номер ведомости"
                          material:HintAssist.IsFloating="True"
+                         TextChanged="StatementNumberTB_TextChanged"
                          Text="{Binding StatementNumber}"/>
             </StackPanel>
 
@@ -113,7 +114,7 @@
                           material:HintAssist.IsFloating="True"/>
             </Grid>
 
-            <Button Content="Преподаватели" 
+            <Button Content="Преподаватели/Коммиссия" 
                     Style="{StaticResource MaterialDesignFlatButton}"
                     Click="CommissionMembersButton_Click"
                     Grid.Row="6"
@@ -270,6 +271,7 @@
                         Click="SaveDocButton_Click"/>
 
                 <Button Content="Сохранить" 
+                        Name="SaveButton"
                         Grid.Column="2"
                         Style="{StaticResource MaterialDesignFlatAccentButton}" 
                         VerticalAlignment="Bottom" 

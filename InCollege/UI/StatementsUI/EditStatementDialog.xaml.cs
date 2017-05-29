@@ -273,6 +273,11 @@ namespace InCollege.Client.UI.StatementsUI
         }
         #endregion
         #region Text filters
+        void StatementNumberTB_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            SaveButton.IsEnabled = !string.IsNullOrWhiteSpace(StatementNumberTB.Text);
+        }
+
         void StatementNumberTB_PreviewTextInput(object sender, TextCompositionEventArgs e)
         {
             string futureText = StatementNumberTB.Text + e.Text;
@@ -313,52 +318,69 @@ namespace InCollege.Client.UI.StatementsUI
         async void SaveDocButton_Click(object sender, RoutedEventArgs e)
         {
             SaveDocButton.IsEnabled = false;
-            var saveDialog = new SaveFileDialog
+
+            var templateFile = Path.Combine(CommonVariables.TemplatesDirectory, $"{Statement.StatementType}.docx");
+
+            OpenFileDialog openTemplateDialog = new OpenFileDialog { Filter = "Шаблон в формате Word|*.docx" };
+            if (!File.Exists(templateFile))
+                if ((Statement.StatementType == StatementType.Other && (openTemplateDialog.ShowDialog() ?? false))
+                    ||
+                    (Statement.StatementType != StatementType.Other &&
+                    MessageBox.Show($"Шаблон \"{Statement.StatementType}\" не найден! У вас есть такой шаблон?", "Шаблон не найден", MessageBoxButton.YesNo) == MessageBoxResult.Yes &&
+                    (openTemplateDialog.ShowDialog() ?? false)))
+
+                    templateFile = openTemplateDialog.FileName;
+
+            if (File.Exists(templateFile))
             {
-                AddExtension = true,
-                Filter = "Документ Microsoft Word|*.docx"
-            };
-            if (saveDialog.ShowDialog() ?? false)
-                try
+                var saveStatementDialog = new SaveFileDialog
                 {
-                    var attestationTypes = (await NetworkUtils.RequestData<StatementAttestationType>(null, (nameof(StatementAttestationType.StatementID), Statement.ID)))
-                                            .Select(async c => (await NetworkUtils.RequestData<AttestationType>(null, (nameof(AttestationType.ID), c.AttestationTypeID)))?.FirstOrDefault());
-
-                    var commissionMembers = (await NetworkUtils.RequestData<CommissionMember>(null, (nameof(CommissionMember.StatementID), Statement.ID)))
-                                            .Select(async c => (await NetworkUtils.RequestData<Account>(null, (nameof(Account.ID), c.ProfessorID)))?.FirstOrDefault());
-
-                    var attestationTypesResults = new List<AttestationType>();
-                    var commissionMembersResults = new List<Account>();
-
-                    foreach (var current in attestationTypes)
-                        attestationTypesResults.Add(await current);
-
-                    foreach (var current in commissionMembers)
-                        commissionMembersResults.Add(await current);
-
-                    var statementResults = (List<StatementResult>)StatementResultsLV.ItemsSource;
-                    var subjects = (List<Subject>)SubjectCB.ItemsSource;
-                    foreach (var current in statementResults)
+                    AddExtension = true,
+                    Filter = "Документ Microsoft Word|*.docx"
+                };
+                if (saveStatementDialog.ShowDialog() ?? false)
+                    try
                     {
-                        var subject = subjects.FirstOrDefault(c => c.ID == current.SubjectID);
-                        //Do not use short form. We have to preserve SubjectID
-                        if (subject != null)
-                            current.Subject = subject;
-                    }
+                        var attestationTypes = (await NetworkUtils.RequestData<StatementAttestationType>(null, (nameof(StatementAttestationType.StatementID), Statement.ID)))
+                                                .Select(async c => (await NetworkUtils.RequestData<AttestationType>(null, (nameof(AttestationType.ID), c.AttestationTypeID)))?.FirstOrDefault());
 
-                    DocumentUtils_DOCX.SaveStatementWithTemplate(Statement, statementResults,
-                        attestationTypesResults?.ToList(),
-                        commissionMembersResults?.ToList(),
-                        Path.Combine(CommonVariables.DataDirectory, "Templates", $"{Statement.StatementType}.docx"),
-                        saveDialog.FileName);
-                }
-                catch (IOException exc)
-                {
-                    MessageBox.Show($"Ошибка сохранения!\nCообщение:\n{exc.Message}");
-                }
+                        var commissionMembers = (await NetworkUtils.RequestData<CommissionMember>(null, (nameof(CommissionMember.StatementID), Statement.ID)))
+                                                .Select(async c => (await NetworkUtils.RequestData<Account>(null, (nameof(Account.ID), c.ProfessorID)))?.FirstOrDefault());
+
+                        var attestationTypesResults = new List<AttestationType>();
+                        var commissionMembersResults = new List<Account>();
+
+                        foreach (var current in attestationTypes)
+                            attestationTypesResults.Add(await current);
+
+                        foreach (var current in commissionMembers)
+                            commissionMembersResults.Add(await current);
+
+                        var statementResults = (List<StatementResult>)StatementResultsLV.ItemsSource;
+                        var subjects = (List<Subject>)SubjectCB.ItemsSource;
+                        foreach (var current in statementResults)
+                        {
+                            var subject = subjects.FirstOrDefault(c => c.ID == current.SubjectID);
+                            //Do not use short form. We have to preserve SubjectID
+                            if (subject != null)
+                                current.Subject = subject;
+                        }
+
+                        DocumentUtils_DOCX.SaveStatementWithTemplate(Statement, statementResults,
+                            attestationTypesResults?.ToList(),
+                            commissionMembersResults?.ToList(),
+                            templateFile,
+                            saveStatementDialog.FileName);
+                    }
+                    catch (IOException exc)
+                    {
+                        MessageBox.Show($"Ошибка сохранения!\nCообщение:\n{exc.Message}");
+                    }
+            }
             SaveDocButton.IsEnabled = true;
         }
         #endregion
+
     }
     #region Converters
     public class IndexConverter : IValueConverter
