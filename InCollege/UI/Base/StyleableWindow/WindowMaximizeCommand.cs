@@ -11,12 +11,12 @@ namespace WpfStyleableWindow.StyleableWindow
             return true;
         }
 
-        #pragma warning disable CS0067
+#pragma warning disable CS0067
         public event EventHandler CanExecuteChanged;
 
         public void Execute(object parameter)
         {
-            if (parameter is Window window)
+            if (parameter is Window window && window.ResizeMode != ResizeMode.NoResize)
                 if (window.WindowState == WindowState.Maximized)
                     window.WindowState = WindowState.Normal;
                 else
