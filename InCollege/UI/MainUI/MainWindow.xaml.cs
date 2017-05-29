@@ -13,6 +13,7 @@ using System.Linq;
 using System.Collections.Generic;
 using Microsoft.Win32;
 using System.IO;
+using System;
 
 namespace InCollege.Client.UI.MainUI
 {
@@ -24,6 +25,8 @@ namespace InCollege.Client.UI.MainUI
 
             EditStatementDialog.OnSave += EditStatementDialog_OnSave;
             EditStatementDialog.OnCancel += EditStatementDialog_OnCancel;
+
+            ShowInfo(InfoTag("Base"));
         }
 
         async void MainWindow_Loaded(object sender, RoutedEventArgs e)
@@ -44,12 +47,51 @@ namespace InCollege.Client.UI.MainUI
 
             CurrentAccountItemHeaderTB.Text = (ProfileDialog.Account = App.Account)?.FullName;
 
-            //TODO:
-            //if(teacher) request<statement>(teacher.subjects);
-            //else if (departmentHead) request<statement>(departmentHead.groups);
-            //else if (admin) request<statement>(all);
-            //On server side!11
+            IsEnabled = false;
+            Cursor = Cursors.Wait;
 
+            switch (App.Account.AccountType)
+            {
+                case AccountType.Guest:
+                    FileItem.IsEnabled = false;
+                    OutputItem.IsEnabled = false;
+                    DictionariesItem.IsEnabled = false;
+                    ParticipantsItem.IsEnabled = false;
+                    StatementsPanel.Visibility = Visibility.Collapsed;
+                    break;
+
+                case AccountType.Student:
+                    FileItem.IsEnabled = false;
+                    OutputItem.IsEnabled = false;
+                    DictionariesItem.IsEnabled = false;
+                    ParticipantsItem.IsEnabled = false;
+                    StatementsPanel.Visibility = Visibility.Collapsed;
+                    MarksPanel.Visibility = Visibility.Visible;
+                    StatementResultsLV.ItemsSource = await NetworkUtils.RequestStudyResults();
+                    break;
+
+                case AccountType.Professor:
+                    DictionariesItem.IsEnabled = false;
+                    ParticipantsItem.IsEnabled = false;
+                    await UpdateStatementsData();
+                    break;
+
+                case AccountType.DepartmentHead:
+                    ParticipantsItem.IsEnabled = false;
+                    await UpdateStatementsData();
+                    break;
+
+                case AccountType.Admin:
+                    await UpdateStatementsData();
+                    break;
+            }
+
+            Cursor = Cursors.Arrow;
+            IsEnabled = true;
+        }
+
+        public async Task UpdateStatementsData()
+        {
             var statementsData = await NetworkUtils.RequestData<Statement>(this);
 
             var specialtiesData = await NetworkUtils.RequestData<Specialty>(this);
@@ -71,17 +113,22 @@ namespace InCollege.Client.UI.MainUI
             StatementsLV.ItemsSource = statementsData;
         }
 
-        void ExitItem_Click(object sender, RoutedEventArgs e)
+        async void MainWindow_KeyDown(object sender, KeyEventArgs e)
         {
-            Close();
+            if (e.Key == Key.F5)
+                await UpdateData();
         }
 
-        async void DictionariesItem_Click(object sender, RoutedEventArgs e)
+        #region Accounts operations
+        void ProfileDialog_KeyDown(object sender, KeyEventArgs e)
         {
-            int itemIndex = ((MenuItem)(((MenuItem)sender).Parent)).Items.IndexOf(sender);
-            if (itemIndex == 0) new AttestationTypesWindow().ShowDialog();
-            else new StudyObjectsWindow(itemIndex - 1).ShowDialog();
-            await UpdateData();
+            if (e.Key == Key.Escape)
+                ProfileDialog.IsOpen = false;
+        }
+
+        void CurrentAccountItem_Click(object sender, RoutedEventArgs e)
+        {
+            ProfileDialog.IsOpen = true;
         }
 
         async void ParticipantsItem_Click(object sender, RoutedEventArgs e)
@@ -95,41 +142,6 @@ namespace InCollege.Client.UI.MainUI
             await AccountExit();
         }
 
-        async void MainWindow_KeyDown(object sender, KeyEventArgs e)
-        {
-            if (e.Key == Key.F5)
-            {
-                IsEnabled = false;
-                await UpdateData();
-                IsEnabled = true;
-                Focus();
-            }
-        }
-
-        async void EditItem_Click(object sender, RoutedEventArgs e)
-        {
-            if (StatementsLV.SelectedItem != null)
-                await EditStatementDialog.Show((Statement)StatementsLV.SelectedItem, false, false, false);
-        }
-
-        async void RemoveItem_Click(object sender, RoutedEventArgs e)
-        {
-            foreach (Statement current in StatementsLV.SelectedItems)
-                await RemoveStatement(current);
-            await UpdateData();
-        }
-
-        void ProfileDialog_KeyDown(object sender, KeyEventArgs e)
-        {
-            if (e.Key == Key.Escape)
-                ProfileDialog.IsOpen = false;
-        }
-
-        void CurrentAccountItem_Click(object sender, RoutedEventArgs e)
-        {
-            ProfileDialog.IsOpen = true;
-        }
-
         async Task AccountExit()
         {
             App.Token = null;
@@ -138,25 +150,6 @@ namespace InCollege.Client.UI.MainUI
             Process.GetCurrentProcess().Kill();
         }
 
-
-        async void AddButton_Click(object sender, RoutedEventArgs e)
-        {
-            await AddStatement(false, false);
-        }
-
-        async void EditStatementDialog_OnSave(object sender, RoutedEventArgs e)
-        {
-            await NetworkUtils.ExecuteDataAction<Statement>(this, EditStatementDialog.Statement, DataAction.Save);
-            EditStatementDialog.IsOpen = false;
-        }
-
-        async void EditStatementDialog_OnCancel(object sender, RoutedEventArgs e)
-        {
-            EditStatementDialog.IsOpen = false;
-            if (EditStatementDialog.AddMode)
-                await RemoveStatement(EditStatementDialog.Statement);
-            await UpdateData();
-        }
 
         async void ProfileDialog_OnSave(object sender, RoutedEventArgs e)
         {
@@ -173,7 +166,58 @@ namespace InCollege.Client.UI.MainUI
 
         void MessagesButton_Click(object sender, RoutedEventArgs e)
         {
-            new ChatWindow().ShowDialog();
+            if (!ChatWindow.Opened)
+                new ChatWindow().Show();
+            MainMenu.IsOpen = false;
+        }
+        #endregion
+        #region Statement operations
+        async void AddButton_Click(object sender, RoutedEventArgs e)
+        {
+            await AddStatement(false, false);
+        }
+
+        async void EditItem_Click(object sender, RoutedEventArgs e)
+        {
+            if (StatementsLV.SelectedItem != null)
+                await EditStatementDialog.Show((Statement)StatementsLV.SelectedItem, false, false, false);
+        }
+
+        async void RemoveItem_Click(object sender, RoutedEventArgs e)
+        {
+            foreach (Statement current in StatementsLV.SelectedItems)
+                await RemoveStatement(current);
+            await UpdateData();
+        }
+
+        async void EditStatementDialog_OnSave(object sender, RoutedEventArgs e)
+        {
+            await NetworkUtils.ExecuteDataAction<Statement>(this, EditStatementDialog.Statement, DataAction.Save);
+            EditStatementDialog.IsOpen = false;
+        }
+
+        async void EditStatementDialog_OnCancel(object sender, RoutedEventArgs e)
+        {
+            EditStatementDialog.IsOpen = false;
+            if (EditStatementDialog.AddMode)
+                await RemoveStatement(EditStatementDialog.Statement);
+            await UpdateData();
+        }
+
+
+        async Task<Statement> AddStatement(bool generatedComplexMode, bool generatedTotalMode, bool background = false)
+        {
+            if (!(generatedComplexMode && generatedTotalMode))
+            {
+                var statement = new Statement();
+                //Attention                    'HERE. It cannot be optimized that way, you thought about.
+                statement.StatementNumber = statement.ID = int.Parse(await NetworkUtils.ExecuteDataAction<Statement>(background ? null : this, statement, DataAction.Save));
+                statement.IsLocal = false;
+                if (!background)
+                    await EditStatementDialog.Show(statement, true, generatedComplexMode, generatedTotalMode);
+                return statement;
+            }
+            else return null;
         }
 
         async Task RemoveStatement(Statement statement)
@@ -184,7 +228,8 @@ namespace InCollege.Client.UI.MainUI
             await NetworkUtils.RemoveWhere<StatementResult>(null, (nameof(StatementResult.StatementID), statement.ID));
             await NetworkUtils.RemoveWhere<RePass>(null, (nameof(RePass.StatementID), statement.ID));
         }
-
+        #endregion
+        #region Generate statement
         async void GenerateComplexStatementItem_Click(object sender, RoutedEventArgs e)
         {
             await GenerateStatement(true, false, 1);
@@ -254,20 +299,81 @@ namespace InCollege.Client.UI.MainUI
                     await UpdateData();
                 }
         }
-
-        async Task<Statement> AddStatement(bool generatedComplexMode, bool generatedTotalMode, bool background = false)
+        #endregion
+        #region Filter
+        void StatementTypeFilterCB_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            if (!(generatedComplexMode && generatedTotalMode))
-            {
-                var statement = new Statement();
-                //Attention                    'HERE. It cannot be optimized that way, you thought about.
-                statement.ID = int.Parse(await NetworkUtils.ExecuteDataAction<Statement>(background ? null : this, statement, DataAction.Save));
-                statement.IsLocal = false;
-                if (!background)
-                    await EditStatementDialog.Show(statement, true, generatedComplexMode, generatedTotalMode);
-                return statement;
-            }
-            else return null;
+            ExecuteFilter();
+        }
+
+        void StatementNumberFilterTB_PreviewTextInput(object sender, TextCompositionEventArgs e)
+        {
+            string futureText = StatementNumberFilterTB.Text + e.Text;
+            e.Handled = string.IsNullOrWhiteSpace(futureText) || !System.Text.RegularExpressions.Regex.IsMatch(futureText, "^\\d{1,10}$");
+        }
+
+        void StatementNumberFilterTB_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            ExecuteFilter();
+        }
+
+        void EnableFiltersCB_CheckedChanged(object sender, RoutedEventArgs e)
+        {
+            ExecuteFilter();
+        }
+
+        void ExecuteFilter()
+        {
+            if (StatementsLV != null)
+                if (EnableFiltersCB.IsChecked ?? false)
+                    StatementsLV.Items.Filter = c =>
+                    {
+                        var statement = (Statement)c;
+                        return statement.StatementNumber.ToString().Contains(StatementNumberFilterTB.Text) &&
+                               (StatementTypeFilterCB.SelectedIndex == 0 || statement.StatementType == (StatementType)(StatementTypeFilterCB.SelectedIndex - 1));
+                    };
+                else StatementsLV.Items.Filter = c => true;
+        }
+
+        #endregion
+        #region Help
+        void HelpItem_Click(object sender, RoutedEventArgs e)
+        {
+            HelpPanel.Visibility = Visibility.Visible;
+            AddButton.Visibility = Visibility.Collapsed;
+        }
+
+        void CloseHelpButton_Click(object sender, RoutedEventArgs e)
+        {
+            HelpPanel.Visibility = Visibility.Collapsed;
+            AddButton.Visibility = Visibility.Visible;
+        }
+
+        void HelpCategoryButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (sender is Button buttonSender)
+                ShowInfo(InfoTag(buttonSender.Name.Split(new[] { "HelpButton" }, StringSplitOptions.RemoveEmptyEntries)[0]));
+        }
+
+        void ShowInfo((string open, string close) tag)
+        {
+            HelpContentTB.Text = Properties.Resources.MainWindow_Help
+                                           .Split(new[] { tag.open }, StringSplitOptions.RemoveEmptyEntries)[1]
+                                           .Split(new[] { tag.close }, StringSplitOptions.RemoveEmptyEntries)[0];
+        }
+
+        (string open, string close) InfoTag(string name)
+        {
+            return ($"[{name}]", $"[/{name}]");
+        }
+        #endregion
+        #region Other menu operations
+        async void DictionariesItem_Click(object sender, RoutedEventArgs e)
+        {
+            int itemIndex = ((MenuItem)(((MenuItem)sender).Parent)).Items.IndexOf(sender);
+            if (itemIndex == 0) new AttestationTypesWindow().ShowDialog();
+            else new StudyObjectsWindow(itemIndex - 1).ShowDialog();
+            await UpdateData();
         }
 
         async void UpdateItem_Click(object sender, RoutedEventArgs e)
@@ -280,17 +386,12 @@ namespace InCollege.Client.UI.MainUI
             MessageBox.Show(await NetworkUtils.CheckVersion());
         }
 
-        void AboutItem_Click(object sender, RoutedEventArgs e)
-        {
-            new AboutWindow().ShowDialog();
-        }
-
         async void OpenItem_Click(object sender, RoutedEventArgs e)
         {
             var dialog = new OpenFileDialog
             {
                 Filter = "Токен авторизации|*.token|Конфигурация клиента|*.json",
-                FileName = CommonVariables.DataDirectory
+                InitialDirectory = CommonVariables.DataDirectory
             };
             if (dialog.ShowDialog() ?? false)
                 if (dialog.FileName.EndsWith(".token"))
@@ -299,6 +400,17 @@ namespace InCollege.Client.UI.MainUI
                     ClientConfiguration.Instance = Newtonsoft.Json.JsonConvert.DeserializeObject<ClientConfiguration>(File.ReadAllText(dialog.FileName));
             await UpdateData();
         }
+
+        void ExitItem_Click(object sender, RoutedEventArgs e)
+        {
+            Close();
+        }
+
+        void AboutItem_Click(object sender, RoutedEventArgs e)
+        {
+            new AboutWindow().ShowDialog();
+        }
+        #endregion
     }
 
     class DistinctByStudentAndSubject : IEqualityComparer<StatementResult>
