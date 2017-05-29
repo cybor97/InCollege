@@ -16,9 +16,30 @@ namespace InCollege.Core.Data
 
         [Ignore]
         [JsonIgnore]
-        public string MarkValueString
+        public string StatementResultDateString => StatementResultDate?.ToString("dd MMMM yyyy") ?? "";
+
+        [Ignore]
+        [JsonIgnore]
+        public string MarkValueString => GetMarkValueString(MarkValue);
+
+        [Ignore]
+        [JsonIgnore]
+        public string MarkValueStringTotal => GetMarkValueStringTotal(MarkValue);
+
+        public static string GetMarkValueStringTotal(sbyte markValue)
         {
-            get => GetMarkValueString(MarkValue);
+            switch (markValue)
+            {
+                case (sbyte)TechnicalMarkValue.Absent:
+                    return "Н";
+                case (sbyte)TechnicalMarkValue.Passed:
+                    return "[З]";
+                case (sbyte)TechnicalMarkValue.Unpassed:
+                    return "Н/А";
+                case (sbyte)TechnicalMarkValue.Blank:
+                    return string.Empty;
+                default: return markValue.ToString();
+            }
         }
 
         public static string GetMarkValueString(sbyte markValue)
@@ -74,5 +95,9 @@ namespace InCollege.Core.Data
             }
         }
         private Subject _subject;
+
+        //TODO:It's cludge. Fix me, please!!!
+        [Ignore]
+        public string SubjectName_STUDENT_MODE { get; set; }
     }
 }
