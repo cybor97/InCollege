@@ -16,9 +16,13 @@ namespace InCollege.Client.UI.ChatUI
 
         List<int> PoolOnline = new List<int>();
 
+        public static bool Opened = false;
+
         public ChatWindow()
         {
             InitializeComponent();
+            Opened = true;
+            Closing += (sender, e) => Opened = false;
         }
 
         public async Task UpdateAccounts()
