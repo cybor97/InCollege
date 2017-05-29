@@ -1,20 +1,19 @@
 ﻿<Window x:Class="InCollege.Client.UI.MainUI.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:sw="clr-namespace:WpfStyleableWindow.StyleableWindow"
-        xmlns:statements="clr-namespace:InCollege.Client.UI.StatementsUI"
+        xmlns:material="http://materialdesigninxaml.net/winfx/xaml/themes"
+        xmlns:statementsui="clr-namespace:InCollege.Client.UI.StatementsUI"
         xmlns:accountsui="clr-namespace:InCollege.Client.UI.AccountsUI"
         Style="{StaticResource BaseWindow}"
         Loaded="MainWindow_Loaded"
         KeyDown="MainWindow_KeyDown"
-        ResizeMode="NoResize"
         WindowStartupLocation="CenterScreen"
         Height="500" Width="1000">
     <Window.Resources>
-        <sw:WindowCloseCommand x:Key="WindowCloseCommand"/>
+        <statementsui:IndexConverter x:Key="IndexConverter"/>
     </Window.Resources>
     <Window.ContextMenu>
-        <ContextMenu Name="MainMenu" Grid.Row="0">
+        <ContextMenu Name="MainMenu">
             <MenuItem Name="CurrentAccountItem" Click="CurrentAccountItem_Click" HorizontalAlignment="Stretch">
                 <MenuItem.Header>
                     <StackPanel Orientation="Horizontal">
@@ -34,35 +33,35 @@
                     </StackPanel>
                 </MenuItem.Header>
             </MenuItem>
-            <MenuItem Header="Файл">
+            <MenuItem Header="Файл" Name="FileItem">
                 <MenuItem Header="Открыть" Click="OpenItem_Click"/>
                 <MenuItem Header="Выход" Click="ExitItem_Click"/>
             </MenuItem>
-            <MenuItem Header="Вывод">
+            <MenuItem Header="Вывод" Name="OutputItem">
                 <MenuItem Header="Сформировать составную ведомость" Click="GenerateComplexStatementItem_Click"/>
                 <MenuItem Header="Сформировать сводную ведомость" Click="GenerateTotalStatementItem_Click"/>
             </MenuItem>
-            <MenuItem Header="Информация об учебном заведении">
+            <MenuItem Header="Данные об учебном заведении" Name="DictionariesItem">
                 <MenuItem Header="Виды аттестации" Click="DictionariesItem_Click"/>
                 <MenuItem Header="Отделения" Click="DictionariesItem_Click"/>
                 <MenuItem Header="Специальности" Click="DictionariesItem_Click"/>
                 <MenuItem Header="Группы" Click="DictionariesItem_Click"/>
                 <MenuItem Header="Дисциплины" Click="DictionariesItem_Click"/>
             </MenuItem>
-            <MenuItem Header="Учетные записи" >
+            <MenuItem Header="Учетные записи" Name="ParticipantsItem">
                 <MenuItem Header="Студенты" Click="ParticipantsItem_Click"/>
                 <MenuItem Header="Преподаватели" Click="ParticipantsItem_Click"/>
                 <MenuItem Header="Заведующие отделениями" Click="ParticipantsItem_Click"/>
                 <MenuItem Header="Администраторы" Click="ParticipantsItem_Click"/>
                 <MenuItem Header="Не назначенные" Click="ParticipantsItem_Click"/>
             </MenuItem>
-            <MenuItem Header="Сеть">
+            <MenuItem Header="Сеть" Name="NetworkItem">
                 <MenuItem Header="Обновить данные (F5)" Click="UpdateItem_Click"/>
                 <MenuItem Header="Аккаунт" Click="CurrentAccountItem_Click"/>
                 <MenuItem Header="Проверить версию сервера" Click="CheckVersionItem_Click"/>
             </MenuItem>
-            <MenuItem Header="Помощь">
-                <MenuItem Header="Справка"/>
+            <MenuItem Header="Помощь" Name="HelpItem">
+                <MenuItem Header="Справка" Click="HelpItem_Click"/>
                 <MenuItem Header="О программе" Click="AboutItem_Click"/>
             </MenuItem>
             <MenuItem Header="Выйти из учетной записи" Click="AccountExitItem_Click"/>
@@ -70,60 +69,160 @@
         </ContextMenu>
     </Window.ContextMenu>
     <Grid>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="*"/>
-        </Grid.RowDefinitions>
+        <Grid Name="StatementsPanel">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
 
-        <ListView Grid.Row="1" Name="StatementsLV">
-            <ListView.ContextMenu>
-                <ContextMenu>
-                    <MenuItem Header="Сформировать составную ведомость" Click="GenerateComplexStatementItem_Click"/>
-                    <MenuItem Header="Сформировать сводную ведомость" Click="GenerateTotalStatementItem_Click"/>
-                    <MenuItem Header="Редактировать" Click="EditItem_Click"/>
-                    <MenuItem Header="Удалить" Click="RemoveItem_Click"/>
-                </ContextMenu>
-            </ListView.ContextMenu>
+            <StackPanel Orientation="Horizontal" Grid.Row="0">
+                <TextBox Name="StatementNumberFilterTB"
+                     TextChanged="StatementNumberFilterTB_TextChanged" PreviewTextInput="StatementNumberFilterTB_PreviewTextInput"
+                     material:HintAssist.Hint="Номер ведомости"
+                     material:HintAssist.IsFloating="True"/>
 
-            <ListView.View>
-                <GridView>
-                    <GridViewColumn>
-                        <GridViewColumn.CellTemplate>
-                            <DataTemplate>
-                                <Image Width="20"
+                <ComboBox material:HintAssist.Hint="Тип ведомости"
+                      material:HintAssist.IsFloating="True"
+                      Name="StatementTypeFilterCB"
+                      SelectionChanged="StatementTypeFilterCB_SelectionChanged"
+                      Foreground="Gray"
+                      SelectedIndex="0"
+                      Margin="10 0 0 0">
+                    <ComboBoxItem Content="Все"/>
+                    <ComboBoxItem Content="Промежуточная" Name="MiddleItem"/>
+                    <ComboBoxItem Content="Экзаменационная" Name="ExamItem"/>
+                    <ComboBoxItem Content="Квалификационный экзамен" Name="QualificationItem"/>
+                    <ComboBoxItem Content="Учебная практика" Name="StudyPracticeItem"/>
+                    <ComboBoxItem Content="Производственная практика" Name="IndustrialPracticeItem"/>
+                    <ComboBoxItem Content="Курсовой проект" Name="CourceProjectItem"/>
+                    <ComboBoxItem Content="Сводная" Name="TotalItem"/>
+                    <ComboBoxItem Content="Прочее" Name="OtherItem"/>
+                </ComboBox>
+
+                <CheckBox Name="EnableFiltersCB" 
+                      Content="Включить фильтрацию" IsChecked="False"
+                      Margin="10 0 0 0" Style="{StaticResource MaterialDesignAccentCheckBox}"
+                      Checked="EnableFiltersCB_CheckedChanged" Unchecked="EnableFiltersCB_CheckedChanged"/>
+            </StackPanel>
+
+            <ListView Grid.Row="1" Name="StatementsLV">
+                <ListView.ContextMenu>
+                    <ContextMenu>
+                        <MenuItem Header="Сформировать составную ведомость" Click="GenerateComplexStatementItem_Click"/>
+                        <MenuItem Header="Сформировать сводную ведомость" Click="GenerateTotalStatementItem_Click"/>
+                        <MenuItem Header="Редактировать" Click="EditItem_Click"/>
+                        <MenuItem Header="Удалить" Click="RemoveItem_Click"/>
+                    </ContextMenu>
+                </ListView.ContextMenu>
+
+                <ListView.View>
+                    <GridView>
+                        <GridViewColumn>
+                            <GridViewColumn.CellTemplate>
+                                <DataTemplate>
+                                    <Image Width="20"
                                        Height="20"
                                        Source="{Binding Path=StateIconURI, Converter={StaticResource ImageToSourceConverter}}"/>
-                            </DataTemplate>
-                        </GridViewColumn.CellTemplate>
-                    </GridViewColumn>
-                    <GridViewColumn Header="Номер" DisplayMemberBinding="{Binding StatementNumber}" Width="100"/>
-                    <GridViewColumn Header="Дата" DisplayMemberBinding="{Binding StatementDate, StringFormat=dd\\.MM\\.yyyy}" Width="150"/>
-                    <GridViewColumn Header="Тип" Width="150" DisplayMemberBinding="{Binding StatementTypeString}"/>
-                    <GridViewColumn Header="Семестр" Width="100" DisplayMemberBinding="{Binding Semester}"/>
-                    <GridViewColumn Header="Примечание" Width="300" >
-                        <GridViewColumn.CellTemplate>
-                            <DataTemplate>
-                                <TextBlock Text="{Binding Note}" TextTrimming="WordEllipsis" Height="16"/>
-                            </DataTemplate>
-                        </GridViewColumn.CellTemplate>
-                    </GridViewColumn>
-                </GridView>
-            </ListView.View>
-        </ListView>
+                                </DataTemplate>
+                            </GridViewColumn.CellTemplate>
+                        </GridViewColumn>
+                        <GridViewColumn Header="Номер" DisplayMemberBinding="{Binding StatementNumber}" Width="80"/>
+                        <GridViewColumn Header="Дата" DisplayMemberBinding="{Binding StatementDate, StringFormat=dd\\.MM\\.yyyy}" Width="100"/>
+                        <GridViewColumn Header="Тип" Width="280" DisplayMemberBinding="{Binding StatementTypeString}"/>
+                        <GridViewColumn Header="Семестр" Width="100" DisplayMemberBinding="{Binding Semester}"/>
+                        <GridViewColumn Header="Примечание" Width="300" >
+                            <GridViewColumn.CellTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding Note}" TextTrimming="WordEllipsis" Height="16"/>
+                                </DataTemplate>
+                            </GridViewColumn.CellTemplate>
+                        </GridViewColumn>
+                    </GridView>
+                </ListView.View>
+            </ListView>
 
-        <Button Grid.Row="1" 
+            <Button Grid.Row="1" Name="AddButton"
                 Foreground="WhiteSmoke" FontSize="30" FontStretch="Medium" 
                 Style="{StaticResource MaterialDesignFloatingActionMiniAccentButton}" Content="+" 
                 Click="AddButton_Click"
                 HorizontalAlignment="Right" VerticalAlignment="Bottom"/>
 
-        <accountsui:AccountEditDialog x:Name="ProfileDialog"
+            <accountsui:AccountEditDialog x:Name="ProfileDialog"
                                            KeyDown="ProfileDialog_KeyDown"
                                            OnSave="ProfileDialog_OnSave"
                                            OnCancel="ProfileDialog_OnCancel"
                                            Background="Black"/>
-        <statements:EditStatementDialog x:Name="EditStatementDialog"
+            <statementsui:EditStatementDialog x:Name="EditStatementDialog"
+                                        Grid.Row="1"
                                         OnSave="EditStatementDialog_OnSave"
                                         OnCancel="EditStatementDialog_OnCancel"/>
+        </Grid>
+        <Grid Name="MarksPanel" Visibility="Collapsed">
+            <ListView  Name="StatementResultsLV">
+                <ListView.View>
+                    <GridView>
+                        <GridViewColumn Header="№ п/п"
+                                        DisplayMemberBinding="{Binding RelativeSource={RelativeSource FindAncestor, 
+                                                                       AncestorType={x:Type ListViewItem}}, 
+                                                                       Converter={StaticResource IndexConverter}}" />
+
+                        <GridViewColumn Header="Дисциплина" DisplayMemberBinding="{Binding SubjectName_STUDENT_MODE}" />
+
+                        <GridViewColumn Header="Дата" DisplayMemberBinding="{Binding StatementResultDate}" />
+
+                        <GridViewColumn Header="Итоговая оценка" DisplayMemberBinding="{Binding MarkValueString}" />
+
+                    </GridView>
+                </ListView.View>
+            </ListView>
+        </Grid>
+        <Grid Background="#DDFFFFFF" Name="HelpPanel" Visibility="Collapsed">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+
+            <Button Content="Закрыть справку" Style="{StaticResource MaterialDesignFlatButton}" 
+                    HorizontalAlignment="Right" VerticalAlignment="Top"
+                    Click="CloseHelpButton_Click" Foreground="Red"/>
+
+            <TextBlock FontSize="22" FontWeight="Bold" Foreground="#232323"
+                       Text="Главное окно системы «InCollege»"
+                       HorizontalAlignment="Center" VerticalAlignment="Top"/>
+
+            <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto" MaxHeight="300">
+                <TextBlock FontSize="14" Foreground="#232323" Name="HelpContentTB"
+                       HorizontalAlignment="Center" VerticalAlignment="Center"
+                       Width="800" TextWrapping="Wrap"/>
+            </ScrollViewer>
+
+            <Grid Grid.Row="1" HorizontalAlignment="Center">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <Button Style="{StaticResource MaterialDesignFlatAccentButton}" Name="BaseHelpButton" Grid.Row="0" Grid.Column="0"
+                        Click="HelpCategoryButton_Click" Content="Основное"/>
+                <Button Style="{StaticResource MaterialDesignFlatAccentButton}" Name="MenuHelpButton"  Grid.Row="0" Grid.Column="1"
+                        Click="HelpCategoryButton_Click" Content="Меню"/>
+                <Button Style="{StaticResource MaterialDesignFlatAccentButton}" Name="FilesHelpButton"  Grid.Row="0" Grid.Column="2"
+                        Click="HelpCategoryButton_Click" Content="Сервисные файлы"/>
+                <Button Style="{StaticResource MaterialDesignFlatAccentButton}" Name="SimpleStatementsHelpButton"  Grid.Row="1" Grid.Column="0"
+                        Click="HelpCategoryButton_Click" Content="Промежуточные и экзаменационные ведомости"/>
+                <Button Style="{StaticResource MaterialDesignFlatAccentButton}" Name="ComplexStatementsHelpButton"  Grid.Row="1" Grid.Column="1"
+                        Click="HelpCategoryButton_Click" Content="Составные и сводные ведомости"/>
+                <Button Style="{StaticResource MaterialDesignFlatAccentButton}" Name="AccountsHelpButton"  Grid.Row="1" Grid.Column="2"
+                        Click="HelpCategoryButton_Click" Content="Учетные записи"/>
+            </Grid>
+
+
+        </Grid>
     </Grid>
 </Window>
