@@ -32,6 +32,7 @@ namespace InCollege.Client.UI.StatementsUI
         public bool AddMode { get; set; }
         public bool GeneratedComplexMode { get; set; }
         public bool GeneratedTotalMode { get; set; }
+        public List<StatementResult> StatementResults { get; set; }
         #endregion
 
         public EditStatementDialog()
@@ -89,20 +90,18 @@ namespace InCollege.Client.UI.StatementsUI
                     GroupCB.Visibility = Visibility.Collapsed;
             }
 
+            StatementResults = await NetworkUtils.RequestData<StatementResult>(null, (nameof(StatementResult.StatementID), Statement?.ID ?? -1));
+
+            var studentsData = await NetworkUtils.RequestData<Account>(null, (nameof(Account.AccountType), AccountType.Student), (nameof(Account.GroupID), Statement.GroupID));
+
+            foreach (var current in StatementResults)
+                current.Student = studentsData.FirstOrDefault(c => c.ID == current.StudentID);
+
             if (GroupCB.SelectedItem != null)
-            {
-                var studentsData = await NetworkUtils.RequestData<Account>(null, (nameof(Account.AccountType), AccountType.Student), (nameof(Account.GroupID), ((Group)GroupCB.SelectedItem).ID));
-
-                var statementResultsData = await NetworkUtils.RequestData<StatementResult>(null, (nameof(StatementResult.StatementID), Statement.ID));
-                foreach (var current in statementResultsData)
-                    current.Student = studentsData.FirstOrDefault(c => c.ID == current.StudentID);
-
-
                 if (GroupCB.SelectedItem != null)
-                    StudentCB.ItemsSource = studentsData.Where(currentStudent => !statementResultsData.Any(c => c.StudentID == currentStudent.ID)).ToList();
+                    StudentCB.ItemsSource = studentsData.Where(currentStudent => !StatementResults.Any(c => c.StudentID == currentStudent.ID)).ToList();
 
-                StatementResultsLV.ItemsSource = statementResultsData;
-            }
+            StatementResultsLV.ItemsSource = StatementResults;
 
             if (GeneratedComplexMode || GeneratedTotalMode)
             {
@@ -305,7 +304,10 @@ namespace InCollege.Client.UI.StatementsUI
         {
             BindingOperations.GetBindingExpressionBase(StatementDatePicker, DatePicker.SelectedDateProperty).UpdateSource();
             if (Statement.StatementDate != null)
+            {
                 OnSave?.Invoke(sender, e);
+                IsOpen = false;
+            }
             else MessageBox.Show("Укажите дату!");
         }
 
@@ -356,17 +358,19 @@ namespace InCollege.Client.UI.StatementsUI
                         foreach (var current in commissionMembers)
                             commissionMembersResults.Add(await current);
 
-                        var statementResults = (List<StatementResult>)StatementResultsLV.ItemsSource;
-                        var subjects = (List<Subject>)SubjectCB.ItemsSource;
-                        foreach (var current in statementResults)
+                        if (StatementResults != null)
                         {
-                            var subject = subjects.FirstOrDefault(c => c.ID == current.SubjectID);
-                            //Do not use short form. We have to preserve SubjectID
-                            if (subject != null)
-                                current.Subject = subject;
+                            var subjects = (List<Subject>)SubjectCB.ItemsSource;
+                            foreach (var current in StatementResults)
+                            {
+                                var subject = subjects.FirstOrDefault(c => c.ID == current.SubjectID);
+                                //Do not use short form. We have to preserve SubjectID
+                                if (subject != null)
+                                    current.Subject = subject;
+                            }
                         }
 
-                        DocumentUtils_DOCX.SaveStatementWithTemplate(Statement, statementResults,
+                        DocumentUtils_DOCX.SaveStatementWithTemplate(Statement, StatementResults,
                             attestationTypesResults?.ToList(),
                             commissionMembersResults?.ToList(),
                             templateFile,
