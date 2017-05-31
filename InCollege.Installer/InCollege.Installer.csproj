@@ -98,6 +98,9 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="APMBuilderWindow.xaml.cs">
+      <DependentUpon>APMBuilderWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="AppPart.cs" />
     <Compile Include="CommonVariables.cs" />
     <Compile Include="LNKManager.cs" />
@@ -106,6 +109,10 @@
     <Compile Include="Styles\ListViewItemContainerStyleConverter.cs" />
     <Compile Include="Styles\ScrollViewerAssist.cs" />
     <Compile Include="ZipStorer.cs" />
+    <Page Include="APMBuilderWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>

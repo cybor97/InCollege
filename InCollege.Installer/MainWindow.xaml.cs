@@ -31,27 +31,40 @@ namespace InCollege.Installer
 
         async void LogoAnimation_Completed(object sender, EventArgs e)
         {
-            await Task.Run(() =>
+            try
             {
-                foreach (DictionaryEntry entry in ResourceSet)
-                    if (entry.Key.ToString().EndsWith("APM"))
-                        InstallComponents.Add((AppPart)new BinaryFormatter().Deserialize(new MemoryStream((byte[])entry.Value)));
-            });
+                if (Environment.CommandLine?.Contains("-generate-apm") ?? false)
+                {
+                    new APMBuilderWindow().ShowDialog();
+                    Close();
+                }
 
-            UninstallerMode = InstallComponents.Any(c => MyFileName.ToLower().Contains(c.UninstallString.Replace("INSTALL_LOCATION", string.Empty).ToLower()));
+                await Task.Run(() =>
+                {
+                    foreach (DictionaryEntry entry in ResourceSet)
+                        if (entry.Key.ToString().EndsWith("APM"))
+                            InstallComponents.Add((AppPart)new BinaryFormatter().Deserialize(new MemoryStream((byte[])entry.Value)));
+                });
 
-            PreInstallTB.Visibility = Visibility.Collapsed;
-            ((Storyboard)InstallButtons.Resources["InstallButtonsAppearStoryboard"]).Begin();
+                UninstallerMode = InstallComponents.Any(c => MyFileName.ToLower().Contains(c.UninstallString.Replace("INSTALL_LOCATION", string.Empty).ToLower()));
 
-            if (UninstallerMode)
-            {
-                InstallButton.Content = "Удалить";
-                InstallButton.IsEnabled = true;
+                PreInstallTB.Visibility = Visibility.Collapsed;
+                ((Storyboard)InstallButtons.Resources["InstallButtonsAppearStoryboard"]).Begin();
+
+                if (UninstallerMode)
+                {
+                    InstallButton.Content = "Удалить";
+                    InstallButton.IsEnabled = true;
+                }
+                else
+                {
+                    ComponentsLV.ItemsSource = InstallComponents;
+                    ((Storyboard)ComponentsLV.Resources["ComponentsLVAppearStoryboard"]).Begin();
+                }
             }
-            else
+            catch (Exception exc)
             {
-                ComponentsLV.ItemsSource = InstallComponents;
-                ((Storyboard)ComponentsLV.Resources["ComponentsLVAppearStoryboard"]).Begin();
+                MessageBox.Show($"Ошибка!\n\n{exc}");
             }
         }
 
@@ -62,12 +75,19 @@ namespace InCollege.Installer
 
         async void InstallButton_Click(object sender, RoutedEventArgs e)
         {
-            if (UninstallerMode)
-                await UninstallApp();
-            else
-                await InstallApp(CommonVariables.InstallRoot);
+            try
+            {
+                if (UninstallerMode)
+                    await UninstallApp();
+                else
+                    await InstallApp(CommonVariables.InstallRoot);
 
-            Close();
+                Close();
+            }
+            catch (Exception exc)
+            {
+                MessageBox.Show($"Ошибка!\n\n{exc}");
+            }
         }
 
         async Task UninstallApp()
@@ -94,7 +114,11 @@ namespace InCollege.Installer
                             while (true)
                                 try
                                 {
-                                    localComponent = ((AppPart)new BinaryFormatter().Deserialize(new FileStream(files[0], FileMode.Open)));
+                                    using (var stream = new FileStream(files[0], FileMode.Open))
+                                    {
+                                        localComponent = ((AppPart)new BinaryFormatter().Deserialize(stream));
+                                        stream.Close();
+                                    }
                                     break;
                                 }
                                 catch (IOException)
