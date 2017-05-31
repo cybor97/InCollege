@@ -128,7 +128,7 @@ namespace InCollege.Server
             }
             else return new HttpResponse(HttpResponseCode.Forbidden, "Аккаунт не подтвержден, отправка сообщений невозможна!", false);
         }
-        //TODO:Improve data protection
+
         #region Here
         static HttpResponse GetRangeProcessor(IHttpHeaders query, Account account)
         {
@@ -254,7 +254,7 @@ namespace InCollege.Server
                             if (!string.IsNullOrWhiteSpace(current.Key))
                                 whereParams.Add((current.Key.Split(new[] { "where" }, StringSplitOptions.RemoveEmptyEntries)[0], current.Value));
 
-                    if (whereParams.Count > 0)
+                    if (whereParams.Count > 0 || table == nameof(Log))
                         return new HttpResponse(HttpResponseCode.Ok, DBHolderSQL.RemoveWhere(table, whereParams.ToArray()).ToString(), true);
                 }
                 return new HttpResponse(HttpResponseCode.BadRequest, "Что удалять???", false);
@@ -275,17 +275,11 @@ namespace InCollege.Server
 
         static bool CheckTableAccess(string tableName, Account account)
         {
-            return tableName == nameof(StatementResult) && account.AccountType >= AccountType.Student
-                || account.AccountType >= AccountType.Professor;
+            return account.AccountType >= AccountType.Professor;
         }
         static bool CheckInTableAcess(string tableName, IHttpHeaders query, Account account)
         {
-            return tableName == nameof(StatementResult) &&
-                   query.TryGetByName(nameof(StatementResult.StudentID), out int studentID) &&
-                   studentID == account.ID &&
-                   account.AccountType >= AccountType.Student
-
-                  || account.AccountType >= AccountType.Professor;
+            return account.AccountType >= AccountType.Professor;
         }
         #endregion
     }

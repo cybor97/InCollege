@@ -64,6 +64,7 @@
                 <MenuItem Header="Справка" Click="HelpItem_Click"/>
                 <MenuItem Header="О программе" Click="AboutItem_Click"/>
             </MenuItem>
+            <MenuItem Header="Журнал событий" Name="LogItem" Click="LogItem_Click"/>
             <MenuItem Header="Выйти из учетной записи" Click="AccountExitItem_Click"/>
             <MenuItem Header="Выйти" Click="ExitItem_Click"/>
         </ContextMenu>

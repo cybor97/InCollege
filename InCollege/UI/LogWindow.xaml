@@ -1,0 +1,50 @@
+﻿<Window x:Class="InCollege.Client.UI.LogWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:material="http://materialdesigninxaml.net/winfx/xaml/themes"
+        Style="{StaticResource BaseWindow}"
+        Title="Журнал событий" Height="350" Width="800"
+        Loaded="LogWindow_Loaded" KeyDown="LogWindow_KeyDown">
+    <Grid>
+        <ListView Name="LogLV" MouseDoubleClick="LogLV_MouseDoubleClick">
+            <ListView.View>
+                <GridView>
+                    <GridViewColumn Header="Дата"
+                                    DisplayMemberBinding="{Binding LogDate, StringFormat=dd.MM.yyyy}"/>
+                    <GridViewColumn Header="Имеет отношение к"
+                                    DisplayMemberBinding="{Binding UserView}" Width="200"/>
+                    <GridViewColumn Header="Краткое сообщение"
+                                    DisplayMemberBinding="{Binding Message}" Width="400"/>
+                </GridView>
+            </ListView.View>
+        </ListView>
+
+        <material:DialogHost Name="LogContentDialog"
+                             KeyDown="LogContentDialog_KeyDown">
+            <material:DialogHost.DialogContent>
+                <StackPanel Margin="5">
+                    <TextBlock Text="{Binding Message}" 
+                               Width="590"
+                               FontWeight="SemiBold"
+                               TextWrapping="Wrap"/>
+
+                    <TextBox AcceptsReturn="True"
+                             Margin="0 10 0 0"
+                             Width="590"
+                             Text="{Binding Description}"
+                             AcceptsTab="True"
+                             IsReadOnly="True"
+                             TextWrapping="Wrap"/>
+
+                    <Button Style="{StaticResource MaterialDesignFlatButton}" Foreground="Red"
+                            HorizontalAlignment="Right" VerticalAlignment="Bottom"
+                            Content="Закрыть" Click="CloseContentDialogButton_Click"/>
+                </StackPanel>
+            </material:DialogHost.DialogContent>
+        </material:DialogHost>
+
+        <Button Foreground="Red" Background="WhiteSmoke"
+                HorizontalAlignment="Right" VerticalAlignment="Bottom"
+                Content="Очистить журнал" Click="ClearLogButton_Click"/>
+    </Grid>
+</Window>

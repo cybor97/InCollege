@@ -214,10 +214,11 @@ namespace InCollege.Core.Data.Base
             using (var connection = new SQLiteConnection(ConnectionString).OpenAndReturn())
             using (var transaction = connection.BeginTransaction(IsolationLevel.Serializable))
             {
-                var command = new SQLiteCommand($"DELETE FROM [{table}] WHERE " +
-                    string.Join(" AND ", whereParams.Where(c => !string.IsNullOrWhiteSpace(c.name) && !string.IsNullOrWhiteSpace(c.value.ToString()))
-                    .Select(c => $"{c.name} LIKE @{c.name}")))
-                { Transaction = transaction };
+                string whereString = whereParams.Length == 0 ? "" : "WHERE " +
+                      string.Join(" AND ", whereParams.Where(c => !string.IsNullOrWhiteSpace(c.name) && !string.IsNullOrWhiteSpace(c.value.ToString()))
+                      .Select(c => $"{c.name} LIKE @{c.name}"));
+
+                var command = new SQLiteCommand($"DELETE FROM [{table}] {whereString}") { Transaction = transaction };
                 command.Parameters.AddRange(whereParams.Select(c => new SQLiteParameter(c.name, c.value)).ToArray());
                 result = command.ExecuteNonQuery();
                 transaction.Commit();
