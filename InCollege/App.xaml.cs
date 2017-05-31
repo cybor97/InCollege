@@ -78,7 +78,6 @@ namespace InCollege.Client
             }
             catch (Exception e) when (e is AggregateException || e is HttpRequestException || e is WebException)
             {
-                //UNDONE:Remove this debug staff!
                 MessageBox.Show($"Ошибка подключения к серверу!\n\nТехническая информация:\n{e}");
                 return false;
             }

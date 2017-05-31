@@ -193,7 +193,6 @@ namespace InCollege.Client.UI.MainUI
         async void EditStatementDialog_OnSave(object sender, RoutedEventArgs e)
         {
             await NetworkUtils.ExecuteDataAction<Statement>(this, EditStatementDialog.Statement, DataAction.Save);
-            EditStatementDialog.IsOpen = false;
         }
 
         async void EditStatementDialog_OnCancel(object sender, RoutedEventArgs e)
@@ -291,10 +290,10 @@ namespace InCollege.Client.UI.MainUI
                             await NetworkUtils.ExecuteDataAction<StatementResult>(null, current, DataAction.Save);
                         }
 
-                        await EditStatementDialog.UpdateData();
                         Cursor = Cursors.Arrow;
 
                         await EditStatementDialog.Show(statement, true, complexMode, totalMode);
+                        await EditStatementDialog.UpdateData();
                     }
                     await UpdateData();
                 }
@@ -303,7 +302,7 @@ namespace InCollege.Client.UI.MainUI
         #region Filter
         void StatementTypeFilterCB_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            ExecuteFilter();
+            ApplyFilter();
         }
 
         void StatementNumberFilterTB_PreviewTextInput(object sender, TextCompositionEventArgs e)
@@ -314,15 +313,15 @@ namespace InCollege.Client.UI.MainUI
 
         void StatementNumberFilterTB_TextChanged(object sender, TextChangedEventArgs e)
         {
-            ExecuteFilter();
+            ApplyFilter();
         }
 
         void EnableFiltersCB_CheckedChanged(object sender, RoutedEventArgs e)
         {
-            ExecuteFilter();
+            ApplyFilter();
         }
 
-        void ExecuteFilter()
+        void ApplyFilter()
         {
             if (StatementsLV != null)
                 if (EnableFiltersCB.IsChecked ?? false)
@@ -367,7 +366,7 @@ namespace InCollege.Client.UI.MainUI
             return ($"[{name}]", $"[/{name}]");
         }
         #endregion
-        #region Other menu operations
+        #region Other menu items
         async void DictionariesItem_Click(object sender, RoutedEventArgs e)
         {
             int itemIndex = ((MenuItem)(((MenuItem)sender).Parent)).Items.IndexOf(sender);
@@ -409,6 +408,11 @@ namespace InCollege.Client.UI.MainUI
         void AboutItem_Click(object sender, RoutedEventArgs e)
         {
             new AboutWindow().ShowDialog();
+        }
+
+        void LogItem_Click(object sender, RoutedEventArgs e)
+        {
+            new LogWindow().ShowDialog();
         }
         #endregion
     }

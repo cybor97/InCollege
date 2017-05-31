@@ -7,7 +7,6 @@ using System.Windows.Input;
 
 namespace InCollege.Client.UI.DictionariesUI
 {
-    //TODO:Implement!
     public partial class GroupStudentsWindow : Window, IUpdatable
     {
         Group Group { get; set; }
