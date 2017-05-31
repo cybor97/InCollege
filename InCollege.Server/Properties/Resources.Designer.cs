@@ -8,10 +8,10 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace InCollege.Server.Properties
-{
-
-
+namespace InCollege.Server.Properties {
+    using System;
+    
+    
     /// <summary>
     ///   A strongly-typed resource class, for looking up localized strings, etc.
     /// </summary>
@@ -22,49 +22,73 @@ namespace InCollege.Server.Properties
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "4.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    internal class Resources
-    {
-
+    internal class Resources {
+        
         private static global::System.Resources.ResourceManager resourceMan;
-
+        
         private static global::System.Globalization.CultureInfo resourceCulture;
-
+        
         [global::System.Diagnostics.CodeAnalysis.SuppressMessageAttribute("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
-        internal Resources()
-        {
+        internal Resources() {
         }
-
+        
         /// <summary>
         ///   Returns the cached ResourceManager instance used by this class.
         /// </summary>
         [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Advanced)]
-        internal static global::System.Resources.ResourceManager ResourceManager
-        {
-            get
-            {
-                if ((resourceMan == null))
-                {
+        internal static global::System.Resources.ResourceManager ResourceManager {
+            get {
+                if (object.ReferenceEquals(resourceMan, null)) {
                     global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("InCollege.Server.Properties.Resources", typeof(Resources).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
             }
         }
-
+        
         /// <summary>
         ///   Overrides the current thread's CurrentUICulture property for all
         ///   resource lookups using this strongly typed resource class.
         /// </summary>
         [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Advanced)]
-        internal static global::System.Globalization.CultureInfo Culture
-        {
-            get
-            {
+        internal static global::System.Globalization.CultureInfo Culture {
+            get {
                 return resourceCulture;
             }
-            set
-            {
+            set {
                 resourceCulture = value;
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        internal static string AuthPage {
+            get {
+                return ResourceManager.GetString("AuthPage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Все методы работают через POST, т.к. кэширование для API не является необходимым.
+        ///.
+        /// </summary>
+        internal static string DataPage {
+            get {
+                return ResourceManager.GetString("DataPage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &lt;center&gt;&lt;h1&gt;&lt;b&gt;Добро пожаловать&lt;/b&gt;&lt;/h1&gt;&lt;/center&gt;
+        ///&lt;center&gt;&lt;h2&gt;&lt;b&gt;На сервер системы InCollege&lt;/b&gt;&lt;/h2&gt;&lt;/center&gt;
+        ///&lt;center&gt;&lt;a href=\&quot;/?Auth&quot;&gt;Авторизация&lt;/a&gt;&lt;/center&gt;
+        ///&lt;center&gt;&lt;a href=\&quot;/?Data&quot;&gt;Данные&lt;/a&gt;&lt;/center&gt;
+        ///&lt;a style=\&quot;position:fixed; bottom: 0; height: auto; margin - top:40px; width: 100 %; text - align:center\&quot;&gt;Made by [CYBOR]&lt;/a&gt;.
+        /// </summary>
+        internal static string HomePage {
+            get {
+                return ResourceManager.GetString("HomePage", resourceCulture);
             }
         }
     }

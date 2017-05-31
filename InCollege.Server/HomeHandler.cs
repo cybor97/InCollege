@@ -16,14 +16,12 @@ namespace InCollege.Server
                 context.Response = new HttpResponse(HttpResponseCode.Ok, "Экзамен по истории сдан! Или не сдан?.. Зависит от точки зрения.", true);
             else if (context.Request.QueryString.TryGetByName("view", out value) && value == "1")
                 context.Response = new HttpResponse(HttpResponseCode.Ok, "Да сколько можно??? undefined", true);
+            else if (context.Request.QueryString.TryGetByName("Auth", out value) && value == "1")
+                context.Response = new HttpResponse(HttpResponseCode.Ok, Properties.Resources.AuthPage, true);
+            else if (context.Request.QueryString.TryGetByName("Data", out value) && value == "1")
+                context.Response = new HttpResponse(HttpResponseCode.Ok, Properties.Resources.DataPage, true);
             else
-                context.Response = new HttpResponse(HttpResponseCode.Ok,
-                    "<center><h1><b>Добро пожаловать</b></h1></center>" +
-                    "<center><h2><b>На сервер системы InCollege</b></h2></center>" +
-                    "<center><a href=\"/Auth\">Авторизация</a></center>" +
-                    "<center><a href=\"/Data?action=GetRange&table=AttestationType\">Данные</a></center>" +
-                    "<a style=\"position:fixed; bottom: 0; height: auto; margin - top:40px; width: 100 %; text - align:center\">Made by [CYBOR]</a>",
-                    true);
+                context.Response = new HttpResponse(HttpResponseCode.Ok, Properties.Resources.HomePage.Replace("{Version}", CommonVariables.Version), true);
 
             return Task.Factory.GetCompleted();
         }

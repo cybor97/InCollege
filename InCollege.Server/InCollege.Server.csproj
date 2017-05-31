@@ -52,6 +52,8 @@
     <Reference Include="Newtonsoft.Json, Version=10.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>..\packages\Newtonsoft.Json.10.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
+    <Reference Include="PresentationCore" />
+    <Reference Include="PresentationFramework" />
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Data.SQLite, Version=1.0.105.1, Culture=neutral, PublicKeyToken=db937bc2d44ff139, processorArchitecture=MSIL">
@@ -70,6 +72,7 @@
     <Reference Include="uhttpsharp, Version=0.1.5653.28566, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\uHttpSharp.0.1.6.22\lib\net40\uhttpsharp.dll</HintPath>
     </Reference>
+    <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AuthorizationHandler.cs" />
@@ -120,6 +123,15 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="server1600.png.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\HomePage.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\DataPage.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\AuthPage.txt" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="..\packages\System.Data.SQLite.Core.1.0.105.1\build\net451\System.Data.SQLite.Core.targets" Condition="Exists('..\packages\System.Data.SQLite.Core.1.0.105.1\build\net451\System.Data.SQLite.Core.targets')" />
