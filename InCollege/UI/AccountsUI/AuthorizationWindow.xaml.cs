@@ -67,7 +67,6 @@ namespace InCollege.Client.UI.AccountsUI
                           (SignUpMode ? $"AccountType={AccountTypeCB.SelectedIndex}" : string.Empty))))).StatusCode == HttpStatusCode.OK)
                     {
                         App.Token = await response.Content.ReadAsStringAsync();
-                        //TODO:Implement token storing for later sessions.
                         DialogResult = true;
                         Close();
                     }
@@ -108,6 +107,13 @@ namespace InCollege.Client.UI.AccountsUI
         private void SettingsButton_Click(object sender, RoutedEventArgs e)
         {
             new SettingsWindow().ShowDialog();
+        }
+
+        async void ServerVersionItem_Click(object sender, RoutedEventArgs e)
+        {
+            var version = await NetworkUtils.CheckVersion();
+            if (version != null)
+                MessageBox.Show($"Успешно! Версия сервера:\n{version}");
         }
     }
 }

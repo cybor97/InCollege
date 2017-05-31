@@ -4,6 +4,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:dragablz="http://dragablz.net/winfx/xaml/dragablz"
         xmlns:accountsui="clr-namespace:InCollege.Client.UI.AccountsUI"
+        xmlns:material="http://materialdesigninxaml.net/winfx/xaml/themes"
         Title="Учетные записи" Height="500" Width="650"
         KeyDown="AccountsWindow_KeyDown"
         Loaded="ParticipantsWindow_Loaded">
@@ -11,9 +12,23 @@
         <Grid>
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
                 <RowDefinition/>
             </Grid.RowDefinitions>
+
+            <StackPanel Orientation="Horizontal">
+                <TextBox Name="AccountsFilterTB" TextChanged="AccountsFilterTB_TextChanged"
+                         material:HintAssist.Hint="ФИО или имя пользователя"
+                         material:HintAssist.IsFloating="True"/>
+
+                <CheckBox Name="EnableFiltersCB" 
+                      Content="Включить фильтрацию" IsChecked="False"
+                      Margin="10 0 0 0" Style="{StaticResource MaterialDesignAccentCheckBox}"
+                      Checked="EnableFiltersCB_CheckedChanged" Unchecked="EnableFiltersCB_CheckedChanged"/>
+            </StackPanel>
+            
             <dragablz:TabablzControl Name="AccountTypesTabs"
+                                     Grid.Row="1"
                                      SelectionChanged="AccountTypesTabs_SelectionChanged"
                                      Style="{StaticResource MaterialDesignAlternateTabablzControlStyle}">
                 <TabItem Header="Не назначенные"/>
@@ -23,7 +38,7 @@
                 <TabItem Header="Администраторы"/>
             </dragablz:TabablzControl>
 
-            <ListView Grid.Row="1" Name="AccountsLV">
+            <ListView Grid.Row="2" Name="AccountsLV">
                 <ListView.ContextMenu>
                     <ContextMenu>
                         <MenuItem Header="Редактировать" Click="EditItem_Click"/>
@@ -58,7 +73,7 @@
             </ListView>
         </Grid>
 
-        <Button Grid.Row="1" 
+        <Button Grid.Row="2" 
                 Foreground="WhiteSmoke" FontSize="30" FontStretch="Medium" 
                 Style="{StaticResource MaterialDesignFloatingActionMiniAccentButton}" Content="+" 
                 Click="AddButton_Click"

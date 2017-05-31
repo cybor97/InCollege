@@ -145,5 +145,27 @@ namespace InCollege.Client.UI.AccountsUI
                     break;
             }
         }
+
+        void AccountsFilterTB_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            ApplyFilter();
+        }
+
+        void EnableFiltersCB_CheckedChanged(object sender, RoutedEventArgs e)
+        {
+            ApplyFilter();
+        }
+
+        void ApplyFilter()
+        {
+            if (EnableFiltersCB.IsChecked ?? false)
+                AccountsLV.Items.Filter = c =>
+                 {
+                     if (c is Account account)
+                         return (account?.FullName?.Contains(AccountsFilterTB.Text) ?? false) || (account?.UserName?.Contains(AccountsFilterTB.Text) ?? false);
+                     else return false;
+                 };
+            else AccountsLV.Items.Filter = c => true;
+        }
     }
 }

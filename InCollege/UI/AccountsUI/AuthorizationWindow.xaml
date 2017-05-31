@@ -17,7 +17,7 @@
 
     <Window.ContextMenu>
         <ContextMenu>
-            <MenuItem Header="Я сисадмин" Click="SysadminModeItem_Click"/>
+            <MenuItem Header="Проверить соединение" Click="ServerVersionItem_Click"/>
             <MenuItem Header="Выйти" Click="CloseItem_Click"/>
         </ContextMenu>
     </Window.ContextMenu>
