@@ -158,7 +158,6 @@ namespace InCollege.Server
                     #region Special rules for messages
                     //All messages, sent us from other person have to be set "IsRead"
                     //It doesn't touches justCount queries
-                    //Need to be replaced with different Processor
                     if (table == nameof(Message) && !justCount)
                         foreach (DataRow current in range.Rows)
                             if ((current[nameof(Message.IsRead)] == DBNull.Value || (long)current[nameof(Message.IsRead)] == 0) && (long)current[nameof(Message.FromID)] != account.ID)
@@ -270,16 +269,15 @@ namespace InCollege.Server
 
         static bool CheckAccess(IHttpHeaders query, Account account, bool write)
         {
-            return account.AccountType >= (write ? AccountType.Professor : AccountType.Student) && account.Approved;
+            return account.Approved &&
+                account.AccountType >= AccountType.Professor &&
+                CheckTableAccess(query.TryGetByName("table", out string table) ? table : null, account);
         }
 
         static bool CheckTableAccess(string tableName, Account account)
         {
-            return account.AccountType >= AccountType.Professor;
-        }
-        static bool CheckInTableAcess(string tableName, IHttpHeaders query, Account account)
-        {
-            return account.AccountType >= AccountType.Professor;
+            //Only Admin may read ALL messages.
+            return tableName != nameof(Message) || account.AccountType == AccountType.Admin;
         }
         #endregion
     }
