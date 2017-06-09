@@ -67,7 +67,10 @@ namespace InCollege.Client.UI.MainUI
                     ParticipantsItem.IsEnabled = false;
                     StatementsPanel.Visibility = Visibility.Collapsed;
                     MarksPanel.Visibility = Visibility.Visible;
-                    StatementResultsLV.ItemsSource = await NetworkUtils.RequestStudyResults();
+                    StatementResultsLV.ItemsSource =
+                        (await NetworkUtils.RequestStudyResults())
+                        .OrderBy(c => c.StatementResultDate)
+                        .GroupBy(c => c.SubjectName_STUDENT_MODE);
                     break;
 
                 case AccountType.Professor:
