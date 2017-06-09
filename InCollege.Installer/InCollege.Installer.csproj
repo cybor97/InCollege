@@ -105,9 +105,6 @@
     <Compile Include="CommonVariables.cs" />
     <Compile Include="LNKManager.cs" />
     <Compile Include="RegistryManager.cs" />
-    <Compile Include="Styles\ListViewAssist.cs" />
-    <Compile Include="Styles\ListViewItemContainerStyleConverter.cs" />
-    <Compile Include="Styles\ScrollViewerAssist.cs" />
     <Compile Include="ZipStorer.cs" />
     <Page Include="APMBuilderWindow.xaml">
       <SubType>Designer</SubType>
