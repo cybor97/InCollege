@@ -98,7 +98,6 @@ namespace InCollege.Core.Data.Base
             return result.Rows.Count > 0 ? result.Rows[0] : null;
         }
 
-
         public static void Log(string message, string description, int accountID = -1)
         {
             Save(nameof(Log), new Log
@@ -151,7 +150,7 @@ namespace InCollege.Core.Data.Base
                 else
                 {
                     row = data.NewRow();
-                    row["ID"] = id = GetFreeID(connection, table);
+                    row["ID"] = id = GetFreeID(connection, transaction, table);
                 }
 
                 row["IsLocal"] = false;
@@ -226,10 +225,15 @@ namespace InCollege.Core.Data.Base
             return result;
         }
 
-        static int GetFreeID(SQLiteConnection connection, string table)
+        static int GetFreeID(SQLiteConnection connection, SQLiteTransaction transaction, string table)
         {
             var data = new DataTable();
-            new SQLiteDataAdapter($"SELECT * FROM sqlite_sequence WHERE name LIKE '{table}';", connection).Fill(data);
+            new SQLiteDataAdapter(
+                new SQLiteCommand($"SELECT * FROM sqlite_sequence WHERE name LIKE '{table}';", connection)
+                {
+                    Transaction = transaction
+                }
+                ).Fill(data);
             return data.Rows.Count == 0 ? 0 : Convert.ToInt32(data.Rows[0]["seq"]) + 1;
         }
     }
