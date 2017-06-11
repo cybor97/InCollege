@@ -6,7 +6,10 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Data;
 using System.Windows.Input;
+using System;
+using System.Globalization;
 
 namespace InCollege.Client.UI.DictionariesUI
 {
@@ -18,6 +21,7 @@ namespace InCollege.Client.UI.DictionariesUI
         {
             InitializeComponent();
             StudyObjectsTabs.SelectedIndex = tabIndex;
+            StudyObjectsTabs.SelectionChanged += (s, e) => Title = ((TabItem)StudyObjectsTabs.SelectedItem).Header.ToString();
 
             Views = new Dictionary<object, (DialogHost dialog, ListView list)>
             {
@@ -30,44 +34,35 @@ namespace InCollege.Client.UI.DictionariesUI
 
         public async Task UpdateData()
         {
-            Title = ((TabItem)StudyObjectsTabs.SelectedItem).Header.ToString();
-            //If not Subjects.
-            if (StudyObjectsTabs.SelectedIndex != StudyObjectsTabs.Items.Count - 1)
-            {
-                var departmentHeads = await NetworkUtils.RequestData<Account>(this, (nameof(Account.AccountType), AccountType.DepartmentHead));
-                DepartmentHeadCB.ItemsSource = departmentHeads;
+            var departmentHeads = await NetworkUtils.RequestData<Account>(this, (nameof(Account.AccountType), AccountType.DepartmentHead));
+            DepartmentHeadCB.ItemsSource = departmentHeads;
 
-                var departmentsData = await NetworkUtils.RequestData<Department>(this);
-                DepartmentCB.ItemsSource = departmentsData;
+            var departmentsData = await NetworkUtils.RequestData<Department>(this);
+            DepartmentCB.ItemsSource = departmentsData;
 
-                foreach (Department current in departmentsData)
-                    current.DepartmentHead = departmentHeads.FirstOrDefault(c => c.ID == current.DepartmentHeadID);
-                DepartmentsLV.ItemsSource = departmentsData;
+            foreach (Department current in departmentsData)
+                current.DepartmentHead = departmentHeads.FirstOrDefault(c => c.ID == current.DepartmentHeadID);
+            DepartmentsLV.ItemsSource = departmentsData;
 
-                if (StudyObjectsTabs.SelectedIndex >= 1)
-                {
-                    var specialtiesData = await NetworkUtils.RequestData<Specialty>(this);
-                    SpecialtyCB.ItemsSource = specialtiesData;
+            var specialtiesData = await NetworkUtils.RequestData<Specialty>(this);
+            SpecialtyCB.ItemsSource = specialtiesData;
 
-                    foreach (Specialty current in specialtiesData)
-                        current.Department = departmentsData.FirstOrDefault(c => c.ID == current.DepartmentID);
-                    SpecialtiesLV.ItemsSource = specialtiesData;
+            foreach (Specialty current in specialtiesData)
+                current.Department = departmentsData.FirstOrDefault(c => c.ID == current.DepartmentID);
+            SpecialtiesLV.ItemsSource = specialtiesData;
 
-                    if (StudyObjectsTabs.SelectedIndex >= 2)
-                    {
-                        var groupsData = await NetworkUtils.RequestData<Group>(this);
-                        foreach (Group current in groupsData)
-                            current.Specialty = specialtiesData.FirstOrDefault(c => c.ID == current.SpecialtyID);
-                        GroupsLV.ItemsSource = groupsData;
-                    }
-                }
-            }
-            else SubjectsLV.ItemsSource = await NetworkUtils.RequestData<Subject>(this);
-        }
+            var groupsData = await NetworkUtils.RequestData<Group>(this);
+            foreach (Group current in groupsData)
+                current.Specialty = specialtiesData.FirstOrDefault(c => c.ID == current.SpecialtyID);
+            GroupsLV.ItemsSource = groupsData;
 
-        async void StudyObjectsTabs_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-            await UpdateData();
+            var subjectsData = await NetworkUtils.RequestData<Subject>(this);
+            foreach (var current in subjectsData)
+                current.Specialty = specialtiesData.FirstOrDefault(c => c.ID == current.SpecialtyID);
+            SubjectsLV.ItemsSource = subjectsData;
+
+            SubjectSpecialtyCB.ItemsSource = specialtiesData;
+            SubjectSpecialtyFilterCB.ItemsSource = specialtiesData;
         }
 
         async void StudyObjectsWindow_Loaded(object sender, RoutedEventArgs e)
@@ -184,6 +179,47 @@ namespace InCollege.Client.UI.DictionariesUI
                     await UpdateData();
                     break;
             }
+        }
+
+        void EnableFiltersCB_CheckedChanged(object sender, RoutedEventArgs e)
+        {
+            ApplyFilter();
+        }
+
+        void SemesterFilterTB_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            ApplyFilter();
+        }
+
+        void SubjectSpecialtyFilterCB_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            ApplyFilter();
+        }
+
+        void ApplyFilter()
+        {
+            if (SubjectsLV != null)
+                if (EnableFiltersCB.IsChecked ?? false)
+                    SubjectsLV.Items.Filter = c =>
+                    {
+                        var subject = (Subject)c;
+                        return (!int.TryParse(SemesterFilterTB.Text, out int semesterValue) || subject.Semester == -1 || subject.Semester == semesterValue) &&
+                        (SubjectSpecialtyFilterCB.SelectedItem == null || SubjectSpecialtyFilterCB.SelectedItem == subject.Specialty);
+                    };
+                else SubjectsLV.Items.Filter = c => true;
+        }
+    }
+
+    public class SemesterConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            return (int)value == -1 ? "" : value;
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            return int.TryParse(value.ToString(), out int intValue) ? intValue : -1;
         }
     }
 }
