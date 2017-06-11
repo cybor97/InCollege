@@ -7,7 +7,7 @@
         WindowStartupLocation="CenterScreen"
         ResizeMode="NoResize"
         KeyDown="_this_KeyDown"
-        Title="Авторизация" Height="350" Width="250">
+        Title="Авторизация" Height="350" Width="300">
     <Window.Resources>
         <Storyboard x:Key="SwitchModeStoryboard">
             <DoubleAnimation Storyboard.TargetName="_this" Storyboard.TargetProperty="Height"

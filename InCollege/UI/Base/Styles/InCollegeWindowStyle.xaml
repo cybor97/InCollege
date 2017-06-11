@@ -140,34 +140,26 @@
                     </Grid.RowDefinitions>
                     <Grid Name="Header" Height="30" Margin="5"
                           Background="{StaticResource MaterialDesignPaper}">
-                        <Grid>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="Auto"/>
-                                <ColumnDefinition Width="*"/>
-                                <ColumnDefinition Width="Auto"/>
-                            </Grid.ColumnDefinitions>
-
+                        <Grid sw:ControlDoubleClickBehavior.ExecuteCommand="{StaticResource MaximizeCommand}"
+                              sw:ControlDoubleClickBehavior.ExecuteCommandParameter="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}}"
+                              sw:WindowDragBehavior.LeftMouseButtonDrag="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}}"
+                              sw:ShowSystemMenuBehavior.TargetWindow="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}}" 
+                              Background="Transparent">
                             <local:WindowButton HorizontalAlignment="Left"
-                                    Grid.Column="0"
                                     Style="{StaticResource WindowButton}" 
-                                    Content="☰"
+                                    Content="☰ Меню"
                                     Command="{StaticResource OpenContextMenuCommand}"
                                     AnimateColor="Green"
                                     CommandParameter="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}}"/>
 
                             <Label Content="{TemplateBinding Title}" 
-                                   Grid.Column="1"
                                    VerticalAlignment="Center"
                                    HorizontalContentAlignment="Center" 
-                                   sw:ControlDoubleClickBehavior.ExecuteCommand="{StaticResource MaximizeCommand}"
-                                   sw:ControlDoubleClickBehavior.ExecuteCommandParameter="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}}"
-                                   sw:WindowDragBehavior.LeftMouseButtonDrag="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}}"
-                                   sw:ShowSystemMenuBehavior.TargetWindow="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}}"
+                                   HorizontalAlignment="Center"
                                    Foreground="{DynamicResource MaterialDesignBody}"
                                    FontSize="16"/>
 
                             <local:WindowButton HorizontalAlignment="Right"
-                                    Grid.Column="2"
                                     Content="X"
                                     AnimateColor="Red"
                                     Style="{StaticResource WindowButton}" 
@@ -227,7 +219,7 @@
         <Setter Property="TextElement.FontSize" Value="13"/>
         <Setter Property="FontFamily" Value="{DynamicResource MaterialDesignFont}"/>
         <Setter Property="AllowsTransparency" Value="True"/>
-                
+
         <Setter Property="Template" Value="{StaticResource BaseWindowTemplate}"/>
 
         <Setter Property="WindowStyle" Value="None"/>
