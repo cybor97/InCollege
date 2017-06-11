@@ -61,7 +61,24 @@ namespace InCollege.Server.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to .
+        ///   Looks up a localized string similar to &lt;center&gt;Авторизация&lt;/center&gt;
+        ///&lt;ol&gt;
+        /// &lt;li&gt;SignIn&lt;/li&gt;
+        /// Авторизирует пользователя. Возвращает токен для доступа к данным. Параметры:
+        /// &lt;ul&gt;
+        /// &lt;li&gt;UserName - имя пользователя&lt;/li&gt;
+        /// &lt;li&gt;Password - пароль&lt;/li&gt;
+        /// &lt;/ul&gt;
+        ///
+        /// &lt;li&gt;SignUp&lt;/li&gt;
+        /// Регистрирует пользователя:
+        /// &lt;ul&gt;
+        /// &lt;li&gt;UserName - имя пользователя&lt;/li&gt;
+        /// &lt;li&gt;Password - пароль&lt;/li&gt;
+        /// &lt;li&gt;AccountType - тип аккаунта(в числовом представлении)&lt;/li&gt;
+        /// &lt;li&gt;BirthDate - дата рождения&lt;/li&gt; 
+        /// &lt;li&gt;FullName - ФИО&lt;/li&gt; 
+        /// &lt;li&gt;ProfileImage - изображение профиля(фун [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string AuthPage {
             get {
@@ -71,7 +88,19 @@ namespace InCollege.Server.Properties {
         
         /// <summary>
         ///   Looks up a localized string similar to Все методы работают через POST, т.к. кэширование для API не является необходимым.
-        ///.
+        ///
+        ///Для доступа к любому методу нужен токен авторизации, полученный при &lt;a href=&quot;/?Auth=1&quot;&gt;авторизации&lt;/a&gt;.
+        ///Передавать его следует параметром token=&quot;содержимое_токена&quot;.
+        ///
+        ///Существуют такие методы:
+        ///
+        ///&lt;ol&gt;
+        /// &lt;li&gt;GetRange&lt;/li&gt;
+        /// Получает диапазон данных. Параметры:
+        /// &lt;ul&gt;
+        /// &lt;li&gt;table - какие данные нужны&lt;/li&gt;
+        /// &lt;li&gt;skipRecords - сколько записей необходимо пропустить&lt;/li&gt;
+        /// &lt;li&gt;countRecords - сколько записей запрашивается с 0-й л [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string DataPage {
             get {
@@ -82,9 +111,10 @@ namespace InCollege.Server.Properties {
         /// <summary>
         ///   Looks up a localized string similar to &lt;center&gt;&lt;h1&gt;&lt;b&gt;Добро пожаловать&lt;/b&gt;&lt;/h1&gt;&lt;/center&gt;
         ///&lt;center&gt;&lt;h2&gt;&lt;b&gt;На сервер системы InCollege&lt;/b&gt;&lt;/h2&gt;&lt;/center&gt;
-        ///&lt;center&gt;&lt;a href=\&quot;/?Auth&quot;&gt;Авторизация&lt;/a&gt;&lt;/center&gt;
-        ///&lt;center&gt;&lt;a href=\&quot;/?Data&quot;&gt;Данные&lt;/a&gt;&lt;/center&gt;
-        ///&lt;a style=\&quot;position:fixed; bottom: 0; height: auto; margin - top:40px; width: 100 %; text - align:center\&quot;&gt;Made by [CYBOR]&lt;/a&gt;.
+        ///&lt;center&gt;&lt;a href=&quot;/?Auth=1&quot;&gt;Авторизация&lt;/a&gt;&lt;/center&gt;
+        ///&lt;center&gt;&lt;a href=&quot;/?Data=1&quot;&gt;Данные&lt;/a&gt;&lt;/center&gt;
+        ///&lt;a style=&quot;position:fixed; bottom:0; height:auto; margin-top:40px; width: 100%; text-align:center&quot;&gt;Made by [CYBOR]&lt;/a&gt;
+        ///&lt;a style=&quot;position:fixed; bottom:0; height:auto; margin-top:40px; width: 100%; text-align:right&quot;&gt;{Version}&lt;/a&gt;.
         /// </summary>
         internal static string HomePage {
             get {

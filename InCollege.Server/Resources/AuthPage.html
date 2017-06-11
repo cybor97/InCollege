@@ -1,0 +1,40 @@
+﻿<html>
+<head>
+    <link href="//cdn.muicss.com/mui-latest/css/mui.min.css" rel="stylesheet" type="text/css" />
+    <script src="//cdn.muicss.com/mui-latest/js/mui.min.js"></script>
+</head>
+<body>
+    <br />
+    <br />
+    <div class="mui-panel mui--text-dark">
+        <center><h1>Авторизация</h1></center>
+        <ol>
+            <li>SignIn</li>
+            Авторизирует пользователя. Возвращает токен для доступа к данным. Параметры:
+            <ul>
+                <li>UserName - имя пользователя</li>
+                <li>Password - пароль</li>
+            </ul>
+
+            <li>SignUp</li>
+            Регистрирует пользователя:
+            <ul>
+                <li>UserName - имя пользователя</li>
+                <li>Password - пароль</li>
+                <li>AccountType - тип аккаунта(в числовом представлении)</li>
+                <li>BirthDate - дата рождения</li>
+                <li>FullName - ФИО</li>
+                <li>ProfileImage - изображение профиля(функционал не реализован)</li>
+            </ul>
+
+            <li>ValidateToken</li>
+            Проверяет токен в параметре token. Возвращает пустой ответ с кодом OK в случае, если токен верный и NotAcceptable в противном случае.
+
+            <li>WhoAmI</li>
+            Возвращает аккаунт для токена.
+        </ol>
+    </div>
+    <br />
+    <br />
+</body>
+</html>
