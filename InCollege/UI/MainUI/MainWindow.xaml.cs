@@ -109,8 +109,13 @@ namespace InCollege.Client.UI.MainUI
 
                 current.Subject = subjectsData.FirstOrDefault(c => c.ID == current.SubjectID);
             }
+
+            foreach (var current in subjectsData)
+                current.Specialty = specialtiesData.FirstOrDefault(c => c.ID == current.SpecialtyID);
+
             EditStatementDialog.SpecialtyCB.ItemsSource = specialtiesData;
             EditStatementDialog.GroupCB.ItemsSource = groupsData;
+
             EditStatementDialog.SubjectCB.ItemsSource = subjectsData;
 
             StatementsLV.ItemsSource = statementsData;
@@ -327,14 +332,13 @@ namespace InCollege.Client.UI.MainUI
         void ApplyFilter()
         {
             if (StatementsLV != null)
-                if (EnableFiltersCB.IsChecked ?? false)
-                    StatementsLV.Items.Filter = c =>
-                    {
-                        var statement = (Statement)c;
-                        return statement.StatementNumber.ToString().Contains(StatementNumberFilterTB.Text) &&
-                               (StatementTypeFilterCB.SelectedIndex == 0 || statement.StatementType == (StatementType)(StatementTypeFilterCB.SelectedIndex - 1));
-                    };
-                else StatementsLV.Items.Filter = c => true;
+                StatementsLV.Items.Filter = c =>
+                {
+                    var statement = (Statement)c;
+                    return !(EnableFiltersCB.IsChecked ?? false) ||
+                            statement.StatementNumber.ToString().Contains(StatementNumberFilterTB.Text) &&
+                           (StatementTypeFilterCB.SelectedIndex == 0 || statement.StatementType == (StatementType)(StatementTypeFilterCB.SelectedIndex - 1));
+                };
         }
 
         #endregion

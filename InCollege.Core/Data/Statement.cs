@@ -58,7 +58,7 @@ namespace InCollege.Core.Data
         #region Service data
         static readonly Dictionary<StatementType, string> StatementTypeStrings = new Dictionary<StatementType, string>()
         {
-            { StatementType.Middle, "Промежуточная" },
+            { StatementType.Middle, "Зачетная" },
             { StatementType.Exam, "Экзаменационная" },
             { StatementType.QualificationExam, "Протокол квалификационного экзамена" },
             { StatementType.StudyPractice, "Учебная практика" },

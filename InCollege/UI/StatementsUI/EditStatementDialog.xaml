@@ -42,7 +42,7 @@
                           SelectionChanged="StatementTypeCB_SelectionChanged"
                           Foreground="Gray"
                           Margin="0 0 5 0">
-                    <ComboBoxItem Content="Промежуточная" Name="MiddleItem"/>
+                    <ComboBoxItem Content="Зачетная" Name="MiddleItem"/>
                     <ComboBoxItem Content="Экзаменационная" Name="ExamItem"/>
                     <ComboBoxItem Content="Квалификационный экзамен" Name="QualificationItem"/>
                     <ComboBoxItem Content="Учебная практика" Name="StudyPracticeItem"/>
@@ -65,6 +65,7 @@
                       Name="SubjectCB"
                       DisplayMemberPath="SubjectName"
                       SelectedValue="{Binding Subject}"
+                      SelectionChanged="SubjectCB_SelectionChanged"
                       material:HintAssist.Hint="Дисциплина/Профессиональный модуль"
                       material:HintAssist.IsFloating="True"
                       Margin="0 0 5 0"/>

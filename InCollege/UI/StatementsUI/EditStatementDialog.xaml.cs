@@ -119,7 +119,8 @@ namespace InCollege.Client.UI.StatementsUI
             }
             else
             {
-                GroupCB.IsEnabled = StatementTypeCB.IsEnabled = SubjectCB.IsEnabled = SpecialtyCB.IsEnabled = StatementResultsLV.Items.Count == 0;
+                StatementTypeCB.IsEnabled = StatementResultsLV.Items.Count == 0;
+                GroupCB.IsEnabled = SpecialtyCB.IsEnabled = StatementResultsLV.Items.Count == 0 || AddMode;
                 SubjectCB.Visibility = Visibility.Visible;
                 foreach (ComboBoxItem current in StatementTypeCB.Items)
                     current.IsEnabled = true;
@@ -132,14 +133,61 @@ namespace InCollege.Client.UI.StatementsUI
         }
         #endregion
         #region Selection callbacks
+
+        private bool handleGroupSelection = true;
         async void GroupCB_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            await UpdateData();
+            if (handleGroupSelection)
+                if (Statement != null && Statement.StatementType != StatementType.Total && AddMode)
+                    if ((StatementResults?.Count ?? 0) == 0 || StatementResults.All(c => c.MarkValue == (sbyte)TechnicalMarkValue.Blank) ||
+                        MessageBox.Show("Внимание! Ведомость содержит оценки, смена группы приведет к их удалению. Продолжить?", "Опасная операция", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
+                    {
+                        GroupCB.IsEnabled = false;
+                        await NetworkUtils.RemoveWhere<StatementResult>(this, (nameof(StatementResult.StatementID), Statement.ID));
+                        int ticketNumber = 0;
+                        foreach (var current in StudentCB.ItemsSource)
+                            await NetworkUtils.ExecuteDataAction<StatementResult>(null, new StatementResult
+                            {
+                                StatementID = Statement.ID,
+                                MarkValue = (sbyte)TechnicalMarkValue.Blank,
+                                Student = (Account)current,
+                                Subject = (Subject)SubjectCB.SelectedItem,
+                                StatementResultDate = Statement.StatementDate,
+                                TicketNumber = ++ticketNumber,
+                            }, DataAction.Save);
+                        GroupCB.IsEnabled = true;
+                        await UpdateData();
+                    }
+                    else
+                    {
+                        handleGroupSelection = false;
+                        GroupCB.SelectedItem = e.RemovedItems[0];
+                        return;
+                    }
+            handleGroupSelection = true;
+
+        }
+
+        async void SubjectCB_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (Statement != null)
+                if (Statement.StatementType == StatementType.Middle || Statement.StatementType == StatementType.Exam)
+                {
+                    IsEnabled = false;
+                    foreach (var current in StatementResults)
+                    {
+                        current.Subject = (Subject)SubjectCB.SelectedItem;
+                        await NetworkUtils.ExecuteDataAction<StatementResult>(null, current, DataAction.Save);
+                    }
+                    IsEnabled = true;
+                    await UpdateData();
+                }
         }
 
         void SpecialtyCB_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             UpdateGroupList();
+            ApplyFilter();
         }
 
         void StatementTypeCB_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -176,6 +224,7 @@ namespace InCollege.Client.UI.StatementsUI
                 var optimal = (int)Math.Ceiling((double)Statement.Semester / 2);
                 Statement.Course = optimal == 0 ? 1 : optimal;
                 BindingOperations.GetBindingExpressionBase(CourseCB, Selector.SelectedValueProperty).UpdateTarget();
+                ApplyFilter();
             }
         }
 
@@ -187,6 +236,7 @@ namespace InCollege.Client.UI.StatementsUI
                 if (optimal > Statement.Semester || optimal < Statement.Semester)
                     Statement.Semester = optimal - 1;
                 BindingOperations.GetBindingExpressionBase(SemesterCB, Selector.SelectedValueProperty).UpdateTarget();
+                ApplyFilter();
             }
         }
         #endregion
@@ -384,6 +434,17 @@ namespace InCollege.Client.UI.StatementsUI
             SaveDocButton.IsEnabled = true;
         }
         #endregion
+
+        public void ApplyFilter()
+        {
+            if (SubjectCB != null)
+                SubjectCB.Items.Filter = c =>
+                  {
+                      var subject = (Subject)c;
+                      return (subject.Semester <= 0 || SemesterCB.SelectedItem == null || subject.Semester == (int)SemesterCB.SelectedItem) &&
+                             (subject.Specialty == null || SpecialtyCB.SelectedItem == null || subject.Specialty == (Specialty)SpecialtyCB.SelectedItem);
+                  };
+        }
 
     }
     #region Converters
