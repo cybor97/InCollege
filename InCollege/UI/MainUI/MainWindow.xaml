@@ -79,6 +79,7 @@
             <StackPanel Orientation="Horizontal" Grid.Row="0">
                 <TextBox Name="StatementNumberFilterTB"
                      TextChanged="StatementNumberFilterTB_TextChanged" PreviewTextInput="StatementNumberFilterTB_PreviewTextInput"
+                     Visibility="{Binding ElementName=EnableFiltersCB, Path=IsChecked, Converter={StaticResource BooleanToVisibilityConverter}}"
                      material:HintAssist.Hint="Номер ведомости"
                      material:HintAssist.IsFloating="True"/>
 
@@ -88,9 +89,10 @@
                       SelectionChanged="StatementTypeFilterCB_SelectionChanged"
                       Foreground="Gray"
                       SelectedIndex="0"
+                      Visibility="{Binding ElementName=EnableFiltersCB, Path=IsChecked, Converter={StaticResource BooleanToVisibilityConverter}}"
                       Margin="10 0 0 0">
                     <ComboBoxItem Content="Все"/>
-                    <ComboBoxItem Content="Промежуточная" Name="MiddleItem"/>
+                    <ComboBoxItem Content="Зачетная" Name="MiddleItem"/>
                     <ComboBoxItem Content="Экзаменационная" Name="ExamItem"/>
                     <ComboBoxItem Content="Квалификационный экзамен" Name="QualificationItem"/>
                     <ComboBoxItem Content="Учебная практика" Name="StudyPracticeItem"/>
@@ -216,7 +218,7 @@
                 <Button Style="{StaticResource MaterialDesignFlatAccentButton}" Name="FilesHelpButton"  Grid.Row="0" Grid.Column="2"
                         Click="HelpCategoryButton_Click" Content="Сервисные файлы"/>
                 <Button Style="{StaticResource MaterialDesignFlatAccentButton}" Name="SimpleStatementsHelpButton"  Grid.Row="1" Grid.Column="0"
-                        Click="HelpCategoryButton_Click" Content="Промежуточные и экзаменационные ведомости"/>
+                        Click="HelpCategoryButton_Click" Content="Зачетные и экзаменационные ведомости"/>
                 <Button Style="{StaticResource MaterialDesignFlatAccentButton}" Name="ComplexStatementsHelpButton"  Grid.Row="1" Grid.Column="1"
                         Click="HelpCategoryButton_Click" Content="Составные и сводные ведомости"/>
                 <Button Style="{StaticResource MaterialDesignFlatAccentButton}" Name="AccountsHelpButton"  Grid.Row="1" Grid.Column="2"
