@@ -1,4 +1,5 @@
-﻿using InCollege.Client.UI.AccountsUI;
+﻿using InCollege.Client.UI;
+using InCollege.Client.UI.AccountsUI;
 using InCollege.Client.UI.MainUI;
 using InCollege.Core.Data;
 using System;
@@ -39,6 +40,9 @@ namespace InCollege.Client
 
         public App()
         {
+            var preloaderWindow = new PreloaderWindow();
+            preloaderWindow.Show();
+
             InitializeComponent();
 
             MainWindow = new MainWindow();
@@ -53,8 +57,13 @@ namespace InCollege.Client
             }
 
             var loginWindow = new AuthorizationWindow();
-            if (Token != null && ValidateToken() ||
+            var tokenValid = Token != null && ValidateToken();
+
+            preloaderWindow.Close();
+
+            if (tokenValid ||
                 loginWindow.ShowDialog().HasValue && loginWindow.DialogResult.Value)
+
                 MainWindow.ShowDialog();
             else Shutdown();
 

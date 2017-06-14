@@ -1,0 +1,31 @@
+﻿<Window x:Class="InCollege.Client.UI.PreloaderWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="MainWindow" Height="400" Width="600"
+        WindowStartupLocation="CenterScreen"
+        WindowStyle="None" ResizeMode="NoResize" 
+        AllowsTransparency="True" Background="Transparent"
+        MouseLeftButtonDown="MD">
+    <x:Code>
+        void MD(object sender, RoutedEventArgs e) { try { DragMove(); } catch { } }
+    </x:Code>
+    <Grid>
+        <Border CornerRadius="10" Background="White"
+                    BorderBrush="WhiteSmoke"
+                    BorderThickness="2">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+
+                <Grid Grid.Row="1">
+                    <TextBlock Text="InCollege" FontSize="70" FontWeight="Bold" 
+                   Foreground="LimeGreen" 
+                   Name="LogoTB"
+                   HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                </Grid>
+            </Grid>
+        </Border>
+    </Grid>
+</Window>   
