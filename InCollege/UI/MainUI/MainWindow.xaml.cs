@@ -434,7 +434,7 @@ namespace InCollege.Client.UI.MainUI
 
         public int GetHashCode(StatementResult obj)
         {
-            return int.Parse($"{obj.StudentID}{obj.SubjectID}");
+            return int.Parse($"{Math.Abs(obj.StudentID)}{Math.Abs(obj.SubjectID)}");
         }
     }
 }
