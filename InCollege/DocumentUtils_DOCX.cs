@@ -254,11 +254,14 @@ namespace InCollege
                     var currentRow = table.InsertRow(templateRow);
 
                     for (int cell_i = 0; cell_i < templateRow.Cells.Count; cell_i++)
+                    {
+                        int ticketNumber = results[result_i].TicketNumber;
                         currentRow.Cells[cell_i]
                                   .Fill("{IndexNumber}", (result_i + 1).ToString())
                                   .Fill("{StatementResult.Student.FullName}", results[result_i].StudentFullName)
                                   .Fill("{StatementResult.MarkValue}", results[result_i].MarkValueString)
-                                  .Fill("{StatementResult.TicketNumber}", results[result_i].TicketNumber.ToString());
+                                  .Fill("{StatementResult.TicketNumber}", ticketNumber == -1 ? "" : ticketNumber.ToString());
+                    }
                 }
 
                 templateRow.Remove();
