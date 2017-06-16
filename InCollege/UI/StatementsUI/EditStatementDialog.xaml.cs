@@ -33,6 +33,8 @@ namespace InCollege.Client.UI.StatementsUI
         public bool GeneratedComplexMode { get; set; }
         public bool GeneratedTotalMode { get; set; }
         public List<StatementResult> StatementResults { get; set; }
+
+        private bool DestructionMode { get; set; }
         #endregion
 
         public EditStatementDialog()
@@ -47,6 +49,7 @@ namespace InCollege.Client.UI.StatementsUI
 
         public async Task Show(Statement statement, bool addMode, bool generatedComplexMode, bool generatedTotalMode)
         {
+            DestructionMode = false;
             if (generatedComplexMode && generatedTotalMode)
                 MessageBox.Show("Ошибка! Ведомость не может быть сгенерирована одновременно \"Составной\" и \"Сводной\"");
             else
@@ -98,8 +101,7 @@ namespace InCollege.Client.UI.StatementsUI
                 current.Student = studentsData.FirstOrDefault(c => c.ID == current.StudentID);
 
             if (GroupCB.SelectedItem != null)
-                if (GroupCB.SelectedItem != null)
-                    StudentCB.ItemsSource = studentsData.Where(currentStudent => !StatementResults.Any(c => c.StudentID == currentStudent.ID)).ToList();
+                StudentCB.ItemsSource = studentsData.Where(currentStudent => !StatementResults.Any(c => c.StudentID == currentStudent.ID)).ToList();
 
             StatementResultsLV.ItemsSource = StatementResults;
 
@@ -137,14 +139,15 @@ namespace InCollege.Client.UI.StatementsUI
         private bool handleGroupSelection = true;
         async void GroupCB_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            if (handleGroupSelection)
-                if (Statement != null && Statement.StatementType != StatementType.Total && AddMode)
+            if (handleGroupSelection && !DestructionMode)
+                if (Statement != null && Statement.StatementType != StatementType.Total && AddMode && ClientConfiguration.Instance.AutoFillStudents)
                     if ((StatementResults?.Count ?? 0) == 0 || StatementResults.All(c => c.MarkValue == (sbyte)TechnicalMarkValue.Blank) ||
                         MessageBox.Show("Внимание! Ведомость содержит оценки, смена группы приведет к их удалению. Продолжить?", "Опасная операция", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
                     {
                         GroupCB.IsEnabled = false;
                         await NetworkUtils.RemoveWhere<StatementResult>(this, (nameof(StatementResult.StatementID), Statement.ID));
                         int ticketNumber = 0;
+                        bool fillTicketNumbers = ClientConfiguration.Instance.AutoFillTicketNumbers;
                         foreach (var current in StudentCB.ItemsSource)
                             await NetworkUtils.ExecuteDataAction<StatementResult>(null, new StatementResult
                             {
@@ -153,7 +156,7 @@ namespace InCollege.Client.UI.StatementsUI
                                 Student = (Account)current,
                                 Subject = (Subject)SubjectCB.SelectedItem,
                                 StatementResultDate = Statement.StatementDate,
-                                TicketNumber = ++ticketNumber,
+                                TicketNumber = fillTicketNumbers ? ++ticketNumber : -1,
                             }, DataAction.Save);
                         GroupCB.IsEnabled = true;
                         await UpdateData();
@@ -165,12 +168,11 @@ namespace InCollege.Client.UI.StatementsUI
                         return;
                     }
             handleGroupSelection = true;
-
         }
 
         async void SubjectCB_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            if (Statement != null)
+            if (Statement != null && !DestructionMode)
                 if (Statement.StatementType == StatementType.Middle || Statement.StatementType == StatementType.Exam)
                 {
                     IsEnabled = false;
@@ -302,7 +304,7 @@ namespace InCollege.Client.UI.StatementsUI
             await UpdateData();
         }
 
-        async void SaveMiddleStatementButton_Click(object sender, RoutedEventArgs e)
+        async void SaveStatementResultButton_Click(object sender, RoutedEventArgs e)
         {
             if (StudentCB.SelectedItem != null && MarkCB.SelectedItem != null)
             {
@@ -315,7 +317,7 @@ namespace InCollege.Client.UI.StatementsUI
             StatementResultDialog.IsOpen = false;
         }
 
-        async void CancelMiddleStatementButton_Click(object sender, RoutedEventArgs e)
+        async void CancelStatementResultButton_Click(object sender, RoutedEventArgs e)
         {
             StatementResultDialog.IsOpen = false;
             await UpdateData();
@@ -355,6 +357,7 @@ namespace InCollege.Client.UI.StatementsUI
             BindingOperations.GetBindingExpressionBase(StatementDatePicker, DatePicker.SelectedDateProperty).UpdateSource();
             if (Statement.StatementDate != null)
             {
+                DestructionMode = true;
                 OnSave?.Invoke(sender, e);
                 IsOpen = false;
             }
@@ -363,6 +366,7 @@ namespace InCollege.Client.UI.StatementsUI
 
         private void CancelButton_Click(object sender, RoutedEventArgs e)
         {
+            DestructionMode = true;
             StatementResultDialog.IsOpen = false;
             OnCancel?.Invoke(sender, e);
         }
@@ -474,5 +478,19 @@ namespace InCollege.Client.UI.StatementsUI
             return (StatementType)(int)value;
         }
     }
+
+    public class TicketNumberConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            return (int)value == -1 ? "" : value;
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            return int.TryParse(value.ToString(), out int intValue) ? intValue : -1;
+        }
+    }
+
     #endregion
 }

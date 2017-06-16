@@ -6,6 +6,7 @@
     <material:DialogHost.Resources>
         <local:StatementTypeToIntConverter x:Key="StatementTypeToIntConverter"/>
         <local:IndexConverter x:Key="IndexConverter"/>
+        <local:TicketNumberConverter x:Key="TicketNumberConverter"/>
     </material:DialogHost.Resources>
     <material:DialogHost.DialogContent>
         <Grid Margin="5"
@@ -155,7 +156,7 @@
                                                                            Converter={StaticResource IndexConverter}}" />
 
                                 <GridViewColumn x:Name="TicketNumberColumn"
-                                                DisplayMemberBinding="{Binding TicketNumber}"
+                                                DisplayMemberBinding="{Binding TicketNumber, Converter={StaticResource TicketNumberConverter}}"
                                                 Width="0">
                                     <GridViewColumn.Header>
                                         <GridViewColumnHeader Content="Номер билета" Name="TicketNumberColumnHeader" Visibility="Collapsed"/>
@@ -196,7 +197,7 @@
                                          Name="TicketNumberTB"
                                          PreviewTextInput="TicketNumberTB_PreviewTextInput"
                                          PreviewKeyDown="TicketNumberTB_PreviewKeyDown"
-                                         Text="{Binding TicketNumber}"
+                                         Text="{Binding TicketNumber, Converter={StaticResource TicketNumberConverter}}"
                                          material:HintAssist.IsFloating="True" 
                                          HorizontalContentAlignment="Center"
                                          Grid.Column="0"/>
@@ -220,13 +221,13 @@
                                     </ComboBox>
 
                                     <Button Grid.Column="1"
-                                        Click="SaveMiddleStatementButton_Click"
+                                        Click="SaveStatementResultButton_Click"
                                         Style="{StaticResource MaterialDesignFlatAccentButton}"
                                         Margin="0 15 0 0"
                                         Content="Сохранить"/>
                                     <Button Grid.Column="2"
                                         Foreground="Red"
-                                        Click="CancelMiddleStatementButton_Click"
+                                        Click="CancelStatementResultButton_Click"
                                         Style="{StaticResource MaterialDesignFlatAccentButton}"
                                         Content="Отмена"/>
                                 </StackPanel>
