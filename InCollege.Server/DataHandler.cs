@@ -195,11 +195,13 @@ namespace InCollege.Server
 
                         //Only admin can edit foreign accounts
                         //Aand admin can do really anything with them
-                        if (account.AccountType != AccountType.Admin || !account.Approved)
+                        if (account.AccountType != AccountType.Admin)
                         {
+                            //If it's not your account - go away.
                             if (account.ID != int.Parse((string)fields.FirstOrDefault(c => c.name == "ID").value))
                                 return new HttpResponse(HttpResponseCode.Forbidden, "Вы не можете редактировать данные другого аккаунта!", false);
 
+                            //You cannot change your 'Approved' status, if you aren't admin.
                             for (int i = 0; i < fields.Length; i++)
                                 if (fields[i].name.Equals("Approved")) fields[i] = ("Approved", account.Approved);
 
@@ -207,7 +209,11 @@ namespace InCollege.Server
                             if (query.TryGetByName("fieldAccountType", out byte accountType) &&
                                 accountType != (byte)account.AccountType)
                                 for (int i = 0; i < fields.Length; i++)
+                                {
                                     if (fields[i].name.Equals("Approved")) fields[i] = ("Approved", false);
+                                    //Username should be left unchanged
+                                    if (fields[i].name.Equals(nameof(Account.UserName))) fields[i] = (nameof(Account.UserName), account.UserName);
+                                }
                         }
                     }
                     #endregion
