@@ -57,6 +57,7 @@ namespace InCollege.Client.UI.MainUI
                     OutputItem.IsEnabled = false;
                     DictionariesItem.IsEnabled = false;
                     ParticipantsItem.IsEnabled = false;
+                    LogItem.IsEnabled = false;
                     StatementsPanel.Visibility = Visibility.Collapsed;
                     break;
 
@@ -65,6 +66,7 @@ namespace InCollege.Client.UI.MainUI
                     OutputItem.IsEnabled = false;
                     DictionariesItem.IsEnabled = false;
                     ParticipantsItem.IsEnabled = false;
+                    LogItem.IsEnabled = false;
                     StatementsPanel.Visibility = Visibility.Collapsed;
                     MarksPanel.Visibility = Visibility.Visible;
                     StatementResultsLV.ItemsSource =
@@ -76,6 +78,7 @@ namespace InCollege.Client.UI.MainUI
                 case AccountType.Professor:
                     DictionariesItem.IsEnabled = false;
                     ParticipantsItem.IsEnabled = false;
+                    LogItem.IsEnabled = false;
                     await UpdateStatementsData();
                     break;
 
@@ -422,6 +425,11 @@ namespace InCollege.Client.UI.MainUI
             new LogWindow().ShowDialog();
         }
         #endregion
+
+        void SettingsItem_Click(object sender, RoutedEventArgs e)
+        {
+            new SettingsWindow().ShowDialog();
+        }
     }
 
     class DistinctByStudentAndSubject : IEqualityComparer<StatementResult>

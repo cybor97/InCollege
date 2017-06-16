@@ -3,8 +3,8 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:material="http://materialdesigninxaml.net/winfx/xaml/themes"
         Style="{StaticResource BaseWindow}"
-        Title="Настройки подключения"
-        Width="300" Height="200">
+        Title="Настройки"
+        Width="300" Height="300">
     <Grid>
         <StackPanel Orientation="Vertical" VerticalAlignment="Top">
             <TextBox Text="{Binding HostName}" Name="HostNameTB" 
@@ -16,6 +16,16 @@
                  material:HintAssist.Hint="Номер порта"
                      Margin="0 5 0 0"
                      material:HintAssist.IsFloating="True"/>
+            <CheckBox Margin="0 10 0 0" IsChecked="{Binding AutoFillStudents}"
+                      Style="{StaticResource MaterialDesignAccentCheckBox}">
+                <TextBlock TextWrapping="Wrap"
+                           Text="Автозаполнение списка студентов в простых ведомостях"/>
+            </CheckBox>
+            <CheckBox Margin="0 10 0 0" IsChecked="{Binding AutoFillTicketNumbers}"
+                      Style="{StaticResource MaterialDesignAccentCheckBox}">
+                <TextBlock TextWrapping="Wrap"
+                           Text="Автозаполнение номеров экзаменационных билетов"/>
+            </CheckBox>
         </StackPanel>
 
         <Button VerticalAlignment="Bottom" Style="{StaticResource MaterialDesignFlatAccentButton}"
