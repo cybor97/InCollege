@@ -45,6 +45,8 @@ namespace InCollege.Client.UI.AccountsUI
             {
                 if (value != null)
                 {
+                    if (value == App.Account)
+                        UserNameTB.IsEnabled = false;
                     PasswordTB.Password = value.Password;
                     AccountTypeCB.SelectedIndex = (byte)value.AccountType;
                 }
@@ -76,8 +78,13 @@ namespace InCollege.Client.UI.AccountsUI
 
         void ProfileSaveButton_Click(object sender, RoutedEventArgs e)
         {
-            AccountDataContext.Modified = true;
-            RaiseEvent(new RoutedEventArgs(OnSaveEvent));
+            if (Account.ID != App.Account.ID || string.IsNullOrWhiteSpace(PasswordTB.Password) ||
+                MessageBox.Show("Пароль изменен, вы будете деавторизованы, продолжить?", "Смена пароля", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
+            {
+                AccountDataContext.Modified = true;
+                RaiseEvent(new RoutedEventArgs(OnSaveEvent));
+            }
+            else RaiseEvent(new RoutedEventArgs(OnCancelEvent));
         }
 
         void ProfileCancelButton_Click(object sender, RoutedEventArgs e)
