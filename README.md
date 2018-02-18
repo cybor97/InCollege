@@ -1,6 +1,8 @@
 # InCollege
 Transfered from private BitBucket repository.
+
 Translatводим...
+
 InCollege - система учета успеваемости, разработанная для ГБПОУ РК "Феодосийский политехнический техникум"
 Разработано на языке C# с использованием технологий uHttpSharp(сервер)+SQLite(портативная легковесная БД)+MaterialDesignInWpfToolkit(стили элементов управления).
 
